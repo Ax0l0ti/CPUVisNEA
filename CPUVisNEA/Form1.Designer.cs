@@ -1,4 +1,4 @@
-﻿namespace WindowsFormsApp1
+﻿namespace CPUVisNEA
 {
     partial class Form1
     {
