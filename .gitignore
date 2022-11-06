@@ -1,3 +1,5 @@
+
+#Literally Ignoring all. Causes error Message. They cant cause an error if I bin them
 CPUVisNEA/bin/*
 CPUVisNEA/obj/*
 .idea/*
