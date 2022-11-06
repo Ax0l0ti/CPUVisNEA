@@ -2,3 +2,5 @@ WindowsFormsApp1/bin/*
 WindowsFormsApp1/obj/*
 .idea/*
 .vs/*
+Test/bin/*
+Test/obj/*
