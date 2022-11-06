@@ -8,16 +8,11 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="766fd2ba-dfb4-4baa-b196-9364388eba02" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/.idea/.idea.WindowsFormsApp1/.idea/workspace.xml" afterDir="false" />
+    <list default="true" id="766fd2ba-dfb4-4baa-b196-9364388eba02" name="Changes" comment="Added tests.&#10;Initial testing of cross-ide gui designer.&#10;Proof of concept form working">
+      <change afterPath="$PROJECT_DIR$/NEA.sln" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/.idea.WindowsFormsApp1/.idea/.gitignore" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/.idea.WindowsFormsApp1/.idea/indexLayout.xml" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/.vs/WindowsFormsApp1/v17/.suo" beforeDir="false" afterPath="$PROJECT_DIR$/.vs/WindowsFormsApp1/v17/.suo" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/WindowsFormsApp1.sln" beforeDir="false" afterPath="$PROJECT_DIR$/NEA.sln" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/WindowsFormsApp1/Form1.Designer.cs" beforeDir="false" afterPath="$PROJECT_DIR$/WindowsFormsApp1/Form1.Designer.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/WindowsFormsApp1/Form1.cs" beforeDir="false" afterPath="$PROJECT_DIR$/WindowsFormsApp1/Form1.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/WindowsFormsApp1/Form1.resx" beforeDir="false" afterPath="$PROJECT_DIR$/WindowsFormsApp1/Form1.resx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/WindowsFormsApp1.sln" beforeDir="false" afterPath="$PROJECT_DIR$/WindowsFormsApp1.sln" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/WindowsFormsApp1/bin/Debug/WindowsFormsApp1.exe" beforeDir="false" afterPath="$PROJECT_DIR$/WindowsFormsApp1/bin/Debug/WindowsFormsApp1.exe" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/WindowsFormsApp1/bin/Debug/WindowsFormsApp1.pdb" beforeDir="false" afterPath="$PROJECT_DIR$/WindowsFormsApp1/bin/Debug/WindowsFormsApp1.pdb" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/WindowsFormsApp1/obj/Debug/WindowsFormsApp1.csproj.GenerateResource.cache" beforeDir="false" afterPath="$PROJECT_DIR$/WindowsFormsApp1/obj/Debug/WindowsFormsApp1.csproj.GenerateResource.cache" afterDir="false" />
@@ -39,6 +34,9 @@
   </component>
   <component name="HighlightingSettingsPerFile">
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/485db82a61b1468bbc9d4475ab6b2b8491700/f0/a0159752/Color.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Tests/obj/Debug/.NETFramework,Version=v4.7.2.AssemblyAttributes.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock://C:/Users/isaac/RiderProjects/WindowsFormsApp1/WindowsFormsApp1/Form1.Designer.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock://C:/Users/isaac/RiderProjects/WindowsFormsApp1/WindowsFormsApp1/Form1.cs" root0="SKIP_HIGHLIGHTING" />
   </component>
   <component name="MarkdownSettingsMigration">
     <option name="stateVersion" value="1" />
@@ -110,7 +108,7 @@
       <updated>1667135408210</updated>
       <workItem from="1667135423108" duration="719000" />
       <workItem from="1667136665959" duration="2572000" />
-      <workItem from="1667762638394" duration="2815000" />
+      <workItem from="1667762638394" duration="2968000" />
     </task>
     <task id="LOCAL-00001" summary="initial">
       <created>1667137017391</created>
@@ -126,7 +124,14 @@
       <option name="project" value="LOCAL" />
       <updated>1667137440906</updated>
     </task>
-    <option name="localTasksCounter" value="3" />
+    <task id="LOCAL-00003" summary="Added tests.&#10;Initial testing of cross-ide gui designer.&#10;Proof of concept form working">
+      <created>1667766055746</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1667766055746</updated>
+    </task>
+    <option name="localTasksCounter" value="4" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -149,6 +154,7 @@
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
     <MESSAGE value="initial" />
     <MESSAGE value="test" />
-    <option name="LAST_COMMIT_MESSAGE" value="test" />
+    <MESSAGE value="Added tests.&#10;Initial testing of cross-ide gui designer.&#10;Proof of concept form working" />
+    <option name="LAST_COMMIT_MESSAGE" value="Added tests.&#10;Initial testing of cross-ide gui designer.&#10;Proof of concept form working" />
   </component>
 </project>
