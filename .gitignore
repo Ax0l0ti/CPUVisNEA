@@ -1,6 +1,10 @@
-WindowsFormsApp1/bin/*
-WindowsFormsApp1/obj/*
+CPUVisNEA/bin/*
+CPUVisNEA/obj/*
 .idea/*
 .vs/*
 Tests/bin/*
 Tests/obj/*
+Testing/bin/*
+Testing/obj/*
+packages/*
+CPUVisNEA.sln.DotSettings.user
