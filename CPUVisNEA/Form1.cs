@@ -132,5 +132,9 @@ namespace CPUVisNEA
 
         }
 
+        private void DD_SelectedIndexChanged(object sender, EventArgs e)
+        {
+
+        }
     }
 }
