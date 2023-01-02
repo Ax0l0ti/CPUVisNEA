@@ -48,11 +48,11 @@ Scrollable and continuously add to log. Only remove after Compile
 
 namespace CPUVisNEA
 {
-    public partial class Form1 : Form
+    public partial class UI : Form
     {
         
         private bool flip = true;
-        public Form1()
+        public UI()
         {
             InitializeComponent();
         }
@@ -133,6 +133,11 @@ namespace CPUVisNEA
         }
 
         private void DD_SelectedIndexChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void btn_Compile_Click(object sender, EventArgs e)
         {
 
         }
