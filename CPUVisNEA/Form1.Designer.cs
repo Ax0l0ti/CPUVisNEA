@@ -29,231 +29,335 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.panel1 = new System.Windows.Forms.Panel();
-            this.UserCodeOrRAM = new System.Windows.Forms.ListBox();
-            this.textBox1 = new System.Windows.Forms.TextBox();
-            this.panel4 = new System.Windows.Forms.Panel();
-            this.textBox2 = new System.Windows.Forms.TextBox();
-            this.button4 = new System.Windows.Forms.Button();
-            this.button3 = new System.Windows.Forms.Button();
-            this.button2 = new System.Windows.Forms.Button();
-            this.button1 = new System.Windows.Forms.Button();
-            this.panel2 = new System.Windows.Forms.Panel();
-            this.textBox4 = new System.Windows.Forms.TextBox();
-            this.panel5 = new System.Windows.Forms.Panel();
-            this.textBox5 = new System.Windows.Forms.TextBox();
-            this.button5 = new System.Windows.Forms.Button();
-            this.button6 = new System.Windows.Forms.Button();
-            this.button7 = new System.Windows.Forms.Button();
-            this.button8 = new System.Windows.Forms.Button();
             this.backgroundWorker1 = new System.ComponentModel.BackgroundWorker();
-            this.panel1.SuspendLayout();
-            this.panel4.SuspendLayout();
-            this.panel5.SuspendLayout();
+            this.gb_userInput = new System.Windows.Forms.GroupBox();
+            this.gb_Execute = new System.Windows.Forms.GroupBox();
+            this.rb_runSpeed = new System.Windows.Forms.RadioButton();
+            this.btn_Compile = new System.Windows.Forms.Button();
+            this.txt_uProg = new System.Windows.Forms.TextBox();
+            this.pnl_uCodeManip = new System.Windows.Forms.Panel();
+            this.pnl_InpOut = new System.Windows.Forms.Panel();
+            this.button1 = new System.Windows.Forms.Button();
+            this.button2 = new System.Windows.Forms.Button();
+            this.button3 = new System.Windows.Forms.Button();
+            this.btn_LoadProg = new System.Windows.Forms.Button();
+            this.btn_ConvertBase = new System.Windows.Forms.Button();
+            this.btn_SaveProg = new System.Windows.Forms.Button();
+            this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.gb_outputs = new System.Windows.Forms.GroupBox();
+            this.txt_longFDE = new System.Windows.Forms.TextBox();
+            this.txt_shortFDE = new System.Windows.Forms.TextBox();
+            this.groupBox3 = new System.Windows.Forms.GroupBox();
+            this.backgroundWorker2 = new System.ComponentModel.BackgroundWorker();
+            this.gb_registers = new System.Windows.Forms.GroupBox();
+            this.DropDown_ = new System.Windows.Forms.ComboBox();
+            this.gb_Display = new System.Windows.Forms.GroupBox();
+            this.gb_userInput.SuspendLayout();
+            this.gb_Execute.SuspendLayout();
+            this.pnl_uCodeManip.SuspendLayout();
+            this.pnl_InpOut.SuspendLayout();
+            this.gb_outputs.SuspendLayout();
+            this.gb_Display.SuspendLayout();
             this.SuspendLayout();
             // 
-            // panel1
+            // gb_userInput
             // 
-            this.panel1.Controls.Add(this.UserCodeOrRAM);
-            this.panel1.Controls.Add(this.textBox1);
-            this.panel1.Controls.Add(this.panel4);
-            this.panel1.Location = new System.Drawing.Point(70, 57);
-            this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(841, 1215);
-            this.panel1.TabIndex = 0;
+            this.gb_userInput.Controls.Add(this.gb_Execute);
+            this.gb_userInput.Controls.Add(this.txt_uProg);
+            this.gb_userInput.Controls.Add(this.pnl_uCodeManip);
+            this.gb_userInput.Controls.Add(this.groupBox1);
+            this.gb_userInput.Location = new System.Drawing.Point(0, 0);
+            this.gb_userInput.Margin = new System.Windows.Forms.Padding(6);
+            this.gb_userInput.Name = "gb_userInput";
+            this.gb_userInput.Padding = new System.Windows.Forms.Padding(6);
+            this.gb_userInput.Size = new System.Drawing.Size(800, 1346);
+            this.gb_userInput.TabIndex = 0;
+            this.gb_userInput.TabStop = false;
+            this.gb_userInput.Text = "User Input";
+            this.gb_userInput.Enter += new System.EventHandler(this.gb_userInput_Enter);
             // 
-            // UserCodeOrRAM
+            // gb_Execute
             // 
-            this.UserCodeOrRAM.AllowDrop = true;
-            this.UserCodeOrRAM.FormattingEnabled = true;
-            this.UserCodeOrRAM.ItemHeight = 25;
-            this.UserCodeOrRAM.Items.AddRange(new object[] { "Ram Display / Machine code of User Code", "Code Input / Assembely Languge" });
-            this.UserCodeOrRAM.Location = new System.Drawing.Point(269, 41);
-            this.UserCodeOrRAM.Name = "UserCodeOrRAM";
-            this.UserCodeOrRAM.Size = new System.Drawing.Size(427, 79);
-            this.UserCodeOrRAM.TabIndex = 2;
-            this.UserCodeOrRAM.SelectedIndexChanged += new System.EventHandler(this.UserCodeOrRAM_SelectedIndexChanged);
+            this.gb_Execute.Controls.Add(this.rb_runSpeed);
+            this.gb_Execute.Controls.Add(this.btn_Compile);
+            this.gb_Execute.Location = new System.Drawing.Point(0, 962);
+            this.gb_Execute.Margin = new System.Windows.Forms.Padding(6);
+            this.gb_Execute.Name = "gb_Execute";
+            this.gb_Execute.Padding = new System.Windows.Forms.Padding(6);
+            this.gb_Execute.Size = new System.Drawing.Size(800, 288);
+            this.gb_Execute.TabIndex = 3;
+            this.gb_Execute.TabStop = false;
+            this.gb_Execute.Text = "Execution Buttons";
             // 
-            // textBox1
+            // rb_runSpeed
             // 
-            this.textBox1.Location = new System.Drawing.Point(269, 3);
-            this.textBox1.Name = "textBox1";
-            this.textBox1.Size = new System.Drawing.Size(300, 31);
-            this.textBox1.TabIndex = 1;
-            this.textBox1.Text = "DropBox  ";
-            this.textBox1.TextChanged += new System.EventHandler(this.textBox1_TextChanged);
+            this.rb_runSpeed.AllowDrop = true;
+            this.rb_runSpeed.AutoSize = true;
+            this.rb_runSpeed.BackColor = System.Drawing.Color.Navy;
+            this.rb_runSpeed.ForeColor = System.Drawing.SystemColors.ControlLight;
+            this.rb_runSpeed.Location = new System.Drawing.Point(520, 48);
+            this.rb_runSpeed.Margin = new System.Windows.Forms.Padding(6);
+            this.rb_runSpeed.Name = "rb_runSpeed";
+            this.rb_runSpeed.Size = new System.Drawing.Size(150, 29);
+            this.rb_runSpeed.TabIndex = 5;
+            this.rb_runSpeed.TabStop = true;
+            this.rb_runSpeed.Text = "Run Speed";
+            this.rb_runSpeed.UseVisualStyleBackColor = false;
             // 
-            // panel4
+            // btn_Compile
             // 
-            this.panel4.Controls.Add(this.textBox2);
-            this.panel4.Controls.Add(this.button4);
-            this.panel4.Controls.Add(this.button3);
-            this.panel4.Controls.Add(this.button2);
-            this.panel4.Controls.Add(this.button1);
-            this.panel4.Location = new System.Drawing.Point(14, 983);
-            this.panel4.Name = "panel4";
-            this.panel4.Size = new System.Drawing.Size(810, 219);
-            this.panel4.TabIndex = 0;
-            this.panel4.Paint += new System.Windows.Forms.PaintEventHandler(this.panel4_Paint);
+            this.btn_Compile.Location = new System.Drawing.Point(24, 37);
+            this.btn_Compile.Margin = new System.Windows.Forms.Padding(6);
+            this.btn_Compile.Name = "btn_Compile";
+            this.btn_Compile.Size = new System.Drawing.Size(150, 44);
+            this.btn_Compile.TabIndex = 4;
+            this.btn_Compile.Text = "Compile";
+            this.btn_Compile.UseVisualStyleBackColor = true;
             // 
-            // textBox2
+            // txt_uProg
             // 
-            this.textBox2.Location = new System.Drawing.Point(255, 16);
-            this.textBox2.Name = "textBox2";
-            this.textBox2.Size = new System.Drawing.Size(300, 31);
-            this.textBox2.TabIndex = 4;
-            this.textBox2.Text = "Button Control Panel";
-            this.textBox2.TextChanged += new System.EventHandler(this.textBox2_TextChanged);
+            this.txt_uProg.AcceptsTab = true;
+            this.txt_uProg.AllowDrop = true;
+            this.txt_uProg.Font = new System.Drawing.Font("Microsoft New Tai Lue", 15.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.txt_uProg.ForeColor = System.Drawing.SystemColors.WindowText;
+            this.txt_uProg.Location = new System.Drawing.Point(0, 192);
+            this.txt_uProg.Margin = new System.Windows.Forms.Padding(6);
+            this.txt_uProg.Multiline = true;
+            this.txt_uProg.Name = "txt_uProg";
+            this.txt_uProg.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
+            this.txt_uProg.Size = new System.Drawing.Size(796, 766);
+            this.txt_uProg.TabIndex = 3;
             // 
-            // button4
+            // pnl_uCodeManip
             // 
-            this.button4.Location = new System.Drawing.Point(215, 137);
-            this.button4.Name = "button4";
-            this.button4.Size = new System.Drawing.Size(167, 46);
-            this.button4.TabIndex = 3;
-            this.button4.Text = "button4";
-            this.button4.UseVisualStyleBackColor = true;
+            this.pnl_uCodeManip.Controls.Add(this.pnl_InpOut);
+            this.pnl_uCodeManip.Controls.Add(this.btn_LoadProg);
+            this.pnl_uCodeManip.Controls.Add(this.btn_ConvertBase);
+            this.pnl_uCodeManip.Controls.Add(this.btn_SaveProg);
+            this.pnl_uCodeManip.Location = new System.Drawing.Point(0, 0);
+            this.pnl_uCodeManip.Margin = new System.Windows.Forms.Padding(6);
+            this.pnl_uCodeManip.Name = "pnl_uCodeManip";
+            this.pnl_uCodeManip.Size = new System.Drawing.Size(800, 150);
+            this.pnl_uCodeManip.TabIndex = 2;
+            this.pnl_uCodeManip.Paint += new System.Windows.Forms.PaintEventHandler(this.pnl_uCodeManip_Paint);
             // 
-            // button3
+            // pnl_InpOut
             // 
-            this.button3.Location = new System.Drawing.Point(26, 137);
-            this.button3.Name = "button3";
-            this.button3.Size = new System.Drawing.Size(167, 46);
-            this.button3.TabIndex = 2;
-            this.button3.Text = "button3";
-            this.button3.UseVisualStyleBackColor = true;
-            // 
-            // button2
-            // 
-            this.button2.Location = new System.Drawing.Point(215, 76);
-            this.button2.Name = "button2";
-            this.button2.Size = new System.Drawing.Size(167, 46);
-            this.button2.TabIndex = 1;
-            this.button2.Text = "button2";
-            this.button2.UseVisualStyleBackColor = true;
+            this.pnl_InpOut.Controls.Add(this.button1);
+            this.pnl_InpOut.Controls.Add(this.button2);
+            this.pnl_InpOut.Controls.Add(this.button3);
+            this.pnl_InpOut.Location = new System.Drawing.Point(8, 8);
+            this.pnl_InpOut.Margin = new System.Windows.Forms.Padding(6);
+            this.pnl_InpOut.Name = "pnl_InpOut";
+            this.pnl_InpOut.Size = new System.Drawing.Size(800, 150);
+            this.pnl_InpOut.TabIndex = 3;
             // 
             // button1
             // 
-            this.button1.Location = new System.Drawing.Point(26, 76);
+            this.button1.AccessibleRole = System.Windows.Forms.AccessibleRole.DropList;
+            this.button1.Location = new System.Drawing.Point(68, 38);
             this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(167, 46);
-            this.button1.TabIndex = 0;
-            this.button1.Text = "button1";
+            this.button1.Size = new System.Drawing.Size(239, 69);
+            this.button1.TabIndex = 2;
+            this.button1.Text = "Load Premade Program";
             this.button1.UseVisualStyleBackColor = true;
             // 
-            // panel2
+            // button2
             // 
-            this.panel2.Location = new System.Drawing.Point(1750, 57);
-            this.panel2.Name = "panel2";
-            this.panel2.Size = new System.Drawing.Size(839, 1229);
-            this.panel2.TabIndex = 1;
+            this.button2.Location = new System.Drawing.Point(561, 38);
+            this.button2.Name = "button2";
+            this.button2.Size = new System.Drawing.Size(210, 69);
+            this.button2.TabIndex = 1;
+            this.button2.Text = "Convert Program to Assembley/Binary";
+            this.button2.UseVisualStyleBackColor = true;
             // 
-            // textBox4
+            // button3
             // 
-            this.textBox4.Location = new System.Drawing.Point(1176, 1056);
-            this.textBox4.Name = "textBox4";
-            this.textBox4.Size = new System.Drawing.Size(300, 31);
-            this.textBox4.TabIndex = 4;
-            this.textBox4.Text = "Registers";
-            this.textBox4.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            this.button3.Location = new System.Drawing.Point(363, 38);
+            this.button3.Name = "button3";
+            this.button3.Size = new System.Drawing.Size(170, 69);
+            this.button3.TabIndex = 0;
+            this.button3.Text = "Save program";
+            this.button3.UseVisualStyleBackColor = true;
             // 
-            // panel5
+            // btn_LoadProg
             // 
-            this.panel5.Controls.Add(this.textBox5);
-            this.panel5.Controls.Add(this.button5);
-            this.panel5.Controls.Add(this.button6);
-            this.panel5.Controls.Add(this.button7);
-            this.panel5.Controls.Add(this.button8);
-            this.panel5.Location = new System.Drawing.Point(917, 57);
-            this.panel5.Name = "panel5";
-            this.panel5.Size = new System.Drawing.Size(810, 219);
-            this.panel5.TabIndex = 5;
-            this.panel5.Paint += new System.Windows.Forms.PaintEventHandler(this.panel5_Paint);
+            this.btn_LoadProg.AccessibleRole = System.Windows.Forms.AccessibleRole.DropList;
+            this.btn_LoadProg.Location = new System.Drawing.Point(68, 38);
+            this.btn_LoadProg.Name = "btn_LoadProg";
+            this.btn_LoadProg.Size = new System.Drawing.Size(239, 69);
+            this.btn_LoadProg.TabIndex = 2;
+            this.btn_LoadProg.Text = "Load Premade Program";
+            this.btn_LoadProg.UseVisualStyleBackColor = true;
             // 
-            // textBox5
+            // btn_ConvertBase
             // 
-            this.textBox5.Location = new System.Drawing.Point(255, 94);
-            this.textBox5.Name = "textBox5";
-            this.textBox5.Size = new System.Drawing.Size(300, 31);
-            this.textBox5.TabIndex = 4;
-            this.textBox5.Text = "Button Control Panel";
+            this.btn_ConvertBase.Location = new System.Drawing.Point(561, 38);
+            this.btn_ConvertBase.Name = "btn_ConvertBase";
+            this.btn_ConvertBase.Size = new System.Drawing.Size(210, 69);
+            this.btn_ConvertBase.TabIndex = 1;
+            this.btn_ConvertBase.Text = "Convert Program to Assembley/Binary";
+            this.btn_ConvertBase.UseVisualStyleBackColor = true;
             // 
-            // button5
+            // btn_SaveProg
             // 
-            this.button5.Location = new System.Drawing.Point(599, 16);
-            this.button5.Name = "button5";
-            this.button5.Size = new System.Drawing.Size(167, 46);
-            this.button5.TabIndex = 3;
-            this.button5.Text = "button5";
-            this.button5.UseVisualStyleBackColor = true;
+            this.btn_SaveProg.Location = new System.Drawing.Point(363, 38);
+            this.btn_SaveProg.Name = "btn_SaveProg";
+            this.btn_SaveProg.Size = new System.Drawing.Size(170, 69);
+            this.btn_SaveProg.TabIndex = 0;
+            this.btn_SaveProg.Text = "Save program";
+            this.btn_SaveProg.UseVisualStyleBackColor = true;
             // 
-            // button6
+            // groupBox1
             // 
-            this.button6.Location = new System.Drawing.Point(403, 16);
-            this.button6.Name = "button6";
-            this.button6.Size = new System.Drawing.Size(167, 46);
-            this.button6.TabIndex = 2;
-            this.button6.Text = "button6";
-            this.button6.UseVisualStyleBackColor = true;
+            this.groupBox1.Location = new System.Drawing.Point(1600, 0);
+            this.groupBox1.Margin = new System.Windows.Forms.Padding(6);
+            this.groupBox1.Name = "groupBox1";
+            this.groupBox1.Padding = new System.Windows.Forms.Padding(6);
+            this.groupBox1.Size = new System.Drawing.Size(800, 1346);
+            this.groupBox1.TabIndex = 1;
+            this.groupBox1.TabStop = false;
+            this.groupBox1.Text = "User Input";
             // 
-            // button7
+            // gb_outputs
             // 
-            this.button7.Location = new System.Drawing.Point(208, 16);
-            this.button7.Name = "button7";
-            this.button7.Size = new System.Drawing.Size(167, 46);
-            this.button7.TabIndex = 1;
-            this.button7.Text = "button7";
-            this.button7.UseVisualStyleBackColor = true;
+            this.gb_outputs.Controls.Add(this.txt_longFDE);
+            this.gb_outputs.Controls.Add(this.txt_shortFDE);
+            this.gb_outputs.Controls.Add(this.groupBox3);
+            this.gb_outputs.Location = new System.Drawing.Point(1600, 0);
+            this.gb_outputs.Margin = new System.Windows.Forms.Padding(6);
+            this.gb_outputs.Name = "gb_outputs";
+            this.gb_outputs.Padding = new System.Windows.Forms.Padding(6);
+            this.gb_outputs.Size = new System.Drawing.Size(800, 1346);
+            this.gb_outputs.TabIndex = 2;
+            this.gb_outputs.TabStop = false;
+            this.gb_outputs.Text = "Console Logs";
             // 
-            // button8
+            // txt_longFDE
             // 
-            this.button8.Location = new System.Drawing.Point(19, 16);
-            this.button8.Name = "button8";
-            this.button8.Size = new System.Drawing.Size(167, 46);
-            this.button8.TabIndex = 0;
-            this.button8.Text = "button8";
-            this.button8.UseVisualStyleBackColor = true;
+            this.txt_longFDE.AllowDrop = true;
+            this.txt_longFDE.Location = new System.Drawing.Point(20, 767);
+            this.txt_longFDE.Margin = new System.Windows.Forms.Padding(6);
+            this.txt_longFDE.Multiline = true;
+            this.txt_longFDE.Name = "txt_longFDE";
+            this.txt_longFDE.ReadOnly = true;
+            this.txt_longFDE.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
+            this.txt_longFDE.Size = new System.Drawing.Size(756, 381);
+            this.txt_longFDE.TabIndex = 3;
+            // 
+            // txt_shortFDE
+            // 
+            this.txt_shortFDE.AllowDrop = true;
+            this.txt_shortFDE.Location = new System.Drawing.Point(20, 192);
+            this.txt_shortFDE.Margin = new System.Windows.Forms.Padding(6);
+            this.txt_shortFDE.Multiline = true;
+            this.txt_shortFDE.Name = "txt_shortFDE";
+            this.txt_shortFDE.ReadOnly = true;
+            this.txt_shortFDE.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
+            this.txt_shortFDE.Size = new System.Drawing.Size(756, 381);
+            this.txt_shortFDE.TabIndex = 2;
+            // 
+            // groupBox3
+            // 
+            this.groupBox3.Location = new System.Drawing.Point(1600, 0);
+            this.groupBox3.Margin = new System.Windows.Forms.Padding(6);
+            this.groupBox3.Name = "groupBox3";
+            this.groupBox3.Padding = new System.Windows.Forms.Padding(6);
+            this.groupBox3.Size = new System.Drawing.Size(800, 1346);
+            this.groupBox3.TabIndex = 1;
+            this.groupBox3.TabStop = false;
+            this.groupBox3.Text = "User Input";
+            // 
+            // gb_registers
+            // 
+            this.gb_registers.Location = new System.Drawing.Point(0, 962);
+            this.gb_registers.Margin = new System.Windows.Forms.Padding(6);
+            this.gb_registers.Name = "gb_registers";
+            this.gb_registers.Padding = new System.Windows.Forms.Padding(6);
+            this.gb_registers.Size = new System.Drawing.Size(800, 288);
+            this.gb_registers.TabIndex = 2;
+            this.gb_registers.TabStop = false;
+            this.gb_registers.Text = "Registers";
+            // 
+            // DropDown_
+            // 
+            this.DropDown_.AccessibleRole = System.Windows.Forms.AccessibleRole.ButtonDropDown;
+            this.DropDown_.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.ListItems;
+            this.DropDown_.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.DropDown_.DropDownWidth = 200;
+            this.DropDown_.Font = new System.Drawing.Font("Microsoft Sans Serif", 16.125F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.DropDown_.FormattingEnabled = true;
+            this.DropDown_.Items.AddRange(new object[] {
+            "Test",
+            "Testy 2"});
+            this.DropDown_.Location = new System.Drawing.Point(50, 50);
+            this.DropDown_.Name = "DropDown_";
+            this.DropDown_.Size = new System.Drawing.Size(344, 59);
+            this.DropDown_.TabIndex = 3;
+            this.DropDown_.SelectedIndexChanged += new System.EventHandler(this.DropDownTest_SelectedIndexChanged);
+            // 
+            // gb_Display
+            // 
+            this.gb_Display.Controls.Add(this.DropDown_);
+            this.gb_Display.Controls.Add(this.gb_registers);
+            this.gb_Display.Location = new System.Drawing.Point(800, 0);
+            this.gb_Display.Margin = new System.Windows.Forms.Padding(6);
+            this.gb_Display.Name = "gb_Display";
+            this.gb_Display.Padding = new System.Windows.Forms.Padding(6);
+            this.gb_Display.Size = new System.Drawing.Size(800, 1346);
+            this.gb_Display.TabIndex = 1;
+            this.gb_Display.TabStop = false;
+            this.gb_Display.Text = "CPU stuff";
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(12F, 25F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(2620, 1348);
-            this.Controls.Add(this.panel5);
-            this.Controls.Add(this.textBox4);
-            this.Controls.Add(this.panel2);
-            this.Controls.Add(this.panel1);
+            this.AutoScroll = true;
+            this.BackColor = System.Drawing.SystemColors.WindowFrame;
+            this.ClientSize = new System.Drawing.Size(2368, 1271);
+            this.Controls.Add(this.gb_outputs);
+            this.Controls.Add(this.gb_Display);
+            this.Controls.Add(this.gb_userInput);
+            this.Margin = new System.Windows.Forms.Padding(4);
             this.Name = "Form1";
             this.Text = "Form1";
-            this.panel1.ResumeLayout(false);
-            this.panel1.PerformLayout();
-            this.panel4.ResumeLayout(false);
-            this.panel4.PerformLayout();
-            this.panel5.ResumeLayout(false);
-            this.panel5.PerformLayout();
+            this.gb_userInput.ResumeLayout(false);
+            this.gb_userInput.PerformLayout();
+            this.gb_Execute.ResumeLayout(false);
+            this.gb_Execute.PerformLayout();
+            this.pnl_uCodeManip.ResumeLayout(false);
+            this.pnl_InpOut.ResumeLayout(false);
+            this.gb_outputs.ResumeLayout(false);
+            this.gb_outputs.PerformLayout();
+            this.gb_Display.ResumeLayout(false);
             this.ResumeLayout(false);
-            this.PerformLayout();
+
         }
 
         #endregion
-
-        private System.Windows.Forms.Panel panel1;
-        private System.Windows.Forms.TextBox textBox1;
-        private System.Windows.Forms.Panel panel4;
-        private System.Windows.Forms.Button button4;
-        private System.Windows.Forms.Button button3;
-        private System.Windows.Forms.Button button2;
-        private System.Windows.Forms.Button button1;
-        private System.Windows.Forms.Panel panel2;
-        private System.Windows.Forms.TextBox textBox2;
-        private System.Windows.Forms.TextBox textBox4;
-        private System.Windows.Forms.Panel panel5;
-        private System.Windows.Forms.TextBox textBox5;
-        private System.Windows.Forms.Button button5;
-        private System.Windows.Forms.Button button6;
-        private System.Windows.Forms.Button button7;
-        private System.Windows.Forms.Button button8;
         private System.ComponentModel.BackgroundWorker backgroundWorker1;
-        private System.Windows.Forms.ListBox UserCodeOrRAM;
+        private System.Windows.Forms.GroupBox gb_userInput;
+        private System.Windows.Forms.GroupBox gb_Execute;
+        private System.Windows.Forms.RadioButton rb_runSpeed;
+        private System.Windows.Forms.Button btn_Compile;
+        private System.Windows.Forms.TextBox txt_uProg;
+        private System.Windows.Forms.Panel pnl_uCodeManip;
+        private System.Windows.Forms.GroupBox groupBox1;
+        private System.Windows.Forms.GroupBox gb_outputs;
+        private System.Windows.Forms.GroupBox groupBox3;
+        private System.ComponentModel.BackgroundWorker backgroundWorker2;
+        private System.Windows.Forms.TextBox txt_longFDE;
+        private System.Windows.Forms.TextBox txt_shortFDE;
+        private System.Windows.Forms.Button btn_SaveProg;
+        private System.Windows.Forms.Button btn_LoadProg;
+        private System.Windows.Forms.Button btn_ConvertBase;
+        private System.Windows.Forms.Panel pnl_InpOut;
+        private System.Windows.Forms.Button button1;
+        private System.Windows.Forms.Button button2;
+        private System.Windows.Forms.Button button3;
+        private System.Windows.Forms.GroupBox gb_registers;
+        public System.Windows.Forms.ComboBox DropDown_;
+        private System.Windows.Forms.GroupBox gb_Display;
     }
 }

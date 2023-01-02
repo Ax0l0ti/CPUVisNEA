@@ -6,12 +6,13 @@ using NUnit.Framework;
 namespace Testing
 {
     [TestFixture]
-    public class ChessBoardTests
+    public class CpuTests
     {
         [Test]
-        public void TestSetStartPosition()
+        public void TestofTests()
         {
             Console.WriteLine("sup g");
         }
     }
 }
+
