@@ -100,8 +100,7 @@ namespace CPUVisNEA
 
             private void txt_uProg_TextChanged(object sender, EventArgs e)
             {
-                throw new System.NotImplementedException();
-
+                
             }
         }
     public class CPU
