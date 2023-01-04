@@ -8,11 +8,19 @@ namespace Testing
     [TestFixture]
     public class CpuTests
     {
-        [Test]
-        public void TestofTests()
+
+        [Test] public void TestofTests()
         {
             Console.WriteLine("sup g");
+            
+        }
+  
+        [Test] public void km()
+        {
+            
+            
         }
     }
 }
+
 

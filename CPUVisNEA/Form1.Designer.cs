@@ -1,4 +1,6 @@
-﻿namespace CPUVisNEA
+﻿
+
+namespace CPUVisNEA
 {
     partial class UI
     {
@@ -39,6 +41,7 @@
             this.gb_registers = new System.Windows.Forms.GroupBox();
             this.txt_TEMPORARY = new System.Windows.Forms.TextBox();
             this.gb_Display = new System.Windows.Forms.GroupBox();
+            this.meme1 = new System.Windows.Forms.PictureBox();
             this.gb_InpOut = new System.Windows.Forms.GroupBox();
             this.txt_out = new System.Windows.Forms.TextBox();
             this.txt_Inp = new System.Windows.Forms.TextBox();
@@ -54,15 +57,14 @@
             this.btn_UIType = new System.Windows.Forms.Button();
             this.btn_Save = new System.Windows.Forms.Button();
             this.gb_userInput = new System.Windows.Forms.GroupBox();
-            this.meme1 = new System.Windows.Forms.PictureBox();
             this.gb_outputs.SuspendLayout();
             this.gb_registers.SuspendLayout();
             this.gb_Display.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.meme1)).BeginInit();
             this.gb_InpOut.SuspendLayout();
             this.gb_Execute.SuspendLayout();
             this.gb_UAssControls.SuspendLayout();
             this.gb_userInput.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.meme1)).BeginInit();
             this.SuspendLayout();
             // 
             // gb_outputs
@@ -95,8 +97,7 @@
             this.txt_longFDE.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
             this.txt_longFDE.Size = new System.Drawing.Size(756, 381);
             this.txt_longFDE.TabIndex = 3;
-            this.txt_longFDE.Text = "\r\nEntire Console Log of CPU FDE Cycle. \r\nScrollable \r\nDoesnt overwrite\r\n\r\nReadOnl" +
-    "y Textbox\r\n\r\n\r\n";
+            this.txt_longFDE.Text = "\r\nEntire Console Log of CPU FDE Cycle. \r\nScrollable \r\nDoesnt overwrite\r\n\r\nReadOnl" + "y Textbox\r\n\r\n\r\n";
             // 
             // txt_shortFDE
             // 
@@ -112,8 +113,7 @@
             this.txt_shortFDE.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
             this.txt_shortFDE.Size = new System.Drawing.Size(756, 381);
             this.txt_shortFDE.TabIndex = 2;
-            this.txt_shortFDE.Text = "\r\nSingle Cycle Detailed Log of current CPU FDE Cycle. \r\nScrollable \r\nwill overwri" +
-    "te with each cycle \r\n\r\nReadOnly Textbox";
+            this.txt_shortFDE.Text = "\r\nSingle Cycle Detailed Log of current CPU FDE Cycle. \r\nScrollable \r\nwill overwri" + "te with each cycle \r\n\r\nReadOnly Textbox";
             // 
             // groupBox3
             // 
@@ -154,8 +154,7 @@
             this.txt_TEMPORARY.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
             this.txt_TEMPORARY.Size = new System.Drawing.Size(682, 165);
             this.txt_TEMPORARY.TabIndex = 4;
-            this.txt_TEMPORARY.Text = "TEMPORARY DEMINSTRATION\r\nPC        MAR      MDR \r\nValue    Value    Value \r\n\r\nACC" +
-    "      CIR        MBF\r\nValue    Value    Value \r\n";
+            this.txt_TEMPORARY.Text = "TEMPORARY DEMINSTRATION\r\nPC        MAR      MDR \r\nValue    Value    Value \r\n\r\nACC" + "      CIR        MBF\r\nValue    Value    Value \r\n";
             this.txt_TEMPORARY.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             // 
             // gb_Display
@@ -173,6 +172,16 @@
             this.gb_Display.TabIndex = 1;
             this.gb_Display.TabStop = false;
             this.gb_Display.Text = "CPU stuff";
+            // 
+            // meme1
+            // 
+            this.meme1.Image = global::CPUVisNEA.Properties.Resources.GoodGlasses;
+            this.meme1.Location = new System.Drawing.Point(34, 400);
+            this.meme1.Name = "meme1";
+            this.meme1.Size = new System.Drawing.Size(741, 466);
+            this.meme1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
+            this.meme1.TabIndex = 4;
+            this.meme1.TabStop = false;
             // 
             // gb_InpOut
             // 
@@ -204,8 +213,7 @@
             this.txt_out.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
             this.txt_out.Size = new System.Drawing.Size(300, 200);
             this.txt_out.TabIndex = 3;
-            this.txt_out.Text = "Output\r\n-----------------\r\nTextBox to record Program Outputs/Prints whilst runnin" +
-    "g user program\r\n\r\n\r\n";
+            this.txt_out.Text = "Output\r\n-----------------\r\nTextBox to record Program Outputs/Prints whilst runnin" + "g user program\r\n\r\n\r\n";
             // 
             // txt_Inp
             // 
@@ -221,8 +229,7 @@
             this.txt_Inp.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
             this.txt_Inp.Size = new System.Drawing.Size(300, 200);
             this.txt_Inp.TabIndex = 2;
-            this.txt_Inp.Text = "Input\r\n-----------------\r\nTextBox to record user inputs whilst running the assemb" +
-    "ely program";
+            this.txt_Inp.Text = "Input\r\n-----------------\r\nTextBox to record user inputs whilst running the assemb" + "ely program";
             // 
             // groupBox4
             // 
@@ -262,6 +269,7 @@
             this.txt_uProg.Size = new System.Drawing.Size(784, 766);
             this.txt_uProg.TabIndex = 3;
             this.txt_uProg.Text = resources.GetString("txt_uProg.Text");
+            this.txt_uProg.TextChanged += new System.EventHandler(this.txt_uProg_TextChanged);
             // 
             // gb_Execute
             // 
@@ -288,12 +296,7 @@
             this.DD_Scheme.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.DD_Scheme.Font = new System.Drawing.Font("Microsoft Sans Serif", 16.125F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.DD_Scheme.FormattingEnabled = true;
-            this.DD_Scheme.Items.AddRange(new object[] {
-            "Dark Mode",
-            "Light Mode",
-            "Colour Blind",
-            "Hacker ",
-            "Custom"});
+            this.DD_Scheme.Items.AddRange(new object[] { "Dark Mode", "Light Mode", "Colour Blind", "Hacker ", "Custom" });
             this.DD_Scheme.Location = new System.Drawing.Point(390, 126);
             this.DD_Scheme.Name = "DD_Scheme";
             this.DD_Scheme.Size = new System.Drawing.Size(346, 59);
@@ -307,12 +310,7 @@
             this.DD_Speed.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.DD_Speed.Font = new System.Drawing.Font("Microsoft Sans Serif", 16.125F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.DD_Speed.FormattingEnabled = true;
-            this.DD_Speed.Items.AddRange(new object[] {
-            "Real time execution",
-            "Fast",
-            "Medium",
-            "Slow",
-            "User Controlled Step"});
+            this.DD_Speed.Items.AddRange(new object[] { "Real time execution", "Fast", "Medium", "Slow", "User Controlled Step" });
             this.DD_Speed.Location = new System.Drawing.Point(390, 32);
             this.DD_Speed.Name = "DD_Speed";
             this.DD_Speed.Size = new System.Drawing.Size(346, 59);
@@ -357,10 +355,7 @@
             this.DD_LoadProg.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.DD_LoadProg.Font = new System.Drawing.Font("Microsoft Sans Serif", 16.125F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.DD_LoadProg.FormattingEnabled = true;
-            this.DD_LoadProg.Items.AddRange(new object[] {
-            "Km ",
-            "We vibe ",
-            "NOt again"});
+            this.DD_LoadProg.Items.AddRange(new object[] { "Km ", "We vibe ", "NOt again" });
             this.DD_LoadProg.Location = new System.Drawing.Point(28, 35);
             this.DD_LoadProg.Name = "DD_LoadProg";
             this.DD_LoadProg.Size = new System.Drawing.Size(278, 59);
@@ -408,16 +403,6 @@
             this.gb_userInput.Text = "User Input";
             this.gb_userInput.Enter += new System.EventHandler(this.gb_userInput_Enter);
             // 
-            // meme1
-            // 
-            this.meme1.Image = global::CPUVisNEA.Properties.Resources.GoodGlasses;
-            this.meme1.Location = new System.Drawing.Point(34, 400);
-            this.meme1.Name = "meme1";
-            this.meme1.Size = new System.Drawing.Size(741, 466);
-            this.meme1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
-            this.meme1.TabIndex = 4;
-            this.meme1.TabStop = false;
-            // 
             // UI
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(12F, 25F);
@@ -439,15 +424,14 @@
             this.gb_registers.ResumeLayout(false);
             this.gb_registers.PerformLayout();
             this.gb_Display.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.meme1)).EndInit();
             this.gb_InpOut.ResumeLayout(false);
             this.gb_InpOut.PerformLayout();
             this.gb_Execute.ResumeLayout(false);
             this.gb_UAssControls.ResumeLayout(false);
             this.gb_userInput.ResumeLayout(false);
             this.gb_userInput.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.meme1)).EndInit();
             this.ResumeLayout(false);
-
         }
 
         #endregion
@@ -477,4 +461,10 @@
         private System.Windows.Forms.GroupBox gb_userInput;
         private System.Windows.Forms.PictureBox meme1;
     }
+    
+    
+    
+    
+    
+    
 }
