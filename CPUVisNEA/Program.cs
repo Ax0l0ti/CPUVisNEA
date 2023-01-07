@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using CPUVisNEA.Properties;
 
 namespace CPUVisNEA
 {
@@ -16,9 +17,11 @@ namespace CPUVisNEA
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new UI());
+            var cpu = new CPU();
+            var ui = new UI(cpu);
+            Application.Run(ui);
+            
         }
-
 
     }
 }

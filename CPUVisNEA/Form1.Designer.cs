@@ -41,7 +41,6 @@ namespace CPUVisNEA
             this.gb_registers = new System.Windows.Forms.GroupBox();
             this.txt_TEMPORARY = new System.Windows.Forms.TextBox();
             this.gb_Display = new System.Windows.Forms.GroupBox();
-            this.meme1 = new System.Windows.Forms.PictureBox();
             this.gb_InpOut = new System.Windows.Forms.GroupBox();
             this.txt_out = new System.Windows.Forms.TextBox();
             this.txt_Inp = new System.Windows.Forms.TextBox();
@@ -60,7 +59,6 @@ namespace CPUVisNEA
             this.gb_outputs.SuspendLayout();
             this.gb_registers.SuspendLayout();
             this.gb_Display.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.meme1)).BeginInit();
             this.gb_InpOut.SuspendLayout();
             this.gb_Execute.SuspendLayout();
             this.gb_UAssControls.SuspendLayout();
@@ -88,6 +86,7 @@ namespace CPUVisNEA
             this.txt_longFDE.AllowDrop = true;
             this.txt_longFDE.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(90)))), ((int)(((byte)(90)))), ((int)(((byte)(90)))));
             this.txt_longFDE.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            this.txt_longFDE.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.txt_longFDE.ForeColor = System.Drawing.Color.White;
             this.txt_longFDE.Location = new System.Drawing.Point(20, 767);
             this.txt_longFDE.Margin = new System.Windows.Forms.Padding(6);
@@ -104,6 +103,7 @@ namespace CPUVisNEA
             this.txt_shortFDE.AllowDrop = true;
             this.txt_shortFDE.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(90)))), ((int)(((byte)(90)))), ((int)(((byte)(90)))));
             this.txt_shortFDE.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            this.txt_shortFDE.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.txt_shortFDE.ForeColor = System.Drawing.Color.White;
             this.txt_shortFDE.Location = new System.Drawing.Point(20, 192);
             this.txt_shortFDE.Margin = new System.Windows.Forms.Padding(6);
@@ -160,7 +160,6 @@ namespace CPUVisNEA
             // gb_Display
             // 
             this.gb_Display.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(70)))), ((int)(((byte)(70)))), ((int)(((byte)(70)))));
-            this.gb_Display.Controls.Add(this.meme1);
             this.gb_Display.Controls.Add(this.gb_InpOut);
             this.gb_Display.Controls.Add(this.gb_registers);
             this.gb_Display.ForeColor = System.Drawing.Color.White;
@@ -172,16 +171,6 @@ namespace CPUVisNEA
             this.gb_Display.TabIndex = 1;
             this.gb_Display.TabStop = false;
             this.gb_Display.Text = "CPU stuff";
-            // 
-            // meme1
-            // 
-            this.meme1.Image = global::CPUVisNEA.Properties.Resources.GoodGlasses;
-            this.meme1.Location = new System.Drawing.Point(34, 400);
-            this.meme1.Name = "meme1";
-            this.meme1.Size = new System.Drawing.Size(741, 466);
-            this.meme1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
-            this.meme1.TabIndex = 4;
-            this.meme1.TabStop = false;
             // 
             // gb_InpOut
             // 
@@ -424,7 +413,6 @@ namespace CPUVisNEA
             this.gb_registers.ResumeLayout(false);
             this.gb_registers.PerformLayout();
             this.gb_Display.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.meme1)).EndInit();
             this.gb_InpOut.ResumeLayout(false);
             this.gb_InpOut.PerformLayout();
             this.gb_Execute.ResumeLayout(false);
@@ -459,7 +447,6 @@ namespace CPUVisNEA
         private System.Windows.Forms.Button btn_UIType;
         private System.Windows.Forms.Button btn_Save;
         private System.Windows.Forms.GroupBox gb_userInput;
-        private System.Windows.Forms.PictureBox meme1;
     }
     
     
