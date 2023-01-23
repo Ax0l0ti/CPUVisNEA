@@ -14,7 +14,11 @@ namespace CPUVisNEA
         public List<Register> BasicRegisters = new List<Register>(10);
         public RAM Ram = new RAM();
         public ALU Alu = new ALU();
-        
+
+        private void ChangeState()
+        {
+            
+        }
     }
     public class RAM
     {
@@ -36,15 +40,21 @@ namespace CPUVisNEA
             return newContent;
         }
 
-        // private List<string> Ass2Bin()
-        // {
-        //     
-        // }
-        //
-        // private List<string> Bin2Ass()
-        // {
-        //     
-        // }
+        private List<string> Ass2Bin()
+        {
+            //for all lines run algorithm to change assembely track to binary equivelant
+
+
+            return UProgRAM;
+        } 
+        
+        private List<string> Bin2Ass()
+        {
+            //opposite search of bin to ass for all lines
+            //both stored as strings 
+            
+            return UProgRAM;
+        }
         
 
     }
@@ -63,6 +73,11 @@ namespace CPUVisNEA
         protected Register(bool assAllowed, string contol)
         {
         
+        }
+
+        protected int RetContent()
+        {
+            return content;
         }
     } 
     //needs to be improved below 
@@ -84,22 +99,59 @@ namespace CPUVisNEA
 
     public class ALU
     {
+        
         /*
-        LDR Rd, <memory ref> Load the value stored in the memory location specified by <memory ref> into register d.
-        STR Rd, <memory ref> Store the value that is in register d into the memory location specified by <memory ref>.
-        ADD Rd, Rn, <operand2> Add the value specified in <operand2> to the value in register n and store the result in register d.
-        SUB Rd, Rn, <operand2> Subtract the value specified by <operand2> from the value in register n and store the result in register d.
-        MOV Rd, <operand2> Copy the value specified by <operand2> into register d.
-        CMP Rn, <operand2> Compare the value stored in register n with the value specified by <operand2>.
-        B <label> Always branch to the instruction at position <label> in the program.
-        B<condition> <label> Conditionally branch to the instruction at position <label> in the program if the last comparison met the criteria specified by the <condition>. Possible values for <condition> and their meaning are: EQ:Equal to, NE:Not equal to, GT:Greater than, LT:Less than.
-        AND Rd, Rn, <operand2> Perform a bitwise logical AND operation between the value in register n and the value specified by <operand2> and store the result in register d.
-        ORR Rd, Rn, <operand2> Perform a bitwise logical OR operation between the value in register n and the value specified by <operand2> and store the result in register d.
-        EOR Rd, Rn, <operand2> Perform a bitwise logical exclusive or (XOR) operation between the value in register n and the value specified by <operand2> and store the result in register d.
-        MVN Rd, <operand2> Perform a bitwise logical NOT operation on the value specified by <operand2> and store the result in register d.
-        LSL Rd, Rn, <operand2> Logically shift left the value stored in register n by the number of bits specified by <operand2> and store the result in register d.
-        LSR Rd, Rn, <operand2> Logically shift right the value stored in register n by the number of bits specified by <operand2> and store the result in register d.
-        HALT Stop the execution of the program.
+        
+        //LDR Rd, <memory ref> Load the value stored in the memory location specified by <memory ref> into register d.
+        private void LDR( Rd, <memory ref> ) {} 
+        
+        //STR Rd, <memory ref> Store the value that is in register d into the memory location specified by <memory ref>.
+        private void STR( Rd, <memory ref> ) {}
+        
+        //ADD Rd, Rn, <operand2> Add the value specified in <operand2> to the value in register n and store the result in register d.
+        private void ADD( Rd, Rn, <operand2> ) {}
+        
+        //SUB Rd, Rn, <operand2> Subtract the value specified by <operand2> from the value in register n and store the result in register d.
+        private void SUB( Rd, Rn, <operand2> ) {}
+        
+        //MOV Rd, <operand2> Copy the value specified by <operand2> into register d.
+        private void MOV( Rd, <operand2> ) {}
+        
+        //CMP Rn, <operand2> Compare the value stored in register n with the value specified by <operand2>.
+        private void CMP( Rn, <operand2> ) {}
+        
+        //B <label> Always branch to the instruction at position <label> in the program.
+        private void B( <label> ) {}
+        
+        //B<condition> <label> Conditionally branch to the instruction at position <label> in the program if the last comparison met the criteria specified by the <condition>. Possible values for <condition> and their meaning are: EQ:Equal to, NE:Not equal to, GT:Greater than, LT:Less than.
+        //conditonal branch as method B already used
+        private void B_if( <condition>, <label> ) {}
+        
+        //AND Rd, Rn, <operand2> Perform a bitwise logical AND operation between the value in register n and the value specified by <operand2> and store the result in register d.
+        private void AND( Rd, Rn, <operand2> )
+        
+        //ORR Rd, Rn, <operand2> Perform a bitwise logical OR operation between the value in register n and the value specified by <operand2> and store the result in register d.
+        private void ORR( Rd, Rn, <operand2> ) {}
+        
+        //EOR Rd, Rn, <operand2> Perform a bitwise logical exclusive or (XOR) operation between the value in register n and the value specified by <operand2> and store the result in register d.
+        private void EOR( Rd, Rn, <operand2>) {}
+        
+        //MVN Rd, <operand2> Perform a bitwise logical NOT operation on the value specified by <operand2> and store the result in register d.
+        private void MVN( Rd, <operand2> ) {}
+        
+        //LSL Rd, Rn, <operand2> Logically shift left the value stored in register n by the number of bits specified by <operand2> and store the result in register d.
+        private void LSL( Rd, Rn, <operand2>){}
+        
+        //LSR Rd, Rn, <operand2> Logically shift right the value stored in register n by the number of bits specified by <operand2> and store the result in register d.
+        private void LSR( Rd, Rn, <operand2> ){}
+        
+        //HALT Stop the execution of the program.
+        //Basically change state to edit 
+        private void Halt(){}
+        
+
+        
+        
         <operand2> can be #nnn or Rm to use either a constant or the contents of register Rm.
         Registers are R0 to R12.
          */

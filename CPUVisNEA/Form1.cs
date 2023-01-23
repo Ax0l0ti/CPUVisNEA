@@ -2,6 +2,7 @@
 using System.Drawing;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Windows.Forms;
 /*
@@ -81,6 +82,7 @@ namespace CPUVisNEA
     public partial class UI : Form
     {
             private CPU cpu;
+            
 
             public UI(CPU cpu)
             {
@@ -102,11 +104,40 @@ namespace CPUVisNEA
             private void btn_Compile_Click(object sender, EventArgs e)
             {
                 txt_uProg.Text = "top line changed";
-
+                // call method in CPU RAM class to check if valid
+                // if valid, call CPU.ChangeState()
+                // if invalid, output assembly problems
             }
 
             private void txt_uProg_TextChanged(object sender, EventArgs e)
             {
+                //current method is inefficient as it iterates round every line when updating
+                Regex blank = new Regex(@"\s*");
+                
+      
+                int i = 0;
+                bool validLine = true; 
+                //while there is still a line with text on it
+                while (validLine)
+                {
+                    //as there is no built in function for converting a text box from a big string to lines or
+                    
+                    try
+                    {
+                        if (txt_uProg.Lines != null)
+                        { 
+                            cpu.Ram.UProgRAM[i] = txt_uProg.Lines[i];
+                        }
+                    }
+                    catch(Exception exception)
+                    {
+                        //if error stop compiling as this is either end of textbook string or incorrect syntax
+                        Console.WriteLine(exception);
+                        validLine = false;
+                    }
+                    i++;
+                }
+
                 //need to create function to update RAM class local variable of contents
                 //
                 // int len = this.txt_uProg.Lines.Length;
