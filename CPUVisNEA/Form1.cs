@@ -52,7 +52,9 @@ class RAM
     Contents {List of Text Arrays ( User input area ) } 
     DisplayType ( Binary Assembly ) 
     
-    Convert Binary / ( Assembly & numbers )
+    Private String[] Binary2Ass
+    Private String[] Ass2Binary 
+    Private String[] GetContents( Contents )
     
 class Register
     display name
@@ -64,6 +66,8 @@ class Register
         
 Class ALU 
     Mapping Dictionary of Binary and assembly 
+    
+    
 
 ____________________________________________________________________________________________________________
 
