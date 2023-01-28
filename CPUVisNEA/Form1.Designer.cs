@@ -154,7 +154,7 @@ namespace CPUVisNEA
             this.txt_TEMPORARY.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
             this.txt_TEMPORARY.Size = new System.Drawing.Size(682, 165);
             this.txt_TEMPORARY.TabIndex = 4;
-            this.txt_TEMPORARY.Text = "TEMPORARY DEMINSTRATION\r\nPC        MAR      MDR \r\nValue    Value    Value \r\n\r\nACC" + "      CIR        MBF\r\nValue    Value    Value \r\n";
+            this.txt_TEMPORARY.Text = "TEMPORARY DEMINSTRATION\r\nPC        MAR      MDR \r\nValue    Value    Value \r\n\r\nACC" + "      CIR        MBR\r\nValue    Value    Value \r\n";
             this.txt_TEMPORARY.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             // 
             // gb_Display

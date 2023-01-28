@@ -1,10 +1,13 @@
 ﻿using System;
 using System.Drawing;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Windows.Forms;
+using NUnit.Framework.Internal;
+
 /*
 //TODO
 Notes Section
@@ -94,6 +97,8 @@ namespace CPUVisNEA
     
     public partial class UI : Form
     {
+        
+        private bool Editstate = true; 
             private CPU cpu;
             
 
@@ -116,10 +121,29 @@ namespace CPUVisNEA
 
             private void btn_Compile_Click(object sender, EventArgs e)
             {
-                txt_uProg.Text = "top line changed";
-                // call method in CPU RAM class to check if valid
+                try
+                {
+                    cpu.Compile(txt_uProg.Text);
+                    MessageBox.Show($"compiled: {txt_uProg.Text}");
+                    setEditState(false);
+                }
+                catch (Exception ex)
+                {
+                    // TODO: show dialog / write to output pane
+                }
                 // if valid, call CPU.ChangeState()
                 // if invalid, output assembly problems
+
+            }
+
+            private void setEditState(bool edit)
+            {
+                if (edit != this.Editstate)
+                {
+                    Trace.WriteLine($"Switched to {edit} mode");
+                    this.Editstate = edit;
+                    txt_uProg.Enabled = edit;
+                }
             }
 
             private void txt_uProg_TextChanged(object sender, EventArgs e)

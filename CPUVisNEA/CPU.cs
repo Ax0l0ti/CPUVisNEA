@@ -1,15 +1,28 @@
 using System;
 using System.Drawing;
 using System.Collections.Generic;
+using System.Diagnostics;
 
 namespace CPUVisNEA
 {
            //------------------------------------------------------------------------------------------------------
         public class CPU
     {
+         
         public List<Register> SPRegisters = new List<Register>(6)
         {
-            new OpcodeReg("succ")
+            // Program Counter
+
+            // Memory Address Register
+
+            // Memory Data Register
+            
+            //Accumulator
+            
+            //Current Instruction Register
+            
+            // Memory Buffer Register 
+
         };
         public List<Register> BasicRegisters = new List<Register>(10);
         public RAM Ram = new RAM();
@@ -18,6 +31,32 @@ namespace CPUVisNEA
         private void ChangeState()
         {
             
+        }
+        
+
+        /* TODO add 
+         GetAssFiles()  // for the menu of load programs
+         Save()  //calls Ram.SaveProg calls create new instantiation of AssProg
+ 
+         Compile() 
+         CompileValid() //set defaults to variables
+         stateChange()
+         Update RunSpeed
+         Runspeed Dictionary //to translate choices to int speed or user step
+         Run()
+         step() //does an iteration
+         RequestInputs() 
+         Outputs()
+         DisplayShortFDE()
+         DisplayLongFDE()
+         ReturnToEdit() 
+         */
+        public void Compile(string text)
+        {
+            List<String> program = new List<string>(text.Split('\n'));
+            // TODO: throw an exception if this isn't a valid program
+            Ram.UProgRAM = program;
+            Trace.Write($"Compiled: [{text}] into {Ram.UProgRAM.Count} instructions");
         }
     }
     public class RAM
@@ -57,22 +96,47 @@ namespace CPUVisNEA
         }
         
 
-    }
+        /* TODO add 
+         state????
+         UpdateRam( string newContent ) 
+         SaveProg( string UprogRam) return AssProg
+         */
 
+    }
+/*basic class of a register. As a register can store either a string or integer I have
+ created a parent class that can be inherited for both basic and special registers */
     public abstract class Register
     {
-        private bool assAllowed = false;
-        private int content;
-        
-
-        public Register(bool assAllowed, int content)
+        //display name of Register Instance
+        protected string name;
+        //determines if Assembly language is allowed or integers. useful to determine what data type the content is
+        // doesnt have to be passed as a parameter as child class influences assAllowed value
+        protected bool assAllowed;
+        //protected constructor so inherited classes can use class
+        protected Register(string name)
         {
-            this.content = Convert.ToInt16(content);
+            
         }
-
-        protected Register(bool assAllowed, string contol)
+        //function to extract value of Register's assAllowed value due to local scope
+        protected bool getAllow()
         {
-        
+            return assAllowed;
+        }
+        //function to extract value of Register's name value due to local scope
+        protected string getName()
+        {
+            return name;
+        }
+    } 
+    //class for Integer only registers that hold opcode values
+    public class IntReg : Register
+    {
+        private int content;
+
+        public IntReg(string name,bool assAllowed, int content) : base( name)
+        {
+            this.assAllowed = false;
+            this.content = content;
         }
 
         protected int RetContent()
@@ -80,22 +144,24 @@ namespace CPUVisNEA
             return content;
         }
     } 
+    public class CodeReg : Register
+    {
+        private string content;
+        public CodeReg(string name,bool assAllowed, string content) : base( name)
+        {
+            assAllowed = true;
+            this.content = content;
+
+        }
+
+        protected string RetContent()
+        {
+            return content;
+        }
+    } 
     //needs to be improved below 
     
     //special case registers created due to Special Purpose needing to store Opcode instructions from assembly language as a string to display 
-    public class OpcodeReg : Register
-    {
-        private static bool assAllowed = true;
-        private string content;
-
-        public OpcodeReg(string content) : base(assAllowed, content)
-        {
-            this.content = Convert.ToString(content);
-            
-        }
-        
-        //TODO 
-    }
 
     public class ALU
     {
@@ -157,7 +223,24 @@ namespace CPUVisNEA
          */
 
     }
-    //------------------------------------------------------------------------------------------------------
+    //--------------------------------------end of CPU -----------------------------------------------
+//assembly program
+    public class AssProg
+    {
+        private string fileName; //what to search when accessing
+        private string displayName;
+        private string[] filecontent;
+
+        public AssProg(string fileName, string displayName, string[] filecontent)
+        {
+            this.fileName = fileName;
+            this.displayName = displayName;
+            this.filecontent = filecontent;
+        }
+        
+    }// maybe have a list of AssProgs? Then call append(Ram.saveProg()) 
 
     
+
 }
+
