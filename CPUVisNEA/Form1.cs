@@ -9,77 +9,6 @@ using System.Windows.Forms;
 using NUnit.Framework.Internal;
 
 /*
-//TODO
-Notes Section
-____________________________________________________________________________________________________________
-User Program
-
-    2 states, edit and run state. Run state has added RAM display and step button 
-
-    File Handling - 
-        Creat dictionary that is maps executable file names to description/displayName of loadable files.
-        stick files in the Bin > Debug > 
-        messagebox.show
-        
-
-    USER RAM 
-        need to find
-
-    Compile //is there error?
-        yes --> output error line, reason for error and line content. Also return edit state 
-        no --> Compile next Line OR return run state, remove edit access to User Program TextBox. 
-               Compile Button turns to "return to edit" button 
-               
-               Calculate number of RAM Lines Required
-               Remove FDE Log Texts
-
-        Create Method to read Line and check if acceptable structure, ?regular expression?
-
-FDE Cycle Console Logs
-    
-Short FDE Cycle Log 
-
-Set structure for all FDE cycles
-Erase Text after complete FDE log / when new compile 
-
-Detailed FDE Cycle Log 
-Scrollable and continuously add to log. Only remove after Compile
-____________________________________________________________________________________________________________
-Classes
-
-class CPU 
-    Register Array
-    RAM class 
-    
-class RAM 
-    Contents {List of Text Arrays ( User input area ) } 
-    DisplayType ( Binary Assembly ) 
-    
-    Private String[] Binary2Ass
-    Private String[] Ass2Binary 
-    Private String[] GetContents( Contents )
-    
-class Register
-    display name
-    Content value 
-    bool Accept Assemble
-    
-    If Assemble true 
-        Method ConvertDisplay type  
-        
-Class ALU 
-    Mapping Dictionary of Binary and assembly 
-    
-    
-
-____________________________________________________________________________________________________________
-
- QUESTION MARK CIRCLE BOX WHEN CLICKED
-Class Query
-    display image
-    contents ( simple text ) 
-    whenClicked
-    
 ____________________________________________________________________________________________________________
 Full method
 Initial
@@ -89,6 +18,8 @@ Compile stage
 
 -----
 Running Stage 
+
+
 ___________________________________________________________________________________________________________
 
 */
@@ -187,3 +118,75 @@ namespace CPUVisNEA
         }
      
 }
+/*
+//TODO
+Notes Section
+____________________________________________________________________________________________________________
+User Program
+
+    2 states, edit and run state. Run state has added RAM display and step button 
+
+    File Handling - 
+        Creat dictionary that is maps executable file names to description/displayName of loadable files.
+        stick files in the Bin > Debug > 
+        messagebox.show
+        
+
+    USER RAM 
+        need to find
+
+    Compile //is there error?
+        yes --> output error line, reason for error and line content. Also return edit state 
+        no --> Compile next Line OR return run state, remove edit access to User Program TextBox. 
+               Compile Button turns to "return to edit" button 
+               
+               Calculate number of RAM Lines Required
+               Remove FDE Log Texts
+
+        Create Method to read Line and check if acceptable structure, ?regular expression?
+
+FDE Cycle Console Logs
+    
+Short FDE Cycle Log 
+
+Set structure for all FDE cycles
+Erase Text after complete FDE log / when new compile 
+
+Detailed FDE Cycle Log 
+Scrollable and continuously add to log. Only remove after Compile
+____________________________________________________________________________________________________________
+Classes
+
+class CPU 
+    Register Array
+    RAM class 
+    
+class RAM 
+    Contents {List of Text Arrays ( User input area ) } 
+    DisplayType ( Binary Assembly ) 
+    
+    Private String[] Binary2Ass
+    Private String[] Ass2Binary 
+    Private String[] GetContents( Contents )
+    
+class Register
+    display name
+    Content value 
+    bool Accept Assemble
+    
+    If Assemble true 
+        Method ConvertDisplay type  
+        
+Class ALU 
+    Mapping Dictionary of Binary and assembly 
+    
+    
+
+____________________________________________________________________________________________________________
+
+ QUESTION MARK CIRCLE BOX WHEN CLICKED
+Class Query
+    display image
+    contents ( simple text ) 
+    whenClicked
+*/

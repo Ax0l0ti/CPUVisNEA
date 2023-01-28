@@ -5,34 +5,19 @@ using System.Diagnostics;
 
 namespace CPUVisNEA
 {
-           //------------------------------------------------------------------------------------------------------
-        public class CPU
+    //------------------------------------------------------------------------------------------------------
+    public class CPU
     {
-         
-        public List<Register> SPRegisters = new List<Register>(6)
-        {
-            // Program Counter
-
-            // Memory Address Register
-
-            // Memory Data Register
-            
-            //Accumulator
-            
-            //Current Instruction Register
-            
-            // Memory Buffer Register 
-
-        };
+        public Register[] SPRegisters;
         public List<Register> BasicRegisters = new List<Register>(10);
         public RAM Ram = new RAM();
         public ALU Alu = new ALU();
+        
 
         private void ChangeState()
         {
-            
         }
-        
+
 
         /* TODO add 
          GetAssFiles()  // for the menu of load programs
@@ -51,17 +36,43 @@ namespace CPUVisNEA
          DisplayLongFDE()
          ReturnToEdit() 
          */
+        public void SetUp()
+        {
+            // Program Counter
+            var PC = new IntReg("PC", 0);
+            // Memory Address Register
+            var MAR = new CodeReg("MAR", "");
+            // Memory Data Register
+            var MDR = new IntReg("MDR", 0);
+            //Accumulator
+            var ACC = new IntReg("ACC", 0);
+            //Current Instruction Register
+            var CIR = new CodeReg("CIR", "");
+            // Memory Buffer Register 
+            var MBR = new IntReg("PC", 0);
+            //Adding all Registers to the Special Purpose Registers
+            //as assigning can only happen in declaration, temporary holds the info before transfer
+            Register[] temporary = { PC, MAR, MDR, ACC, CIR, MBR };
+            SPRegisters = temporary;
+        }
+
         public void Compile(string text)
         {
-            List<String> program = new List<string>(text.Split('\n'));
+            var program = new List<string>(text.Split('\n'));
             // TODO: throw an exception if this isn't a valid program
             Ram.UProgRAM = program;
             Trace.Write($"Compiled: [{text}] into {Ram.UProgRAM.Count} instructions");
         }
+
+        public CPU()
+        {
+            SetUp();
+        }
     }
+
     public class RAM
     {
-        private bool binaryMode = false;
+        private readonly bool binaryMode = false;
         public List<string> UProgRAM = new List<string>();
 
         //Local Convert function in RAM class to completely translate the users program between its binary representation
@@ -69,7 +80,7 @@ namespace CPUVisNEA
         //select the direction on conversion - binary to Assembly ( Bin2Ass() ) or Assembly to binary ( Ass2Bin() ) 
         private List<string> Convert()
         {
-            List<string> newContent = new List<string>();
+            var newContent = new List<string>();
             if (binaryMode)
             {
                 //      newContent = Bin2Ass();
@@ -85,57 +96,61 @@ namespace CPUVisNEA
 
 
             return UProgRAM;
-        } 
-        
+        }
+
         private List<string> Bin2Ass()
         {
             //opposite search of bin to ass for all lines
             //both stored as strings 
-            
+
             return UProgRAM;
         }
-        
+
 
         /* TODO add 
          state????
          UpdateRam( string newContent ) 
          SaveProg( string UprogRam) return AssProg
          */
-
     }
+
 /*basic class of a register. As a register can store either a string or integer I have
  created a parent class that can be inherited for both basic and special registers */
     public abstract class Register
     {
         //display name of Register Instance
         protected string name;
+
         //determines if Assembly language is allowed or integers. useful to determine what data type the content is
         // doesnt have to be passed as a parameter as child class influences assAllowed value
         protected bool assAllowed;
+
         //protected constructor so inherited classes can use class
         protected Register(string name)
         {
-            
         }
+
         //function to extract value of Register's assAllowed value due to local scope
         protected bool getAllow()
         {
             return assAllowed;
         }
+
         //function to extract value of Register's name value due to local scope
         protected string getName()
         {
             return name;
         }
-    } 
+    }
+
     //class for Integer only registers that hold opcode values
     public class IntReg : Register
     {
-        private int content;
+        private readonly int content;
 
-        public IntReg(string name,bool assAllowed, int content) : base( name)
+        public IntReg(string name, int content) : base(name)
         {
-            this.assAllowed = false;
+            assAllowed = false;
             this.content = content;
         }
 
@@ -143,29 +158,29 @@ namespace CPUVisNEA
         {
             return content;
         }
-    } 
+    }
+
     public class CodeReg : Register
     {
-        private string content;
-        public CodeReg(string name,bool assAllowed, string content) : base( name)
+        private readonly string content;
+
+        public CodeReg(string name, string content) : base(name)
         {
             assAllowed = true;
             this.content = content;
-
         }
 
         protected string RetContent()
         {
             return content;
         }
-    } 
+    }
     //needs to be improved below 
-    
+
     //special case registers created due to Special Purpose needing to store Opcode instructions from assembly language as a string to display 
 
     public class ALU
     {
-        
         /*
         
         //LDR Rd, <memory ref> Load the value stored in the memory location specified by <memory ref> into register d.
@@ -221,8 +236,8 @@ namespace CPUVisNEA
         <operand2> can be #nnn or Rm to use either a constant or the contents of register Rm.
         Registers are R0 to R12.
          */
-
     }
+
     //--------------------------------------end of CPU -----------------------------------------------
 //assembly program
     public class AssProg
@@ -237,10 +252,6 @@ namespace CPUVisNEA
             this.displayName = displayName;
             this.filecontent = filecontent;
         }
-        
-    }// maybe have a list of AssProgs? Then call append(Ram.saveProg()) 
-
-    
-
+    } // maybe have a list of AssProgs? Then call append(Ram.saveProg()) 
 }
 
