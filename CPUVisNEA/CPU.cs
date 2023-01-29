@@ -3,6 +3,7 @@ using System.Drawing;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Windows.Forms;
+using System.Text.RegularExpressions;  
 
 namespace CPUVisNEA
 {
@@ -37,7 +38,7 @@ namespace CPUVisNEA
          DisplayLongFDE()
          ReturnToEdit() 
          */
-        public void SetUp()
+        private void SetUp()
         {
             // Program Counter
             var PC = new IntReg("PC", 0);
@@ -56,12 +57,10 @@ namespace CPUVisNEA
             Register[] temporary = { PC, MAR, MDR, ACC, CIR, MBR };
             SPRegisters = temporary;
         }
-        
-        
 
-        public bool Compile(string text)
+
+        public void fillRam(string text)
         {
-            bool valid = false;
             try
             {
                 /*split the string representing the content of the textbox into string[]
@@ -70,31 +69,32 @@ namespace CPUVisNEA
                 
                 Ram.UProgRAM = program;
                 //TODO Remove blanks & Validate 
-                Trace.Write($"Compiled: [{text}] into {Ram.UProgRAM.Count} instructions");
+                Trace.WriteLine($"Compiled: [{text}] into {Ram.UProgRAM.Count} instructions");
                 Ram.Cleanse();
-                Trace.Write($"removed blank space: to {Ram.UProgRAM.Count} instructions");
-                valid = true;
+                Trace.WriteLine($"removed blank space: to {Ram.UProgRAM.Count} instructions");
             }
             catch (Exception ex)
             {
                 MessageBox.Show(Convert.ToString(ex));
-                valid = false;
             }
+       
+        }
+        public bool Compile(string text)
+        {
+            bool valid = false;
             
-            
-           
-            
-
-            // try
-            // {
-            //     Ram.Cleanse();
-            // }
-            // catch (Exception ex)
-            // {
-            //     MessageBox.Show(" failed to shorten code");
-            // }
+            try
+            {
+                fillRam(text);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(" failed to shorten code");
+            }
 
             // TODO: throw an exception if this isn't a valid program
+            valid = Ram.valid(Ram.UProgRAM);
+            
             return valid;
 
         }
@@ -128,8 +128,6 @@ namespace CPUVisNEA
         private List<string> Ass2Bin()
         {
             //for all lines run algorithm to change assembely track to binary equivelant
-
-
             return UProgRAM;
         }
 
@@ -137,10 +135,10 @@ namespace CPUVisNEA
         {
             //opposite search of bin to ass for all lines
             //both stored as strings 
-
             return UProgRAM;
         }
         //Cleanse() used for removing all blank lines
+        
         public void Cleanse()
         {
             List<String> temporary = new List<string>();
@@ -153,6 +151,61 @@ namespace CPUVisNEA
             }
 
             UProgRAM = temporary;
+        }
+        //checks if valid format, called after cleanse
+        public bool valid(List<String> program)
+        {
+            
+            
+            foreach (var line in program)
+            {
+                lineValid(line);
+            }
+            return true;
+        }
+        public void lineValid(string line)
+        {
+            string VmemRef = "";
+            string Vlabel = "";
+            string VReg = @"(B)";
+            string Vcondition = "";
+            
+            // Vline = composite of valids above 
+            string Vline = "" /* todo */ + " ";
+            
+            //----- valid line formats -----
+            // ordered by input size
+            // \w word character, 
+            
+            
+            //HALT 
+            //B <label>
+            //B<condition> <label>
+            
+            // HALT    |    ( (B) (Vcondition)? (/w)* ) 
+            //check if (/w)* exists 
+
+            //MOV Rd, <operand2>
+            //CMP Rn, <operand2>
+            //MVN Rd, <operand2> 
+            
+            //
+            
+            //LDR Rd, <memory ref> 
+            //STR Rd, <memory ref> 
+            
+            //
+
+            //AND Rd, Rn, <operand2>
+            //ORR Rd, Rn, <operand2>
+            //EOR Rd, Rn, <operand2>
+            //LSL Rd, Rn, <operand2>
+            //LSR Rd, Rn, <operand2>
+            //ADD Rd, Rn, <operand2>
+            //SUB Rd, Rn, <operand2>
+            
+            // ( (AND) | (ORR) | (EOR) | (LSL) | (LSR) | (ADD) | (SUB) ) {VReg} ","\s {VReg} ","\s {Voperand}
+
         }
 
 
