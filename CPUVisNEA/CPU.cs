@@ -2,16 +2,127 @@ using System;
 using System.Drawing;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Windows.Forms;
 using System.Text.RegularExpressions;  
+//https://resources.jetbrains.com/storage/products/rider/docs/Rider_default_win_shortcuts.pdf?_gl=1*8v6mpv*_ga*Mzk0Njg2ODg3LjE2NjExMDU4MzA.*_ga_9J976DJZ68*MTY3NTAyNjgxNS4xNy4wLjE2NzUwMjY4MjAuMC4wLjA.&_ga=2.77451923.725299765.1675026816-394686887.1661105830
 
 namespace CPUVisNEA
-{
-    //------------------------------------------------------------------------------------------------------
+{     
+    
+    //---------------------------------------- Argument classes ------------------------------------------------
+    
+    //todo fill in arguement and acceptible RegArg and Literal value arguements, Add additonal types of parameters
+    
+    public interface Argument
+    {
+    }
+    /*Potential Parameters -
+     
+     Register Argument  ( memory reference is basically a Register Argument) 
+     Integer Argument
+     label ( label : Normal Line todo whilst filtering, if random string ( label ) , check valid b4 record index and label name - treat after : as instruction to be filtered
+     condition ( on B if bla bla bla )
+     
+     */
+    public class RegisterArg : Argument
+    {
+        public int index; // requires index of register before calling to CPU to retrieve value of target
+    }
+    public class IntegerArg : Argument
+    {
+        public int value; // basic value passed
+    }
+    public class label : Argument //todo maybe create linked class between label argument and desitnation location
+    {
+        private int location; // destination
+        private string name; // correspondent string for display purpose
+    }
+    public class condition : Argument
+    {
+        private string expression; // todo new class expression required that takes parameters and returns boolean
+    } 
+    //----------------------------------------Instruction classes and generation------------------------------------------------
+    public abstract class Instruction
+    {
+        private List<Argument> arguments = new List<Argument>();
+        public CPU.Instructions Tag { get; }
+
+        public List<Argument> Arguments => arguments;
+
+        protected Instruction(CPU.Instructions tag)
+        {
+            this.Tag = tag;
+        }
+
+        public static void addParsedArgs(Instruction instruc, List<string> arguments)
+        {
+            //for each argument, create a new correspondent instance of argument type
+            foreach (var arg in arguments)
+            {
+                // todo try matching on different regex (or even just look at the first char or something)
+                // return an instance of Register, Literal, etc
+                // create function for GetArgType
+                // string type = GetArgType(arg);
+                // switch (type)
+                // {
+                //     case : "Register" { Argument parsed = new RegisterArg(); break;
+                //     case : "Integer" { Argument parsed = new IntegerArg(); break;
+                //     case : "label" { Argument parsed = new label(); break;
+                //     case : "condition" { Argument parsed = new condition(); break;
+                //     default : new ErrorMessage("unrecognised")
+                // }
+                
+                //temporary 
+                Argument parsed = new IntegerArg();
+                instruc.addArg(parsed);
+            }
+        }
+
+        protected abstract void addArg(Argument arg);
+    }
+ 
+    
+    //todo create all instruction options
+    public class Mov : Instruction
+    {
+        
+        //todo create Instruction (Mov) method to deal w input ( also add description of how operator works, NEA writeup ) 
+        public static Mov parseArgs(List<string> args)
+        {
+            var mov = new Mov();
+            Instruction.addParsedArgs(mov, args);
+            return mov;
+        }
+        
+        public Mov() : base(CPU.Instructions.MOV)
+        {
+            
+        }
+
+        protected override void addArg(Argument arg)
+        {
+            if (arg.GetType().IsInstanceOfType(typeof(RegisterArg)))
+            {
+                if (Arguments.Count > 0)
+                {
+                    throw new Exception("Second arg can't be register"); // TODO THIS IS A LIE
+                }
+            }
+        }
+    }
+
+    //----------------------------------------Main Class CPU------------------------------------------------
+    // vast majority of classes are instantiated in CPU ( Composition relation )
     public class CPU
     {
+        public enum Instructions
+        {
+            MOV, ADD, SUB
+        }
         public Register[] SPRegisters;
         public List<Register> BasicRegisters = new List<Register>(10);
+        
         public RAM Ram = new RAM();
         public ALU Alu = new ALU();
         
@@ -93,7 +204,7 @@ namespace CPUVisNEA
             }
 
             // TODO: throw an exception if this isn't a valid program
-            valid = Ram.valid(Ram.UProgRAM);
+            
             
             return valid;
 
@@ -104,11 +215,12 @@ namespace CPUVisNEA
             SetUp();
         }
     }
-
+    //----------------------------------------Random Access Memory Class - Compiling methods ------------------------------------------------
     public class RAM
     {
         private readonly bool binaryMode = false;
         public List<string> UProgRAM = new List<string>();
+        private Instruction[] Program = new Instruction[] { };
 
         //Local Convert function in RAM class to completely translate the users program between its binary representation
         //and its assembly language representation. This is completed by checking the local class variable binaryMode to
@@ -118,7 +230,7 @@ namespace CPUVisNEA
             var newContent = new List<string>();
             if (binaryMode)
             {
-                //      newContent = Bin2Ass();
+                // newContent = Bin2Ass();
             }
             //   else newContent = Ass2Bin();
 
@@ -153,48 +265,86 @@ namespace CPUVisNEA
             UProgRAM = temporary;
         }
         //checks if valid format, called after cleanse
-        public bool valid(List<String> program)
+        public Instruction[] valid(List<String> program)
         {
-            
+            Instruction[] InstrArray = new Instruction[] {} ;
             
             foreach (var line in program)
             {
-                lineValid(line);
+                //linearly iterate through Program and add correspondent Instruction to array of instruction with parameters
+                Instruction nextInstr = lineToInstruction(line);
+                InstrArray.Append(nextInstr);
             }
-            return true;
+            return InstrArray;
         }
-        public void lineValid(string line)
-        {
-            string VmemRef = "";
+        
+        public Instruction lineToInstruction (string line)
+        { //todo           
+            //Regular expressions of valid label / register / condition / memory reference / operand
+            Regex VmemRef = new Regex("R[0-9]");
             string Vlabel = "";
             string VReg = @"(B)";
             string Vcondition = "";
             
-            // Vline = composite of valids above 
-            string Vline = "" /* todo */ + " ";
+            var tokens = line.Split(new char[0], StringSplitOptions.RemoveEmptyEntries);
+            if (tokens.Length == 1)
+            {
+                //it must be HALT command if only one word 
+                //return new Halt();
+
+            } else
+            {
+                string instruction = tokens[0];
+                List<string> args = new List<string>();
+                // we have split on whitespace, but we need to split on comma too
+                for (int i = 1; i < tokens.Length; i++)
+                {
+                    var token = tokens[i];
+                    var strings = token.Split(",".ToCharArray(), StringSplitOptions.RemoveEmptyEntries);
+                    foreach (var s in strings)
+                    {
+                        args.Add(s);
+                    }
+                }
+
+                Instruction parsed;
+                switch (instruction) 
+                {
+                    
+                    case "MOV":
+                    {
+                        parsed = new Mov();
+                        break;
+                    }
+                    
+                    //todo add rest of options
+                    
+                    
+                    default: throw new Exception($"Unknown instruction: {instruction}");
+                }
+                // now add the arguments to the instruction:
+                Instruction.addParsedArgs(parsed, args);
+                return parsed;
+            }
             
-            //----- valid line formats -----
+            //----- valid line formats ----- 
             // ordered by input size
             // \w word character, 
-            
-            
+
             //HALT 
             //B <label>
             //B<condition> <label>
-            
             // HALT    |    ( (B) (Vcondition)? (/w)* ) 
-            //check if (/w)* exists 
+            //check if label exists OUTDATED COMMENTS 
 
             //MOV Rd, <operand2>
             //CMP Rn, <operand2>
             //MVN Rd, <operand2> 
-            
-            //
+            // ( (MOV) | (CMP) | (MVN) ) {VReg} ","\s {Voperand}
             
             //LDR Rd, <memory ref> 
             //STR Rd, <memory ref> 
-            
-            //
+            // ( (LDR) | (STR) ) {VReg} ","\s {Voperand}
 
             //AND Rd, Rn, <operand2>
             //ORR Rd, Rn, <operand2>
@@ -203,18 +353,36 @@ namespace CPUVisNEA
             //LSR Rd, Rn, <operand2>
             //ADD Rd, Rn, <operand2>
             //SUB Rd, Rn, <operand2>
-            
             // ( (AND) | (ORR) | (EOR) | (LSL) | (LSR) | (ADD) | (SUB) ) {VReg} ","\s {VReg} ","\s {Voperand}
-
+            //todo change line below to failsafe, move comment above 
+            return new Mov();
         }
-
-
-        /* TODO add 
+        /* outdated TODO add 
          state????
          UpdateRam( string newContent ) 
          SaveProg( string UprogRam) return AssProg
          */
+
+        //----------------------------------------Execute ------------------------------------------------
+        //todo fill in rest of cases
+        public void execute(Instruction instr)
+        {
+            switch (instr.Tag)
+            {
+                case CPU.Instructions.MOV:
+                    
+                    break;
+                case CPU.Instructions.ADD:
+                    break;
+                case CPU.Instructions.SUB:
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
+        }
     }
+    
+//----------------------------------------Class of user interactable Registers  ------------------------------------------------
 
 /*basic class of a register. As a register can store either a string or integer I have
  created a parent class that can be inherited for both basic and special registers */
@@ -261,7 +429,7 @@ namespace CPUVisNEA
             return content;
         }
     }
-
+    //class for Assembly opcode only registers that hold opcode values
     public class CodeReg : Register
     {
         private readonly string content;
@@ -280,7 +448,7 @@ namespace CPUVisNEA
     //needs to be improved below 
 
     //special case registers created due to Special Purpose needing to store Opcode instructions from assembly language as a string to display 
-
+    //mabye delete below? Methods stored in individual classes instead
     public class ALU
     {
         /*
@@ -340,8 +508,9 @@ namespace CPUVisNEA
          */
     }
 
-    //--------------------------------------end of CPU -----------------------------------------------
+    //--------------------------------------Assembely Program classes - files -----------------------------------------------
 //assembly program
+//need to test access 
     public class AssProg
     {
         private string fileName; //what to search when accessing
@@ -356,4 +525,3 @@ namespace CPUVisNEA
         }
     } // maybe have a list of AssProgs? Then call append(Ram.saveProg()) 
 }
-
