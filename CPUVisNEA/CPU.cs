@@ -2,6 +2,7 @@ using System;
 using System.Drawing;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Windows.Forms;
 
 namespace CPUVisNEA
 {
@@ -55,13 +56,47 @@ namespace CPUVisNEA
             Register[] temporary = { PC, MAR, MDR, ACC, CIR, MBR };
             SPRegisters = temporary;
         }
+        
+        
 
-        public void Compile(string text)
+        public bool Compile(string text)
         {
-            var program = new List<string>(text.Split('\n'));
+            bool valid = false;
+            try
+            {
+                /*split the string representing the content of the textbox into string[]
+                 By looking for the new line character*/ 
+                var program = new List<string>(text.Split('\n'));
+                
+                Ram.UProgRAM = program;
+                //TODO Remove blanks & Validate 
+                Trace.Write($"Compiled: [{text}] into {Ram.UProgRAM.Count} instructions");
+                Ram.Cleanse();
+                Trace.Write($"removed blank space: to {Ram.UProgRAM.Count} instructions");
+                valid = true;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(Convert.ToString(ex));
+                valid = false;
+            }
+            
+            
+           
+            
+
+            // try
+            // {
+            //     Ram.Cleanse();
+            // }
+            // catch (Exception ex)
+            // {
+            //     MessageBox.Show(" failed to shorten code");
+            // }
+
             // TODO: throw an exception if this isn't a valid program
-            Ram.UProgRAM = program;
-            Trace.Write($"Compiled: [{text}] into {Ram.UProgRAM.Count} instructions");
+            return valid;
+
         }
 
         public CPU()
@@ -104,6 +139,20 @@ namespace CPUVisNEA
             //both stored as strings 
 
             return UProgRAM;
+        }
+        //Cleanse() used for removing all blank lines
+        public void Cleanse()
+        {
+            List<String> temporary = new List<string>();
+            foreach (string line in UProgRAM)
+            {
+                if (!String.IsNullOrWhiteSpace(line))
+                {
+                    temporary.Add(line);
+                }
+            }
+
+            UProgRAM = temporary;
         }
 
 

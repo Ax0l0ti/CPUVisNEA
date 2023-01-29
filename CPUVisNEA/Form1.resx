@@ -123,14 +123,6 @@
   <metadata name="backgroundWorker2.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
     <value>181, 17</value>
   </metadata>
-  <data name="txt_uProg.Text" xml:space="preserve">
-    <value>Coding Area for User's Assembly Program. 
-
-Controls above can save or load example programs or previously saved programs from the user.
-Convert program button tries to translate the existing text instantly and the end method for validating if the code is viable to run 
-
-Controls Below change depending on if background code in run or edit state</value>
-  </data>
   <metadata name="$this.TrayHeight" type="System.Int32, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>25</value>
   </metadata>

@@ -54,7 +54,7 @@ namespace CPUVisNEA
             {
                 try
                 {
-                    cpu.Compile(txt_uProg.Text);
+                    var valid = cpu.Compile(txt_uProg.Text);
                     MessageBox.Show($"compiled: {txt_uProg.Text}");
                     setEditState(false);
                 }
