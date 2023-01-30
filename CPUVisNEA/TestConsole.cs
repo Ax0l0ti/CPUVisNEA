@@ -36,7 +36,7 @@ namespace CPUVisNEA
         {
             Mov mov = new Mov();
             Instruction.addParsedArgs(mov, new string[]{"R1", "1234"}.ToList());
-            Assert.Equals(mov.Arguments.Count, 2);
+            Assert.Equals(mov.args.Count, 2);
             Instruction.addParsedArgs(mov, new string[]{"R1", "R1"}.ToList());
             
        }

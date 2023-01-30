@@ -10,115 +10,13 @@ using System.Text.RegularExpressions;
 namespace CPUVisNEA
 {     
     
-    //---------------------------------------- Argument classes ------------------------------------------------
-    
-    //todo fill in arguement and acceptible RegArg and Literal value arguements, Add additonal types of parameters
-    
-    public interface Argument
-    {
-    }
-    /*Potential Parameters -
-     
-     Register Argument  ( memory reference is basically a Register Argument) 
-     Integer Argument
-     label ( label : Normal Line todo whilst filtering, if random string ( label ) , check valid b4 record index and label name - treat after : as instruction to be filtered
-     condition ( on B if bla bla bla )
-     
-     */
-    public class RegisterArg : Argument
-    {
-        public int index; // requires index of register before calling to CPU to retrieve value of target
-    }
-    public class IntegerArg : Argument
-    {
-        public int value; // basic value passed
-    }
-    public class label : Argument //todo maybe create linked class between label argument and desitnation location
-    {
-        private int location; // destination
-        private string name; // correspondent string for display purpose
-    }
-    public class condition : Argument
-    {
-        private string expression; // todo new class expression required that takes parameters and returns boolean
-    } 
-    //----------------------------------------Instruction classes and generation------------------------------------------------
-    public abstract class Instruction
-    {
-        private List<Argument> arguments = new List<Argument>();
-        public CPU.Instructions Tag { get; }
-
-        public List<Argument> Arguments => arguments;
-
-        protected Instruction(CPU.Instructions tag)
-        {
-            this.Tag = tag;
-        }
-
-        public static void addParsedArgs(Instruction instruc, List<string> arguments)
-        {
-            //for each argument, create a new correspondent instance of argument type
-            foreach (var arg in arguments)
-            {
-                // todo try matching on different regex (or even just look at the first char or something)
-                // return an instance of Register, Literal, etc
-                // create function for GetArgType
-                // string type = GetArgType(arg);
-                // switch (type)
-                // {
-                //     case : "Register" { Argument parsed = new RegisterArg(); break;
-                //     case : "Integer" { Argument parsed = new IntegerArg(); break;
-                //     case : "label" { Argument parsed = new label(); break;
-                //     case : "condition" { Argument parsed = new condition(); break;
-                //     default : new ErrorMessage("unrecognised")
-                // }
-                
-                //temporary 
-                Argument parsed = new IntegerArg();
-                instruc.addArg(parsed);
-            }
-        }
-
-        protected abstract void addArg(Argument arg);
-    }
- 
-    
-    //todo create all instruction options
-    public class Mov : Instruction
-    {
-        
-        //todo create Instruction (Mov) method to deal w input ( also add description of how operator works, NEA writeup ) 
-        public static Mov parseArgs(List<string> args)
-        {
-            var mov = new Mov();
-            Instruction.addParsedArgs(mov, args);
-            return mov;
-        }
-        
-        public Mov() : base(CPU.Instructions.MOV)
-        {
-            
-        }
-
-        protected override void addArg(Argument arg)
-        {
-            if (arg.GetType().IsInstanceOfType(typeof(RegisterArg)))
-            {
-                if (Arguments.Count > 0)
-                {
-                    throw new Exception("Second arg can't be register"); // TODO THIS IS A LIE
-                }
-            }
-        }
-    }
-
     //----------------------------------------Main Class CPU------------------------------------------------
     // vast majority of classes are instantiated in CPU ( Composition relation )
     public class CPU
     {
         public enum Instructions
         {
-            MOV, ADD, SUB
+            HALT, B, MOV, CMP, MVN, LDR, AND, ORR, EOR, LSL, LSR, ADD, SUB
         }
         public Register[] SPRegisters;
         public List<Register> BasicRegisters = new List<Register>(10);
@@ -311,12 +209,93 @@ namespace CPUVisNEA
                 switch (instruction) 
                 {
                     
+                    case "HALT":
+                    {
+                        //special case stop execution return to edit state 
+                        parsed = new Halt();
+                        break;
+                    }
+                    //todo special as b can be condit or non condit
+                    
+                    case "B":
+                    {
+                        //special case condition 
+                        
+                        // if(condit exists)
+                        // {
+                        //     parsed = new B condit ();
+                        // }
+                        //
+                        //TEMPORARY
+                        parsed = new B();
+                        break;
+                    }
+
                     case "MOV":
                     {
                         parsed = new Mov();
                         break;
                     }
+
+                    case "CMP":
+                    {
+                        parsed = new Cmp();
+                        break;
+                    } 
+
+                    case "MVN":
+                    {
+                        parsed = new Mvn();
+                        break;
+                    }
                     
+                    case "LDR":
+                    {
+                        parsed = new Ldr();
+                        break;
+                    }
+                    
+                    case "AND":
+                    {
+                        parsed = new And();
+                        break;
+                    }
+                    
+                    case "ORR":
+                    {
+                        parsed = new Orr();
+                        break;
+                    }
+                    
+                    case "EOR":
+                    {
+                        parsed = new Eor();
+                        break;
+                    }
+                    
+                    case "LSL":
+                    {
+                        parsed = new Lsl();
+                        break;
+                    }
+                    
+                    case "LSR":
+                    {
+                        parsed = new Lsr();
+                        break;
+                    }
+                    
+                    case "ADD":
+                    {
+                        parsed = new Add();
+                        break;
+                    }
+                    
+                    case "SUB":
+                    {
+                        parsed = new Sub();
+                        break;
+                    }
                     //todo add rest of options
                     
                     
