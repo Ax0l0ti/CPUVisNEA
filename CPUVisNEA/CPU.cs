@@ -9,14 +9,14 @@ using System.Text.RegularExpressions;
 
 namespace CPUVisNEA
 {     
-    
+    //rando todos 
     //----------------------------------------Main Class CPU------------------------------------------------
     // vast majority of classes are instantiated in CPU ( Composition relation )
     public class CPU
     {
         public enum Instructions
         {
-            HALT, B, MOV, CMP, MVN, LDR, AND, ORR, EOR, LSL, LSR, ADD, SUB
+            HALT, B, MOV, CMP, MVN, LDR, STR, AND, ORR, EOR, LSL, LSR, ADD, SUB
         }
         public Register[] SPRegisters;
         public List<Register> BasicRegisters = new List<Register>(10);
@@ -308,23 +308,14 @@ namespace CPUVisNEA
             
             //----- valid line formats ----- 
             // ordered by input size
-            // \w word character, 
-
             //HALT 
             //B <label>
             //B<condition> <label>
-            // HALT    |    ( (B) (Vcondition)? (/w)* ) 
-            //check if label exists OUTDATED COMMENTS 
-
             //MOV Rd, <operand2>
             //CMP Rn, <operand2>
             //MVN Rd, <operand2> 
-            // ( (MOV) | (CMP) | (MVN) ) {VReg} ","\s {Voperand}
-            
             //LDR Rd, <memory ref> 
             //STR Rd, <memory ref> 
-            // ( (LDR) | (STR) ) {VReg} ","\s {Voperand}
-
             //AND Rd, Rn, <operand2>
             //ORR Rd, Rn, <operand2>
             //EOR Rd, Rn, <operand2>
@@ -332,15 +323,10 @@ namespace CPUVisNEA
             //LSR Rd, Rn, <operand2>
             //ADD Rd, Rn, <operand2>
             //SUB Rd, Rn, <operand2>
-            // ( (AND) | (ORR) | (EOR) | (LSL) | (LSR) | (ADD) | (SUB) ) {VReg} ","\s {VReg} ","\s {Voperand}
+            
             //todo change line below to failsafe, move comment above 
             return new Mov();
         }
-        /* outdated TODO add 
-         state????
-         UpdateRam( string newContent ) 
-         SaveProg( string UprogRam) return AssProg
-         */
 
         //----------------------------------------Execute ------------------------------------------------
         //todo fill in rest of cases
@@ -502,5 +488,6 @@ namespace CPUVisNEA
             this.displayName = displayName;
             this.filecontent = filecontent;
         }
+        
     } // maybe have a list of AssProgs? Then call append(Ram.saveProg()) 
 }

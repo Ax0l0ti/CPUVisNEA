@@ -48,7 +48,7 @@ namespace CPUVisNEA
         ---->  creating
         
         Instructions 
-        ---->  Valid
+        ---->  Test if split works properly on a string 
         ---->  Computation 
         --------->  take the params and work w???
         ---->  Branch

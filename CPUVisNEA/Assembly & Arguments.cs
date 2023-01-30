@@ -13,7 +13,9 @@ namespace CPUVisNEA
     
     //---------------------------------------- Argument classes ------------------------------------------------
     //todo fill in arguement and acceptible RegArg and Literal value arguements, Add additonal types of parameters
-    
+    //mabye take number and type of inputs as Dictionary or multidimensional array
+    // Instruction x position x possibles 
+    // e.g Parameters[ {Instruction} , { Param Index } ] returns Array[RegisterTypes]
     
     
     public interface Argument
@@ -110,6 +112,7 @@ namespace CPUVisNEA
     //todo create all instruction options
     
     //---------------------------------------     HALT     Instruction ------------------------------------------------
+
     public class Halt : Instruction
     {
         public Halt() : base(CPU.Instructions.HALT)
@@ -152,6 +155,8 @@ namespace CPUVisNEA
     }
     
     //---------------------------------------     B     Instruction ------------------------------------------------
+    //B <label>
+    
     // todo special due to condition
 
     public class B : Instruction
@@ -196,6 +201,9 @@ namespace CPUVisNEA
     }
 
     //---------------------------------------     MOV     Instruction ------------------------------------------------
+    //MOV RegisterArg, IntegerArg
+
+
     public class Mov : Instruction
     {
         public Mov() : base(CPU.Instructions.MOV)
@@ -238,6 +246,8 @@ namespace CPUVisNEA
     }
 
     //---------------------------------------     CMP      Instruction ------------------------------------------------
+    //CMP RegisterArg, IntegerArg
+
     public class Cmp : Instruction
     {
         public Cmp() : base(CPU.Instructions.CMP)
@@ -280,6 +290,8 @@ namespace CPUVisNEA
     }
 
     //---------------------------------------     MVN      Instruction ------------------------------------------------
+    //MVN RegisterArg, IntegerArg
+
     public class Mvn : Instruction
     {
         public Mvn() : base(CPU.Instructions.MVN)
@@ -322,6 +334,16 @@ namespace CPUVisNEA
     }
 
     //---------------------------------------     LDR      Instruction ------------------------------------------------
+    //LDR RegisterArg, RegisterArg
+    //STR RegisterArg, RegisterArg
+    // Below will have multiple acceptable types in second addArg index
+    //AND RegisterArg, RegisterArg, IntorReg
+    //ORR RegisterArg, RegisterArg, IntorReg
+    //EOR RegisterArg, RegisterArg, IntorReg
+    //LSL RegisterArg, RegisterArg, IntorReg
+    //LSR RegisterArg, RegisterArg, IntorReg
+    //ADD RegisterArg, RegisterArg, IntorReg
+    //SUB RegisterArg, RegisterArg, IntorReg
     public class Ldr : Instruction
     {
         public Ldr() : base(CPU.Instructions.LDR)
@@ -363,7 +385,53 @@ namespace CPUVisNEA
         }
     }
 
+    //---------------------------------------     STR      Instruction ------------------------------------------------
+    //STR RegisterArg, RegisterArg
+
+    public class Str : Instruction
+    {
+        public Str() : base(CPU.Instructions.STR)
+        {
+            
+        }
+        
+        //todo create Instruction method to deal w input ( also add description of how operator works, from NEA writeup ) 
+        protected override void executeInstruction(List<Argument> args )
+        {
+            
+        }
+        
+        public static Str parseArgs(List<string> args)
+        {
+            var str = new Str();
+            //passes Instruction in Parameter 1 the arguments in args
+            //calls modified version of addArg (below) in child class 
+            addParsedArgs(str, args);
+            return str;
+        }
+        
+
+        //overriden to only accept valid parameter types in specific positions
+        
+        protected override void addArg(Argument arg) //TODO LIESSSSSSSS 
+        {
+            //if argument added isn't an acceptable type of argument at 1st Instruction parameter
+            if ( ( !arg.GetType().IsInstanceOfType(typeof(RegisterArg)) && args.Count == 0 ) 
+                 ||  // or not acceptable type of argument at 2nd argument 
+                 ( !arg.GetType().IsInstanceOfType(typeof(IntegerArg)) && args.Count == 1 )  )
+            { throw new Exception($"= arg {args.Count + 1} can't be {arg.GetType()} ");
+            }
+            else //acceptable input 
+            {
+                
+            }
+
+        }
+    }
     //---------------------------------------     AND      Instruction ------------------------------------------------
+    //AND RegisterArg, RegisterArg, IntorReg
+    //will have multiple acceptable types in second addArg index
+
     public class And : Instruction
     {
         public And() : base(CPU.Instructions.AND)
@@ -406,6 +474,9 @@ namespace CPUVisNEA
     }
 
     //---------------------------------------     ORR      Instruction ------------------------------------------------
+    //ORR RegisterArg, RegisterArg, IntorReg
+    //will have multiple acceptable types in second addArg index
+
     public class Orr : Instruction
     {
         public Orr() : base(CPU.Instructions.ORR)
@@ -448,6 +519,9 @@ namespace CPUVisNEA
     }
 
     //---------------------------------------     EOR      Instruction ------------------------------------------------
+    //EOR RegisterArg, RegisterArg, IntorReg
+    //will have multiple acceptable types in second addArg index
+
     public class Eor : Instruction
     {
         public Eor() : base(CPU.Instructions.EOR)
@@ -490,6 +564,9 @@ namespace CPUVisNEA
     }
 
     //---------------------------------------     LSL      Instruction ------------------------------------------------
+    //LSL RegisterArg, RegisterArg, IntorReg
+    //will have multiple acceptable types in second addArg index
+
     public class Lsl : Instruction
     {
         public Lsl() : base(CPU.Instructions.LSL)
@@ -532,6 +609,9 @@ namespace CPUVisNEA
     }
 
     //---------------------------------------     LSR      Instruction ------------------------------------------------
+    //LSR RegisterArg, RegisterArg, IntorReg
+    //will have multiple acceptable types in second addArg index
+
     public class Lsr : Instruction
     {
         public Lsr() : base(CPU.Instructions.LSR)
@@ -574,6 +654,9 @@ namespace CPUVisNEA
     }
 
     //---------------------------------------     ADD      Instruction ------------------------------------------------
+    //ADD RegisterArg, RegisterArg, IntorReg
+    //will have multiple acceptable types in second addArg index
+
     public class Add : Instruction
     {
         public Add() : base(CPU.Instructions.ADD)
@@ -616,6 +699,8 @@ namespace CPUVisNEA
     }
 
     //---------------------------------------     SUB     Instruction ------------------------------------------------
+    //SUB RegisterArg, RegisterArg, IntorReg
+    //will have multiple acceptable types in second addArg index
     public class Sub : Instruction
     {
         public Sub() : base(CPU.Instructions.SUB)
