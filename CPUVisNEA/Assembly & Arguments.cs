@@ -12,11 +12,39 @@ namespace CPUVisNEA
     
     
     //---------------------------------------- Argument classes ------------------------------------------------
-    //todo fill in arguement and acceptible RegArg and Literal value arguements, Add additonal types of parameters
-    //mabye take number and type of inputs as Dictionary or multidimensional array
-    // Instruction x position x possibles 
-    // e.g Parameters[ {Instruction} , { Param Index } ] returns Array[RegisterTypes]
+    /*todo fill in arguement and acceptible RegArg and Literal value arguements, Add additonal types of parameters
+    mabye take number and type of inputs as Dictionary or multidimensional array?
+    grouping of like instructions,
+    Instruction x position x possibles 
+    e.g Parameters[ {Instruction} , { Param Index } ] returns Array[RegisterTypes] 
     
+    todo addArg is a joke - 
+        create addArg method calls look up method to check if valid 
+        look up function uses  that uses public dictionary to search by Tag to find grouping and correspondent valid input list
+        addArg uses parameter (Argument arg) and returns valid if 
+        todo change statement below
+        {!arg.GetType().IsInstanceOfType(typeof(RegisterArg)) && args.Count == 0 } 
+        /*whilst this method creates a public dictionary that takes up storage, it vastly reduces number
+        of repetitive methods and lines in the following child classes and programs in code below. *#
+        
+        protected void validParamType(Argument arg,  ) {
+            if( !(  arg.GetType().IsInstanceOfType( typeof(RegisterArg) )  )  && args.Count == 0 } 
+        }
+        
+        protected void addArg(Argument arg){
+            if( validParamType( arg ) ) {
+                args.append( arg ) ; 
+            }
+        }
+    
+    */
+    
+    var dictionaryOfValidParams = new Dictionary<List<CPU.Instructions>, List<Argument >>()
+    {
+        //todo 
+        // 
+        //{ new List CPU.Instructions { }  , new StudentName { FirstName="Sachin", LastName="Karnik", ID=211 } },
+    };
     
     public interface Argument
     {
@@ -26,7 +54,7 @@ namespace CPUVisNEA
      Register Argument  ( memory reference is basically a Register Argument) 
      Integer Argument
      label ( label : Normal Line todo whilst filtering, if random string ( label ) , check valid b4 record index and label name - treat after : as instruction to be filtered
-     condition ( on B if bla bla bla )
+     condition ( EQ NE LT MT ) 
      */
     public class RegisterArg : Argument { public int index; } // requires index of register before calling to CPU to retrieve value of target
     
@@ -38,7 +66,7 @@ namespace CPUVisNEA
     }
     public class condition : Argument
     {
-        private string expression; // todo new class expression required that takes parameters and returns boolean
+        private string expression; // todo case EQ NE LT GT 
     } 
     
     
@@ -48,7 +76,7 @@ namespace CPUVisNEA
     public abstract class Instruction
     {
         //protected so all inherited classes have args attributes 
-        // internal so TestConsole can access child class' args
+        // internal so TestConsole can access Instruction child class' args
         protected internal List<Argument> args = new List<Argument>(); //list of instruction arguments
         public CPU.Instructions Tag { get; } //use enum to get Tag ( instruction name ) 
         //sets instruction tag automatically to new instance of an Instruction class or child classes
@@ -86,7 +114,7 @@ namespace CPUVisNEA
 
         protected abstract void addArg(Argument arg);
 
-        protected abstract void executeInstruction( /*arguement type*/ List<Argument> args); //????????
+        protected internal abstract void executeInstruction( /*arguement type*/ List<Argument> args); //????????
 
     }
     // total acceptable statements 
@@ -121,7 +149,7 @@ namespace CPUVisNEA
         }
         
         //todo create Instruction method to deal w input ( also add description of how operator works, from NEA writeup ) 
-        protected override void executeInstruction(List<Argument> args )
+        protected internal override void executeInstruction(List<Argument> args )
         {
             //break out of program and enter frozen/ return to edit state
         }
@@ -167,7 +195,7 @@ namespace CPUVisNEA
         }
         
         //todo create Instruction method to deal w input ( also add description of how operator works, from NEA writeup ) 
-        protected override void executeInstruction(List<Argument> args )
+        protected internal override void executeInstruction(List<Argument> args )
         {
             
         }
@@ -212,7 +240,7 @@ namespace CPUVisNEA
         }
         
         //todo create Instruction method to deal w input ( also add description of how operator works, from NEA writeup ) 
-        protected override void executeInstruction(List<Argument> args )
+        protected internal override void executeInstruction(List<Argument> args )
         {
             
         }
@@ -256,7 +284,7 @@ namespace CPUVisNEA
         }
         
         //todo create Instruction method to deal w input ( also add description of how operator works, from NEA writeup ) 
-        protected override void executeInstruction(List<Argument> args )
+        protected internal override void executeInstruction(List<Argument> args )
         {
             
         }
@@ -300,7 +328,7 @@ namespace CPUVisNEA
         }
         
         //todo create Instruction method to deal w input ( also add description of how operator works, from NEA writeup ) 
-        protected override void executeInstruction(List<Argument> args )
+        protected internal override void executeInstruction(List<Argument> args )
         {
             
         }
@@ -352,7 +380,7 @@ namespace CPUVisNEA
         }
         
         //todo create Instruction method to deal w input ( also add description of how operator works, from NEA writeup ) 
-        protected override void executeInstruction(List<Argument> args )
+        protected internal override void executeInstruction(List<Argument> args )
         {
             
         }
@@ -396,7 +424,7 @@ namespace CPUVisNEA
         }
         
         //todo create Instruction method to deal w input ( also add description of how operator works, from NEA writeup ) 
-        protected override void executeInstruction(List<Argument> args )
+        protected internal override void executeInstruction(List<Argument> args )
         {
             
         }
@@ -440,7 +468,7 @@ namespace CPUVisNEA
         }
         
         //todo create Instruction method to deal w input ( also add description of how operator works, from NEA writeup ) 
-        protected override void executeInstruction(List<Argument> args )
+        protected internal override void executeInstruction(List<Argument> args )
         {
             
         }
@@ -485,7 +513,7 @@ namespace CPUVisNEA
         }
         
         //todo create Instruction method to deal w input ( also add description of how operator works, from NEA writeup ) 
-        protected override void executeInstruction(List<Argument> args )
+        protected internal override void executeInstruction(List<Argument> args )
         {
             
         }
@@ -530,7 +558,7 @@ namespace CPUVisNEA
         }
         
         //todo create Instruction method to deal w input ( also add description of how operator works, from NEA writeup ) 
-        protected override void executeInstruction(List<Argument> args )
+        protected internal override void executeInstruction(List<Argument> args )
         {
             
         }
@@ -575,7 +603,7 @@ namespace CPUVisNEA
         }
         
         //todo create Instruction method to deal w input ( also add description of how operator works, from NEA writeup ) 
-        protected override void executeInstruction(List<Argument> args )
+        protected internal override void executeInstruction(List<Argument> args )
         {
             
         }
@@ -620,7 +648,7 @@ namespace CPUVisNEA
         }
         
         //todo create Instruction method to deal w input ( also add description of how operator works, from NEA writeup ) 
-        protected override void executeInstruction(List<Argument> args )
+        protected internal override void executeInstruction(List<Argument> args )
         {
             
         }
@@ -665,7 +693,7 @@ namespace CPUVisNEA
         }
         
         //todo create Instruction method to deal w input ( also add description of how operator works, from NEA writeup ) 
-        protected override void executeInstruction(List<Argument> args )
+        protected internal override void executeInstruction(List<Argument> args )
         {
             
         }
@@ -709,7 +737,7 @@ namespace CPUVisNEA
         }
         
         //todo create Instruction method to deal w input ( also add description of how operator works, from NEA writeup ) 
-        protected override void executeInstruction(List<Argument> args )
+        protected internal override void executeInstruction(List<Argument> args )
         {
             
         }

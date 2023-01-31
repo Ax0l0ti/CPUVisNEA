@@ -16,27 +16,25 @@ namespace CPUVisNEA
     {
         public enum Instructions
         {
+            //enum number integer can beconverted to represent binary value 
+            //e.g Halt == 0 == 0000
+            //e.g LDR == 5 == 0101
             HALT, B, MOV, CMP, MVN, LDR, STR, AND, ORR, EOR, LSL, LSR, ADD, SUB
         }
-        public Register[] SPRegisters;
-        public List<Register> BasicRegisters = new List<Register>(10);
+
+        private Register[] SPRegisters;
+        private List<Register> BasicRegisters = new List<Register>(10);
         
         public RAM Ram = new RAM();
         public ALU Alu = new ALU();
         
 
-        private void ChangeState()
-        {
-        }
-
 
         /* TODO add 
          GetAssFiles()  // for the menu of load programs
          Save()  //calls Ram.SaveProg calls create new instantiation of AssProg
- 
-         Compile() 
-         CompileValid() //set defaults to variables
-         stateChange()
+         stateChange()??
+         
          Update RunSpeed
          Runspeed Dictionary //to translate choices to int speed or user step
          Run()
@@ -335,12 +333,13 @@ namespace CPUVisNEA
             switch (instr.Tag)
             {
                 case CPU.Instructions.MOV:
-                    
+                    instr.executeInstruction(instr.args);
                     break;
                 case CPU.Instructions.ADD:
                     break;
                 case CPU.Instructions.SUB:
                     break;
+                //todo add cases
                 default:
                     throw new ArgumentOutOfRangeException();
             }
