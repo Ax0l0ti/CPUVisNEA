@@ -35,11 +35,18 @@ namespace CPUVisNEA
         public void testInstructionParse()
         {
             Mov mov = new Mov();
-            Instruction.addParsedArgs(mov, new string[]{"R1", "1234"}.ToList());
-            Assert.Equals(mov.args.Count, 2);
-            Instruction.addParsedArgs(mov, new string[]{"R1", "R1"}.ToList());
-            
-       }
+            Console.WriteLine( typeof(CPU.Instructions) ) ; 
+            Console.WriteLine(mov.Tag);
+            var valid = mov.validParamType(new RegisterArg() );
+            var notValid  = mov.validParamType(new IntegerArg() );
+            Console.WriteLine($"1st param = register should pass  {valid} as true ");
+            Console.WriteLine($"1st param = integer should pass  {notValid} as false ");
+            //
+            // Instruction.addParsedArgs(mov, new string[]{"R1", "1234"}.ToList());
+            // Assert.Equals(mov.args.Count, 2);
+            // Instruction.addParsedArgs(mov, new string[]{"R1", "R1"}.ToList());
+            // Console.WriteLine(mov.args[0].GetType());
+        }
 
         /* todo list of tests
         file handling  

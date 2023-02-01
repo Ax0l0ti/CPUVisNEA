@@ -21,6 +21,7 @@ namespace CPUVisNEA
             //e.g LDR == 5 == 0101
             HALT, B, MOV, CMP, MVN, LDR, STR, AND, ORR, EOR, LSL, LSR, ADD, SUB
         }
+ 
 
         private Register[] SPRegisters;
         private List<Register> BasicRegisters = new List<Register>(10);

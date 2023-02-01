@@ -7,26 +7,48 @@ using System.Windows.Forms;
 using System.Text.RegularExpressions;  
 //https://resources.jetbrains.com/storage/products/rider/docs/Rider_default_win_shortcuts.pdf?_gl=1*8v6mpv*_ga*Mzk0Njg2ODg3LjE2NjExMDU4MzA.*_ga_9J976DJZ68*MTY3NTAyNjgxNS4xNy4wLjE2NzUwMjY4MjAuMC4wLjA.&_ga=2.77451923.725299765.1675026816-394686887.1661105830
 
+/* OLD ADDARG method 
+ protected override void addArg(Argument arg) //TODO LIESSSSSSSS 
+        {
+            //if argument added isn't an acceptable type of argument at 1st Instruction parameter
+            if ( ( !arg.GetType().IsInstanceOfType(typeof(RegisterArg)) && args.Count == 0 ) 
+                 ||  // or not acceptable type of argument at 2nd argument 
+                 ( !arg.GetType().IsInstanceOfType(typeof(IntegerArg)) && args.Count == 1 )  )
+            { throw new Exception($"= arg {args.Count + 1} can't be {arg.GetType()} ");
+            }
+            else //acceptable input 
+            {
+                
+            }
+
+        }
+
+*/
 namespace CPUVisNEA
-{     
+{
     
-    
+
     //---------------------------------------- Argument classes ------------------------------------------------
     /*todo fill in arguement and acceptible RegArg and Literal value arguements, Add additonal types of parameters
-    mabye take number and type of inputs as Dictionary or multidimensional array?
-    grouping of like instructions,
-    Instruction x position x possibles 
-    e.g Parameters[ {Instruction} , { Param Index } ] returns Array[RegisterTypes] 
+    
+    //HALT 
+    //B <label>
+    //B<condition> <label>
+    //MOV RegisterArg, IntegerArg
+    //CMP RegisterArg, IntegerArg
+    //MVN RegisterArg, IntegerArg
+    //LDR RegisterArg, RegisterArg
+    //STR RegisterArg, RegisterArg
+    // Below will have multiple acceptable types in second addArg index
+    //AND RegisterArg, RegisterArg, IntorReg
+    //ORR RegisterArg, RegisterArg, IntorReg
+    //EOR RegisterArg, RegisterArg, IntorReg
+    //LSL RegisterArg, RegisterArg, IntorReg
+    //LSR RegisterArg, RegisterArg, IntorReg
+    //ADD RegisterArg, RegisterArg, IntorReg
+    //SUB RegisterArg, RegisterArg, IntorReg
     
     todo addArg is a joke - 
-        create addArg method calls look up method to check if valid 
-        look up function uses  that uses public dictionary to search by Tag to find grouping and correspondent valid input list
-        addArg uses parameter (Argument arg) and returns valid if 
-        todo change statement below
-        {!arg.GetType().IsInstanceOfType(typeof(RegisterArg)) && args.Count == 0 } 
-        /*whilst this method creates a public dictionary that takes up storage, it vastly reduces number
-        of repetitive methods and lines in the following child classes and programs in code below. *#
-        
         protected void validParamType(Argument arg,  ) {
             if( !(  arg.GetType().IsInstanceOfType( typeof(RegisterArg) )  )  && args.Count == 0 } 
         }
@@ -38,13 +60,6 @@ namespace CPUVisNEA
         }
     
     */
-    
-    var dictionaryOfValidParams = new Dictionary<List<CPU.Instructions>, List<Argument >>()
-    {
-        //todo 
-        // 
-        //{ new List CPU.Instructions { }  , new StudentName { FirstName="Sachin", LastName="Karnik", ID=211 } },
-    };
     
     public interface Argument
     {
@@ -84,6 +99,19 @@ namespace CPUVisNEA
         {
             this.Tag = tag;
         }
+
+
+        protected static internal Dictionary<CPU.Instructions[], Type[]> dictionaryOfValidParams =
+            new Dictionary<CPU.Instructions[], Type[]>()
+            {
+                //todo fill in 
+                // 
+                //{ new List CPU.Instructions { }  , new StudentName { FirstName="Sachin", LastName="Karnik", ID=211 } },
+                {new CPU.Instructions[] { CPU.Instructions.MOV, CPU.Instructions.CMP , CPU.Instructions.MVN, CPU.Instructions.LDR, CPU.Instructions.STR   }   , new Type[]{ typeof(RegisterArg), typeof(IntegerArg) }  }
+            };
+    
+        
+        
         //add Parsed Argument takes 
         public static void addParsedArgs(Instruction instruc, List<string> arguments)
         {
@@ -110,11 +138,44 @@ namespace CPUVisNEA
                 //todo check if below works
                 instruc.addArg(parsed);
             }
+
+            MessageBox.Show($"successfully passed all {instruc.Tag}");
+            
         }
 
         protected abstract void addArg(Argument arg);
 
-        protected internal abstract void executeInstruction( /*arguement type*/ List<Argument> args); //????????
+        /*  protected void addArg(Argument arg);
+        {
+            if (validParamType(arg)) {args.append(arg)} 
+            else { throw new Exception($"= arg {args.Count + 1} can't be {arg.GetType()} ");  }
+        }
+         
+        Checks if the arguement passed is a valid arguement to be passed to the instruction
+        protected and stored in Instruction class so all child classes can inherit
+        internal used so the Console interface can access the method 
+        whilst this method of solving the problem creates a public dictionary that takes up storage, it vastly reduces number
+        of repetitive methods and lines in the following child classes and programs in code below due to repetitive format of Instruction Parameters */
+        protected internal bool validParamType(Argument arg)
+        {
+            foreach (var InstructGrouping in dictionaryOfValidParams)
+            {
+                if (InstructGrouping.Key.Contains(Tag) ){
+                    if (arg.GetType() == InstructGrouping.Value[args.Count])
+                    {
+                        return true;
+                    }
+                }  
+            }
+            return false;
+        }
+        
+        
+
+
+
+
+    protected internal abstract void executeInstruction( /*arguement type*/ List<Argument> args); //????????
 
     }
     // total acceptable statements 
