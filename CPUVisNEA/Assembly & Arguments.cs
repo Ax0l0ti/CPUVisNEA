@@ -7,23 +7,25 @@ using System.Windows.Forms;
 using System.Text.RegularExpressions;  
 //https://resources.jetbrains.com/storage/products/rider/docs/Rider_default_win_shortcuts.pdf?_gl=1*8v6mpv*_ga*Mzk0Njg2ODg3LjE2NjExMDU4MzA.*_ga_9J976DJZ68*MTY3NTAyNjgxNS4xNy4wLjE2NzUwMjY4MjAuMC4wLjA.&_ga=2.77451923.725299765.1675026816-394686887.1661105830
 
-/* OLD ADDARG method 
- protected override void addArg(Argument arg) //TODO LIESSSSSSSS 
-        {
-            //if argument added isn't an acceptable type of argument at 1st Instruction parameter
-            if ( ( !arg.GetType().IsInstanceOfType(typeof(RegisterArg)) && args.Count == 0 ) 
-                 ||  // or not acceptable type of argument at 2nd argument 
-                 ( !arg.GetType().IsInstanceOfType(typeof(IntegerArg)) && args.Count == 1 )  )
-            { throw new Exception($"= arg {args.Count + 1} can't be {arg.GetType()} ");
-            }
-            else //acceptable input 
-            {
-                
-            }
-
-        }
-
+/* basic todo list
+ General
+ ---->  Deal w parseArgs()
+ --------->  Seems kinda wacko 
+ ---->  Take old and new method of param get acceptable
+ 
+ 
+ Specialised 
+ ---->  ExecuteInstruction whatnot
+ ---->  B parsedArgs errors( relates to general 1 ) 
+ --------->  Compare Branch interactions
+ --------->  Labels
+ ---->  Halt business
+ --------->  Check she doesnt Kill program w null list
+  
+ 
+ 
 */
+
 namespace CPUVisNEA
 {
     
@@ -40,37 +42,26 @@ namespace CPUVisNEA
     //LDR RegisterArg, RegisterArg
     //STR RegisterArg, RegisterArg
     // Below will have multiple acceptable types in second addArg index
-    //AND RegisterArg, RegisterArg, IntorReg
-    //ORR RegisterArg, RegisterArg, IntorReg
-    //EOR RegisterArg, RegisterArg, IntorReg
-    //LSL RegisterArg, RegisterArg, IntorReg
-    //LSR RegisterArg, RegisterArg, IntorReg
-    //ADD RegisterArg, RegisterArg, IntorReg
-    //SUB RegisterArg, RegisterArg, IntorReg
+    //AND RegisterArg, RegisterArg, IntegerArg
+    //ORR RegisterArg, RegisterArg, IntegerArg
+    //EOR RegisterArg, RegisterArg, IntegerArg
+    //LSL RegisterArg, RegisterArg, IntegerArg
+    //LSR RegisterArg, RegisterArg, IntegerArg
+    //ADD RegisterArg, RegisterArg, IntegerArg
+    //SUB RegisterArg, RegisterArg, IntegerArg
     
-    todo addArg is a joke - 
+    todo compare old valid param w new in Write up
         protected void validParamType(Argument arg,  ) {
             if( !(  arg.GetType().IsInstanceOfType( typeof(RegisterArg) )  )  && args.Count == 0 } 
         }
         
         protected void addArg(Argument arg){
-            if( validParamType( arg ) ) {
-                args.append( arg ) ; 
-            }
-        }
-    
+            if( validParamType( arg ) ) {  args.append( arg ) ;   } }
+            
     */
     
-    public interface Argument
-    {
-    }
-    /*Potential Parameters -
-     
-     Register Argument  ( memory reference is basically a Register Argument) 
-     Integer Argument
-     label ( label : Normal Line todo whilst filtering, if random string ( label ) , check valid b4 record index and label name - treat after : as instruction to be filtered
-     condition ( EQ NE LT MT ) 
-     */
+    public interface Argument{}
+
     public class RegisterArg : Argument { public int index; } // requires index of register before calling to CPU to retrieve value of target
     
     public class IntegerArg : Argument {public int value; } // basic value passed
@@ -79,12 +70,8 @@ namespace CPUVisNEA
     {   private int location; // destination
         private string name; // correspondent string for display purpose
     }
-    public class condition : Argument
-    {
-        private string expression; // todo case EQ NE LT GT 
-    } 
-    
-    
+
+
     //----------------------------------------Instruction classes and generation------------------------------------------------
     
     
@@ -98,6 +85,7 @@ namespace CPUVisNEA
         protected Instruction(CPU.Instructions tag)
         {
             this.Tag = tag;
+            
         }
 
 
@@ -105,9 +93,17 @@ namespace CPUVisNEA
             new Dictionary<CPU.Instructions[], Type[]>()
             {
                 //todo fill in 
-                // 
-                //{ new List CPU.Instructions { }  , new StudentName { FirstName="Sachin", LastName="Karnik", ID=211 } },
-                {new CPU.Instructions[] { CPU.Instructions.MOV, CPU.Instructions.CMP , CPU.Instructions.MVN, CPU.Instructions.LDR, CPU.Instructions.STR   }   , new Type[]{ typeof(RegisterArg), typeof(IntegerArg) }  }
+                //MOV CMP MVN LDR STR
+                {new CPU.Instructions[] { CPU.Instructions.MOV, CPU.Instructions.CMP , CPU.Instructions.MVN, CPU.Instructions.LDR, CPU.Instructions.STR   }
+                ,new Type[]{ typeof(RegisterArg), typeof(IntegerArg) } },
+                //AND ORR EOR LSL LSR ADD SUB
+                {new CPU.Instructions[] { CPU.Instructions.AND, CPU.Instructions.ORR , CPU.Instructions.EOR, CPU.Instructions.LSL, CPU.Instructions.LSR, CPU.Instructions.ADD, CPU.Instructions.SUB }, 
+                 new Type[]{ typeof(RegisterArg), typeof(RegisterArg), typeof(IntegerArg) } },
+                {new CPU.Instructions[] { CPU.Instructions.HALT } , null }, // doesnt accept any additional text or parameters to statement
+                //B *=( acts for all branches
+                {new CPU.Instructions[] { CPU.Instructions.B } , new Type[] {typeof(label)  } }
+                
+                
             };
     
         
@@ -127,7 +123,6 @@ namespace CPUVisNEA
                 //     case : "Register" { Argument parsed = new RegisterArg(); break;
                 //     case : "Integer" { Argument parsed = new IntegerArg(); break;
                 //     case : "label" { Argument parsed = new label(); break;
-                //     case : "condition" { Argument parsed = new condition(); break;
                 //     default : new ErrorMessage("unrecognised")
                 // }
                 
@@ -142,15 +137,20 @@ namespace CPUVisNEA
             MessageBox.Show($"successfully passed all {instruc.Tag}");
             
         }
+        //FAT Todo 
 
-        protected abstract void addArg(Argument arg);
-
-        /*  protected void addArg(Argument arg);
+        protected internal void addArg(Argument arg)
         {
-            if (validParamType(arg)) {args.append(arg)} 
-            else { throw new Exception($"= arg {args.Count + 1} can't be {arg.GetType()} ");  }
+            if (validParamType(arg))
+            {
+                args.Add(arg);
+            }
+            else
+            {
+                throw new Exception($"= arg {args.Count + 1} can't be {arg.GetType()} ");
+            }
         }
-         
+        /*
         Checks if the arguement passed is a valid arguement to be passed to the instruction
         protected and stored in Instruction class so all child classes can inherit
         internal used so the Console interface can access the method 
@@ -169,13 +169,8 @@ namespace CPUVisNEA
             }
             return false;
         }
-        
-        
-
-
-
-
-    protected internal abstract void executeInstruction( /*arguement type*/ List<Argument> args); //????????
+        // basic overridable call statement for all assembly operations to override to deal with individual arguments 
+        protected internal abstract void executeInstruction( List<Argument> args); 
 
     }
     // total acceptable statements 
@@ -189,13 +184,13 @@ namespace CPUVisNEA
     //LDR RegisterArg, RegisterArg
     //STR RegisterArg, RegisterArg
     // Below will have multiple acceptable types in second addArg index
-    //AND RegisterArg, RegisterArg, IntorReg
-    //ORR RegisterArg, RegisterArg, IntorReg
-    //EOR RegisterArg, RegisterArg, IntorReg
-    //LSL RegisterArg, RegisterArg, IntorReg
-    //LSR RegisterArg, RegisterArg, IntorReg
-    //ADD RegisterArg, RegisterArg, IntorReg
-    //SUB RegisterArg, RegisterArg, IntorReg
+    //AND RegisterArg, RegisterArg, IntegerArg
+    //ORR RegisterArg, RegisterArg, IntegerArg
+    //EOR RegisterArg, RegisterArg, IntegerArg
+    //LSL RegisterArg, RegisterArg, IntegerArg
+    //LSR RegisterArg, RegisterArg, IntegerArg
+    //ADD RegisterArg, RegisterArg, IntegerArg
+    //SUB RegisterArg, RegisterArg, IntegerArg
     
     
     //todo create all instruction options
@@ -224,70 +219,52 @@ namespace CPUVisNEA
             return halt;
         }
         
-
-        //overriden to only accept valid parameter types in specific positions
-        
-        protected override void addArg(Argument arg) //TODO LIESSSSSSSS 
-        {
-            //if argument added isn't an acceptable type of argument at 1st Instruction parameter
-            if ( ( !arg.GetType().IsInstanceOfType(typeof(RegisterArg)) && args.Count == 0 ) 
-                 ||  // or not acceptable type of argument at 2nd argument 
-                 ( !arg.GetType().IsInstanceOfType(typeof(IntegerArg)) && args.Count == 1 )  )
-            { throw new Exception($"= arg {args.Count + 1} can't be {arg.GetType()} ");
-            }
-            else //acceptable input 
-            {
-                
-            }
-
-        }
     }
     
     //---------------------------------------     B     Instruction ------------------------------------------------
     //B <label>
     
     // todo special due to condition
-
+    //B class acts as all variants, conditional is seperated and stored as a local attribute of the Branch statement to switch case action in execute Instruction
     public class B : Instruction
     {
-        public B() : base(CPU.Instructions.B)
+        private string condition;
+        //takes condition as a parameter 
+        public B(string condition) : base(CPU.Instructions.B)
         {
+            this.condition = condition;
             
         }
         
         //todo create Instruction method to deal w input ( also add description of how operator works, from NEA writeup ) 
         protected internal override void executeInstruction(List<Argument> args )
         {
+            switch (condition)
+            {
+                case "LT" :
+                    break;
+                case "GT" :
+                    break;
+                case "EQ" :
+                    break;
+                case "NE" :
+                    break;
+            }
             
+                
         }
         
-        public static B parseArgs(List<string> args)
+        public B parseArgs(List<string> args)
         {
-            var b = new B();
-            //passes Instruction in Parameter 1 the arguments in args
-            //calls modified version of addArg (below) in child class 
-            addParsedArgs(b, args);
+            var b = new B(condition );
+            addParsedArgs( b , args);
             return b;
         }
         
-
-        //overriden to only accept valid parameter types in specific positions
-        
-        protected override void addArg(Argument arg) //TODO LIESSSSSSSS
-        {
-            //if argument added isn't an acceptable type of argument at 1st Instruction parameter
-            if ( ( !arg.GetType().IsInstanceOfType(typeof(RegisterArg)) && args.Count == 0 ) 
-                 ||  // or not acceptable type of argument at 2nd argument 
-                 ( !arg.GetType().IsInstanceOfType(typeof(IntegerArg)) && args.Count == 1 )  )
-            { throw new Exception($"= arg {args.Count + 1} can't be {arg.GetType()} ");
-            }
-            else //acceptable input 
-            {
-                
-            }
-
-        }
     }
+    //todo all braches 
+
+    
 
     //---------------------------------------     MOV     Instruction ------------------------------------------------
     //MOV RegisterArg, IntegerArg
@@ -315,23 +292,6 @@ namespace CPUVisNEA
             return mov;
         }
         
-
-        //overriden to only accept valid parameter types in specific positions
-        
-        protected override void addArg(Argument arg) //TODO LIESSSSSSSS 
-        {
-            //if argument added isn't an acceptable type of argument at 1st Instruction parameter
-            if ( ( !arg.GetType().IsInstanceOfType(typeof(RegisterArg)) && args.Count == 0 ) 
-                 ||  // or not acceptable type of argument at 2nd argument 
-                 ( !arg.GetType().IsInstanceOfType(typeof(IntegerArg)) && args.Count == 1 )  )
-            { throw new Exception($"= arg {args.Count + 1} can't be {arg.GetType()} ");
-            }
-            else //acceptable input 
-            {
-                
-            }
-
-        }
     }
 
     //---------------------------------------     CMP      Instruction ------------------------------------------------
@@ -359,23 +319,6 @@ namespace CPUVisNEA
             return cmp;
         }
         
-
-        //overriden to only accept valid parameter types in specific positions
-        
-        protected override void addArg(Argument arg) //TODO LIESSSSSSSS 
-        {
-            //if argument added isn't an acceptable type of argument at 1st Instruction parameter
-            if ( ( !arg.GetType().IsInstanceOfType(typeof(RegisterArg)) && args.Count == 0 ) 
-                 ||  // or not acceptable type of argument at 2nd argument 
-                 ( !arg.GetType().IsInstanceOfType(typeof(IntegerArg)) && args.Count == 1 )  )
-            { throw new Exception($"= arg {args.Count + 1} can't be {arg.GetType()} ");
-            }
-            else //acceptable input 
-            {
-                
-            }
-
-        }
     }
 
     //---------------------------------------     MVN      Instruction ------------------------------------------------
@@ -403,36 +346,10 @@ namespace CPUVisNEA
             return mvn;
         }
         
-
-        //overriden to only accept valid parameter types in specific positions
-        
-        protected override void addArg(Argument arg) //TODO LIESSSSSSSS 
-        {
-            //if argument added isn't an acceptable type of argument at 1st Instruction parameter
-            if ( ( !arg.GetType().IsInstanceOfType(typeof(RegisterArg)) && args.Count == 0 ) 
-                 ||  // or not acceptable type of argument at 2nd argument 
-                 ( !arg.GetType().IsInstanceOfType(typeof(IntegerArg)) && args.Count == 1 )  )
-            { throw new Exception($"= arg {args.Count + 1} can't be {arg.GetType()} ");
-            }
-            else //acceptable input 
-            {
-                
-            }
-
-        }
     }
 
     //---------------------------------------     LDR      Instruction ------------------------------------------------
     //LDR RegisterArg, RegisterArg
-    //STR RegisterArg, RegisterArg
-    // Below will have multiple acceptable types in second addArg index
-    //AND RegisterArg, RegisterArg, IntorReg
-    //ORR RegisterArg, RegisterArg, IntorReg
-    //EOR RegisterArg, RegisterArg, IntorReg
-    //LSL RegisterArg, RegisterArg, IntorReg
-    //LSR RegisterArg, RegisterArg, IntorReg
-    //ADD RegisterArg, RegisterArg, IntorReg
-    //SUB RegisterArg, RegisterArg, IntorReg
     public class Ldr : Instruction
     {
         public Ldr() : base(CPU.Instructions.LDR)
@@ -455,23 +372,6 @@ namespace CPUVisNEA
             return ldr;
         }
         
-
-        //overriden to only accept valid parameter types in specific positions
-        
-        protected override void addArg(Argument arg) //TODO LIESSSSSSSS 
-        {
-            //if argument added isn't an acceptable type of argument at 1st Instruction parameter
-            if ( ( !arg.GetType().IsInstanceOfType(typeof(RegisterArg)) && args.Count == 0 ) 
-                 ||  // or not acceptable type of argument at 2nd argument 
-                 ( !arg.GetType().IsInstanceOfType(typeof(IntegerArg)) && args.Count == 1 )  )
-            { throw new Exception($"= arg {args.Count + 1} can't be {arg.GetType()} ");
-            }
-            else //acceptable input 
-            {
-                
-            }
-
-        }
     }
 
     //---------------------------------------     STR      Instruction ------------------------------------------------
@@ -499,26 +399,9 @@ namespace CPUVisNEA
             return str;
         }
         
-
-        //overriden to only accept valid parameter types in specific positions
-        
-        protected override void addArg(Argument arg) //TODO LIESSSSSSSS 
-        {
-            //if argument added isn't an acceptable type of argument at 1st Instruction parameter
-            if ( ( !arg.GetType().IsInstanceOfType(typeof(RegisterArg)) && args.Count == 0 ) 
-                 ||  // or not acceptable type of argument at 2nd argument 
-                 ( !arg.GetType().IsInstanceOfType(typeof(IntegerArg)) && args.Count == 1 )  )
-            { throw new Exception($"= arg {args.Count + 1} can't be {arg.GetType()} ");
-            }
-            else //acceptable input 
-            {
-                
-            }
-
-        }
     }
     //---------------------------------------     AND      Instruction ------------------------------------------------
-    //AND RegisterArg, RegisterArg, IntorReg
+    //AND RegisterArg, RegisterArg, IntegerArg
     //will have multiple acceptable types in second addArg index
 
     public class And : Instruction
@@ -543,27 +426,10 @@ namespace CPUVisNEA
             return and;
         }
         
-
-        //overriden to only accept valid parameter types in specific positions
-        
-        protected override void addArg(Argument arg) //TODO LIESSSSSSSS 
-        {
-            //if argument added isn't an acceptable type of argument at 1st Instruction parameter
-            if ( ( !arg.GetType().IsInstanceOfType(typeof(RegisterArg)) && args.Count == 0 ) 
-                 ||  // or not acceptable type of argument at 2nd argument 
-                 ( !arg.GetType().IsInstanceOfType(typeof(IntegerArg)) && args.Count == 1 )  )
-            { throw new Exception($"= arg {args.Count + 1} can't be {arg.GetType()} ");
-            }
-            else //acceptable input 
-            {
-                
-            }
-
-        }
     }
 
     //---------------------------------------     ORR      Instruction ------------------------------------------------
-    //ORR RegisterArg, RegisterArg, IntorReg
+    //ORR RegisterArg, RegisterArg, IntegerArg
     //will have multiple acceptable types in second addArg index
 
     public class Orr : Instruction
@@ -588,27 +454,10 @@ namespace CPUVisNEA
             return orr;
         }
         
-
-        //overriden to only accept valid parameter types in specific positions
-        
-        protected override void addArg(Argument arg) //TODO LIESSSSSSSS 
-        {
-            //if argument added isn't an acceptable type of argument at 1st Instruction parameter
-            if ( ( !arg.GetType().IsInstanceOfType(typeof(RegisterArg)) && args.Count == 0 ) 
-                 ||  // or not acceptable type of argument at 2nd argument 
-                 ( !arg.GetType().IsInstanceOfType(typeof(IntegerArg)) && args.Count == 1 )  )
-            { throw new Exception($"= arg {args.Count + 1} can't be {arg.GetType()} ");
-            }
-            else //acceptable input 
-            {
-                
-            }
-
-        }
     }
 
     //---------------------------------------     EOR      Instruction ------------------------------------------------
-    //EOR RegisterArg, RegisterArg, IntorReg
+    //EOR RegisterArg, RegisterArg, IntegerArg
     //will have multiple acceptable types in second addArg index
 
     public class Eor : Instruction
@@ -633,27 +482,10 @@ namespace CPUVisNEA
             return eor;
         }
         
-
-        //overriden to only accept valid parameter types in specific positions
-        
-        protected override void addArg(Argument arg) //TODO LIESSSSSSSS 
-        {
-            //if argument added isn't an acceptable type of argument at 1st Instruction parameter
-            if ( ( !arg.GetType().IsInstanceOfType(typeof(RegisterArg)) && args.Count == 0 ) 
-                 ||  // or not acceptable type of argument at 2nd argument 
-                 ( !arg.GetType().IsInstanceOfType(typeof(IntegerArg)) && args.Count == 1 )  )
-            { throw new Exception($"= arg {args.Count + 1} can't be {arg.GetType()} ");
-            }
-            else //acceptable input 
-            {
-                
-            }
-
-        }
     }
 
     //---------------------------------------     LSL      Instruction ------------------------------------------------
-    //LSL RegisterArg, RegisterArg, IntorReg
+    //LSL RegisterArg, RegisterArg, IntegerArg
     //will have multiple acceptable types in second addArg index
 
     public class Lsl : Instruction
@@ -678,27 +510,10 @@ namespace CPUVisNEA
             return lsl;
         }
         
-
-        //overriden to only accept valid parameter types in specific positions
-        
-        protected override void addArg(Argument arg) //TODO LIESSSSSSSS 
-        {
-            //if argument added isn't an acceptable type of argument at 1st Instruction parameter
-            if ( ( !arg.GetType().IsInstanceOfType(typeof(RegisterArg)) && args.Count == 0 ) 
-                 ||  // or not acceptable type of argument at 2nd argument 
-                 ( !arg.GetType().IsInstanceOfType(typeof(IntegerArg)) && args.Count == 1 )  )
-            { throw new Exception($"= arg {args.Count + 1} can't be {arg.GetType()} ");
-            }
-            else //acceptable input 
-            {
-                
-            }
-
-        }
     }
 
     //---------------------------------------     LSR      Instruction ------------------------------------------------
-    //LSR RegisterArg, RegisterArg, IntorReg
+    //LSR RegisterArg, RegisterArg, IntegerArg
     //will have multiple acceptable types in second addArg index
 
     public class Lsr : Instruction
@@ -723,27 +538,10 @@ namespace CPUVisNEA
             return lsr;
         }
         
-
-        //overriden to only accept valid parameter types in specific positions
-        
-        protected override void addArg(Argument arg) //TODO LIESSSSSSSS 
-        {
-            //if argument added isn't an acceptable type of argument at 1st Instruction parameter
-            if ( ( !arg.GetType().IsInstanceOfType(typeof(RegisterArg)) && args.Count == 0 ) 
-                 ||  // or not acceptable type of argument at 2nd argument 
-                 ( !arg.GetType().IsInstanceOfType(typeof(IntegerArg)) && args.Count == 1 )  )
-            { throw new Exception($"= arg {args.Count + 1} can't be {arg.GetType()} ");
-            }
-            else //acceptable input 
-            {
-                
-            }
-
-        }
     }
 
     //---------------------------------------     ADD      Instruction ------------------------------------------------
-    //ADD RegisterArg, RegisterArg, IntorReg
+    //ADD RegisterArg, RegisterArg, IntegerArg
     //will have multiple acceptable types in second addArg index
 
     public class Add : Instruction
@@ -768,27 +566,10 @@ namespace CPUVisNEA
             return add;
         }
         
-
-        //overriden to only accept valid parameter types in specific positions
-        
-        protected override void addArg(Argument arg) //TODO LIESSSSSSSS 
-        {
-            //if argument added isn't an acceptable type of argument at 1st Instruction parameter
-            if ( ( !arg.GetType().IsInstanceOfType(typeof(RegisterArg)) && args.Count == 0 ) 
-                 ||  // or not acceptable type of argument at 2nd argument 
-                 ( !arg.GetType().IsInstanceOfType(typeof(IntegerArg)) && args.Count == 1 )  )
-            { throw new Exception($"= arg {args.Count + 1} can't be {arg.GetType()} ");
-            }
-            else //acceptable input 
-            {
-                
-            }
-
-        }
     }
 
     //---------------------------------------     SUB     Instruction ------------------------------------------------
-    //SUB RegisterArg, RegisterArg, IntorReg
+    //SUB RegisterArg, RegisterArg, IntegerArg
     //will have multiple acceptable types in second addArg index
     public class Sub : Instruction
     {
@@ -812,22 +593,5 @@ namespace CPUVisNEA
             return sub;
         }
         
-
-        //overriden to only accept valid parameter types in specific positions
-        
-        protected override void addArg(Argument arg) //TODO LIESSSSSSSS 
-        {
-            //if argument added isn't an acceptable type of argument at 1st Instruction parameter
-            if ( ( !arg.GetType().IsInstanceOfType(typeof(RegisterArg)) && args.Count == 0 ) 
-                 ||  // or not acceptable type of argument at 2nd argument 
-                 ( !arg.GetType().IsInstanceOfType(typeof(IntegerArg)) && args.Count == 1 )  )
-            { throw new Exception($"= arg {args.Count + 1} can't be {arg.GetType()} ");
-            }
-            else //acceptable input 
-            {
-                
-            }
-
-        }
     }
 }

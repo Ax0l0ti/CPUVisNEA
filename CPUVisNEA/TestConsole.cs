@@ -41,7 +41,9 @@ namespace CPUVisNEA
             var notValid  = mov.validParamType(new IntegerArg() );
             Console.WriteLine($"1st param = register should pass  {valid} as true ");
             Console.WriteLine($"1st param = integer should pass  {notValid} as false ");
-            //
+            
+            // todo add more lines to test second param valid 
+            
             // Instruction.addParsedArgs(mov, new string[]{"R1", "1234"}.ToList());
             // Assert.Equals(mov.args.Count, 2);
             // Instruction.addParsedArgs(mov, new string[]{"R1", "R1"}.ToList());

@@ -203,7 +203,7 @@ namespace CPUVisNEA
                         args.Add(s);
                     }
                 }
-
+                var conditional = "";
                 Instruction parsed;
                 switch (instruction) 
                 {
@@ -216,17 +216,14 @@ namespace CPUVisNEA
                     }
                     //todo special as b can be condit or non condit
                     
-                    case "B":
+                    case "B" : 
+                    case "BEQ" : 
+                    case "BNE" : 
+                    case "BLT" : 
+                    case "BMT" :
                     {
-                        //special case condition 
-                        
-                        // if(condit exists)
-                        // {
-                        //     parsed = new B condit ();
-                        // }
-                        //
-                        //TEMPORARY
-                        parsed = new B();
+                        string condition = instruction.Replace("B", null);
+                        parsed = new B( condition );
                         break;
                     }
 
