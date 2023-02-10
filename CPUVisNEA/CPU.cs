@@ -32,17 +32,18 @@ namespace CPUVisNEA
 
 
         /* TODO add 
-         GetAssFiles()  // for the menu of load programs
-         Save()  //calls Ram.SaveProg calls create new instantiation of AssProg
+         GetAssemblyFiles()  // for the menu of load programs
+         SaveUserAssembly()  //calls Ram.SaveProg calls create new instantiation of AssProg
          stateChange()??
          
-         Update RunSpeed
+         UpdateRunSpeed ( int selection ) 
          Runspeed Dictionary //to translate choices to int speed or user step
-         Run()
+         Run() // uses big if( user step ) else run at speed ...
          step() //does an iteration
-         RequestInputs() 
-         Outputs()
-         DisplayShortFDE()
+         RequestInputs() // display message box to take input
+            // message box code req while(!validInput) { carry on asking for input type }  
+         Outputs() // update lil output box and pass to FDE stuff
+         DisplayShortFDE() // create calls for steps in cycle e.g 
          DisplayLongFDE()
          ReturnToEdit() 
          */
@@ -214,8 +215,10 @@ namespace CPUVisNEA
                         parsed = new Halt();
                         break;
                     }
-                    //todo special as b can be condit or non condit
-                    
+
+                    /* as Branch can be a non conditional or conditional variant, I have decided to model all as a base Branch class but
+                     execution changes nature dependent on the condition passed down to the B constructor
+                     ( given by removing the B from switch case instruction to get add-on e.g EQ or NE) */ 
                     case "B" : 
                     case "BEQ" : 
                     case "BNE" : 

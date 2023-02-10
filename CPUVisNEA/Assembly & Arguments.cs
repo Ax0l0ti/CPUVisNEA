@@ -11,7 +11,7 @@ using System.Text.RegularExpressions;
  General
  ---->  Deal w parseArgs()
  --------->  Seems kinda wacko 
- ---->  Take old and new method of param get acceptable
+ ---->  Take old and new method of param get acceptable and do writeup
  
  
  Specialised 
@@ -228,6 +228,7 @@ namespace CPUVisNEA
     //B class acts as all variants, conditional is seperated and stored as a local attribute of the Branch statement to switch case action in execute Instruction
     public class B : Instruction
     {
+
         private string condition;
         //takes condition as a parameter 
         public B(string condition) : base(CPU.Instructions.B)
@@ -239,15 +240,24 @@ namespace CPUVisNEA
         //todo create Instruction method to deal w input ( also add description of how operator works, from NEA writeup ) 
         protected internal override void executeInstruction(List<Argument> args )
         {
+            //note to self, any executions they all do? e.g local variable assignement? SPR? 
             switch (condition)
             {
+                // basic unconditional B statment
+                case null :
+                    // return a jump command to indicated index by label in args[0]
+                    break;
                 case "LT" :
+                    
                     break;
                 case "GT" :
+                    
                     break;
                 case "EQ" :
+                    
                     break;
                 case "NE" :
+                    
                     break;
             }
             
@@ -262,9 +272,8 @@ namespace CPUVisNEA
         }
         
     }
-    //todo all braches 
 
-    
+
 
     //---------------------------------------     MOV     Instruction ------------------------------------------------
     //MOV RegisterArg, IntegerArg

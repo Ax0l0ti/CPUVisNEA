@@ -1,5 +1,4 @@
 ﻿
-
 namespace CPUVisNEA
 {
     partial class UI

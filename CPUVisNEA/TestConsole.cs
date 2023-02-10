@@ -49,6 +49,7 @@ namespace CPUVisNEA
             // Instruction.addParsedArgs(mov, new string[]{"R1", "R1"}.ToList());
             // Console.WriteLine(mov.args[0].GetType());
         }
+        
 
         /* todo list of tests
         file handling  
