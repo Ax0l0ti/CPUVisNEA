@@ -9,45 +9,129 @@ using System.Text.RegularExpressions;
 
 namespace CPUVisNEA
 {     
-    //rando todos 
-    /* General 
-     * ----> Execute
-     * ---------> Instructions need to edit Cpu registers
-     * --------------> Scope / pass CPU as parameter?
+ 
+    /* General todos 
+     * ----> Regex for Arguements
      * ----> LineInstruction
+     * ---------> Instructions need to edit Cpu registers / pass CPU as parameter?
      * ---------> Add rest of options
-     * ---------> Regex for Instructions
-     
-     
+     * ----> Branch needs new Instruction subclasses ( overide Branch class)
+     * 
      */
+    
     //----------------------------------------Main Class CPU------------------------------------------------
-    // vast majority of classes are instantiated in CPU ( Composition relation )
+    // vast majority of classes are instantiated in CPU 
     public class CPU
     {
-        public enum Instructions
+        public enum Instructions : byte
         {
-            //enum number integer can beconverted to represent binary value 
+            //todo reorder to correct AQA order
+            //enum number integer can be converted to represent binary value 
             //e.g Halt == 0 == 0000
             //e.g LDR == 5 == 0101
             HALT, B, MOV, CMP, MVN, LDR, STR, AND, ORR, EOR, LSL, LSR, ADD, SUB
         }
+
+
+        public static Instruction newInstruction(Instructions instr)
+        {
+            switch (instr)
+            {
+                case Instructions.HALT:
+                    return new Halt();
+                case Instructions.B:
+                    return new B();
+                case Instructions.MOV:
+                    return new Mov();
+                case Instructions.CMP:
+                    return new Cmp();
+                case Instructions.MVN:
+                    return new Mvn();
+                case Instructions.LDR:
+                    return new Ldr();
+                case Instructions.STR:
+                    return new Str();
+                case Instructions.AND:
+                    return new And();
+                case Instructions.ORR:
+                    return new Orr();
+                case Instructions.EOR:
+                    return new Eor();
+                case Instructions.LSL:
+                    return new Lsl();
+                case Instructions.LSR:
+                    return new Lsr();
+                case Instructions.ADD:
+                    return new Add();
+                case Instructions.SUB:
+                    return new Sub();
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(instr), instr, null);
+            }
+        }
  
 
+        // Special Purpose Registers used by a CPU 
         private Register[] SPRegisters;
-        private List<Register> BasicRegisters = new List<Register>(10);
-        
-        
-        public RAM Ram = new RAM();
+        // Normal interactable 
+        private Register[] BasicRegisters = new Register[10]; 
+        // todo explain why line below is bs, how to fix - CPUState[] new class 
+        private Tuple<Register[], Register[], int>[] CPUHistory = new Tuple<Register[], Register[], int>[] {};
+
+        private RAM ram = new RAM();
+        public Compiler Compiler = new Compiler();
         public ALU Alu = new ALU();
         
+        /*---------------------------------------- Run ------------------------------------------------
+        |  BREAKDOWN
+        |---->  Run() ==== while( ! halt ) do ...
+        |
+        |--------->  Fetch() Go to RAM class at index
+        |--------->  Decode()
+        |-------------->  Check how many indexes arguements takes
+        |-------------->  Fetch arguements
+        |--------->  Execute()
+        |-------------->  ExecuteInstruction()
+        |-------------->  Add new CPUState to History 
+        */
+        public void Run()
+        {
+            bool halted = false;
+            while(!halted){
+             Fetch();
+             Decode();
+             Execute( );
+            }
+             
+        }
+
+        public void Fetch()
+        {
+            
+        }
+
+        public void Decode()
+        {
+            
+        }
+        public void Execute(Instruction instr)
+        {
+            //call the overriden instruction's execute command with its given arguements
+            //( Could be partically more efficient with passed args but this allows easy testing
+            //with my Unit testing interface for if executeInstruction works)
+            instr.executeInstruction(instr.args, /*todo*/null);
+        }
 
 
+        private void UpdateRunSpeed(int selection)
+        {
+            // 
+        }
         /* TODO add 
          GetAssemblyFiles()  // for the menu of load programs
-         SaveUserAssembly()  //calls Ram.SaveProg calls create new instantiation of AssProg
-         stateChange()??
+         SaveUserAssembly()  //calls Compiler.SaveProg calls create new instantiation of AssProg
          
-         UpdateRunSpeed ( int selection ) 
+         
          Runspeed Dictionary //to translate choices to int speed or user step
          Run() // uses big if( user step ) else run at speed ...
          step() //does an iteration
@@ -79,7 +163,7 @@ namespace CPUVisNEA
         }
 
 
-        public void fillRam(string text)
+        public void RamLoader(string text)
         {
             try
             {
@@ -87,11 +171,10 @@ namespace CPUVisNEA
                  By looking for the new line character*/ 
                 var program = new List<string>(text.Split('\n'));
                 
-                Ram.UStringProgRam = program;
-                //TODO Remove blanks & Validate 
-                Trace.WriteLine($"Compiled: [{text}] into {Ram.UStringProgRam.Count} instructions");
-                Ram.Cleanse();
-                Trace.WriteLine($"removed blank space: to {Ram.UStringProgRam.Count} instructions");
+                Compiler.UStringProg = program;
+                Trace.WriteLine($"Compiled: [{text}] into {Compiler.UStringProg.Count} instructions");
+                Compiler.Cleanse();
+                Trace.WriteLine($"removed blank space: to {Compiler.UStringProg.Count} instructions");
             }
             catch (Exception ex)
             {
@@ -105,7 +188,7 @@ namespace CPUVisNEA
             
             try
             {
-                fillRam(text);
+                RamLoader(text);
             }
             catch (Exception ex)
             {
@@ -125,16 +208,20 @@ namespace CPUVisNEA
         }
     }
     //----------------------------------------Random Access Memory Class - Compiling methods ------------------------------------------------
+
     public class RAM
     {
-        private bool binaryMode = false;
-        public List<string> UStringProgRam = new List<string>();
-        public Instruction[] CompUProgRam_Instructions = new Instruction[] { };
+        //todo mabye string that can be made byte OR all List<string> to smth else
         
-
-        //Local Convert function in RAM class to completely translate the users program between its binary representation
+        private byte[][] Memory = new byte[5][] ;
+        private Instruction[] AssembelyProgram = new Instruction[] { };
+        private bool binaryMode = false;
+        
+        //Local Convert function in RAM class to completely translate the users program displayed in RAm between its binary representation
         //and its assembly language representation. This is completed by checking the local class variable binaryMode to
         //select the direction on conversion - binary to Assembly ( Bin2Ass() ) or Assembly to binary ( Ass2Bin() ) 
+        
+        //this is useful so students can see what is being held in RAM as values they can read and understand
         private List<string> Convert()
         {
             var newContent = new List<string>();
@@ -151,21 +238,30 @@ namespace CPUVisNEA
         private List<string> Ass2Bin()
         {
             //for all lines run algorithm to change assembely track to binary equivelant
-            return UStringProgRam;
+            return null;
         }
 
         private List<string> Bin2Ass()
         {
             //opposite search of bin to ass for all lines
             //both stored as strings 
-            return UStringProgRam;
+            return null;
         }
+    }
+    public class Compiler
+    {
+        
+        public List<string> UStringProg = new List<string>();
+        public Instruction[] CompUProg_Instructions = new Instruction[] { };
+        
+
+        
         
         //Cleanse() used for removing all lines comprised of blank characters (blank line) 
         public void Cleanse()
         {
             List<String> temporary = new List<string>();
-            foreach (string line in UStringProgRam)
+            foreach (string line in UStringProg)
             {
                 if (!String.IsNullOrWhiteSpace(line))
                 {
@@ -173,7 +269,7 @@ namespace CPUVisNEA
                 }
             }
 
-            UStringProgRam = temporary;
+            UStringProg = temporary;
         }
         //checks if valid format, called after cleanse
         public Instruction[] valid(List<String> program)
@@ -220,7 +316,11 @@ namespace CPUVisNEA
                 }
 
                 
-                Instruction parsed;
+                CPU.Instructions instrType;
+                CPU.Instructions.TryParse(instruction, out instrType);
+                byte testFromMem = 1;
+                CPU.Instructions inst = (CPU.Instructions)testFromMem;
+                Instruction parsed = CPU.newInstruction(instrType);
                 switch (instruction)
                 {
 
@@ -329,27 +429,7 @@ namespace CPUVisNEA
             return new Mov();
         }
 
-        //----------------------------------------Execute ------------------------------------------------
-        
-        public void execute()
-        {
-            //todo while still in executuion mode
-            while (true)
-            { 
-                foreach (Instruction AssembelyLine in CompUProgRam_Instructions)
-                {
-                    //is a user step required or weight time?
-                    executeLine( AssembelyLine );
-                }
-            }
-        }
-        public void executeLine(Instruction instr)
-        {
-            //call the overriden instruction's execute command with its given arguements
-            //( Could be partically more efficient with passed args but this allows easy testing
-            //with my Unit testing interface for if executeInstruction works)
-            instr.executeInstruction(instr.args);
-        }
+
     }
     
 //----------------------------------------Class of user interactable Registers  ------------------------------------------------
@@ -478,6 +558,11 @@ namespace CPUVisNEA
          */
     }
 
+    public class CPUState
+    {
+        
+    }
+
     //--------------------------------------Assembely Program classes - files -----------------------------------------------
 //assembly program
 //need to test access 
@@ -494,5 +579,7 @@ namespace CPUVisNEA
             this.filecontent = filecontent;
         }
         
-    } // maybe have a list of AssProgs? Then call append(Ram.saveProg()) 
+    } // maybe have a list of AssProgs? Then call append(Compiler.saveProg()) 
+    
+     
 }

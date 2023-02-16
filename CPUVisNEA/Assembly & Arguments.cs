@@ -10,7 +10,9 @@ using System.Text.RegularExpressions;
 /* basic todo list
  General 
  ---->  Take old and new method of param get acceptable and do writeup
- ---->  ExecuteInstruction whatnot
+ ---->  ExecuteInstruction 
+ --------->  returns CPUState
+ --------->  Takes CPUState
  
  Specialised 
  ---->  ExecuteInstruction whatnot
@@ -171,7 +173,7 @@ namespace CPUVisNEA
         }
         // basic overridable call statement for all assembly operations to override to deal with individual arguments
         //means CPU can call executeInstruction regardless of Child class to get unique behaviour
-        protected internal abstract void executeInstruction(List<Argument> args);
+        protected internal abstract void executeInstruction(List<Argument> args, CPU cpu);
 
     }
 
@@ -185,7 +187,7 @@ namespace CPUVisNEA
         }
         
         //todo create Instruction method to deal w input ( also add description of how operator works, from NEA writeup ) 
-        protected internal override void executeInstruction(List<Argument> args )
+        protected internal override void executeInstruction(List<Argument> args, CPU cpu)
         {        
             //HALT Stop the execution of the program.
 
@@ -226,7 +228,7 @@ namespace CPUVisNEA
         //todo create Instruction method to deal w input ( also add description of how operator works, from NEA writeup ) 
         //B<condition>  <label> Conditionally branch to the instruction at position <label> in the program if the last comparison met the criteria specified by the <condition>.
 
-        protected internal override void executeInstruction(List<Argument> args )
+        protected internal override void executeInstruction(List<Argument> args, CPU cpu)
         {
             int jump = 0;
             
@@ -290,7 +292,7 @@ namespace CPUVisNEA
         }
         
         //todo create Instruction method to deal w input ( also add description of how operator works, from NEA writeup ) 
-        protected internal override void executeInstruction(List<Argument> args )
+        protected internal override void executeInstruction(List<Argument> args, CPU cpu)
         { 
             //MOV Rd, <operand2> Copy the value specified by <operand2> into register d.
 
@@ -323,7 +325,7 @@ namespace CPUVisNEA
         }
         
         //todo create Instruction method to deal w input ( also add description of how operator works, from NEA writeup ) 
-        protected internal override void executeInstruction(List<Argument> args )
+        protected internal override void executeInstruction(List<Argument> args, CPU cpu)
         {
             //CMP Rn, <operand2> Compare the value stored in register n with the value specified by <operand2>. 
             
@@ -355,9 +357,11 @@ namespace CPUVisNEA
         }
         
         //todo create Instruction method to deal w input ( also add description of how operator works, from NEA writeup ) 
-        protected internal override void executeInstruction(List<Argument> args )
+        protected internal override void executeInstruction(List<Argument> args, CPU cpu)
         {
             //MVN Rd, <operand2> Perform a bitwise logical NOT operation on the value specified by <operand2> and store the result in register d.
+            
+            
 
         }
         //todo move all comments to all valid loc - create, passes string... ,return modified
@@ -387,7 +391,7 @@ namespace CPUVisNEA
         }
         
         //todo create Instruction method to deal w input ( also add description of how operator works, from NEA writeup ) 
-        protected internal override void executeInstruction(List<Argument> args )
+        protected internal override void executeInstruction(List<Argument> args, CPU cpu)
         {
 
             //LDR Rd, <memory ref> Load the value stored in the memory location specified by <memory ref> into register d. 
@@ -420,7 +424,7 @@ namespace CPUVisNEA
         }
         
         //todo create Instruction method to deal w input ( also add description of how operator works, from NEA writeup ) 
-        protected internal override void executeInstruction(List<Argument> args )
+        protected internal override void executeInstruction(List<Argument> args, CPU cpu)
         {
             //STR Rd, <memory ref> Store the value that is in register d into the memory location specified by <memory ref>.
             
@@ -452,7 +456,7 @@ namespace CPUVisNEA
         }
         
         //todo create Instruction method to deal w input ( also add description of how operator works, from NEA writeup ) 
-        protected internal override void executeInstruction(List<Argument> args )
+        protected internal override void executeInstruction(List<Argument> args, CPU cpu)
         {
             //AND Rd, Rn, <operand2> Perform a bitwise logical AND operation between the value in register n and the value specified by <operand2> and store the result in register d.
             
@@ -486,7 +490,7 @@ namespace CPUVisNEA
         }
         
         //todo create Instruction method to deal w input ( also add description of how operator works, from NEA writeup ) 
-        protected internal override void executeInstruction(List<Argument> args )
+        protected internal override void executeInstruction(List<Argument> args, CPU cpu)
         {
             //ORR Rd, Rn, <operand2> Perform a bitwise logical OR operation between the value in register n and the value specified by <operand2> and store the result in register d.
             
@@ -519,7 +523,7 @@ namespace CPUVisNEA
         }
         
         //todo create Instruction method to deal w input ( also add description of how operator works, from NEA writeup ) 
-        protected internal override void executeInstruction(List<Argument> args )
+        protected internal override void executeInstruction(List<Argument> args, CPU cpu)
         {
             //EOR Rd, Rn, <operand2> Perform a bitwise logical exclusive or (XOR) operation between the value in register n and the value specified by <operand2> and store the result in register d.
 
@@ -552,7 +556,7 @@ namespace CPUVisNEA
         }
         
         //todo create Instruction method to deal w input ( also add description of how operator works, from NEA writeup ) 
-        protected internal override void executeInstruction(List<Argument> args )
+        protected internal override void executeInstruction(List<Argument> args, CPU cpu)
         {
             
             //LSL Rd, Rn, <operand2> Logically shift left the value stored in register n by the number of bits specified by <operand2> and store the result in register d.
@@ -586,7 +590,7 @@ namespace CPUVisNEA
         }
         
         //todo create Instruction method to deal w input ( also add description of how operator works, from NEA writeup ) 
-        protected internal override void executeInstruction(List<Argument> args )
+        protected internal override void executeInstruction(List<Argument> args, CPU cpu)
         {
             //LSR Rd, Rn, <operand2> Logically shift right the value stored in register n by the number of bits specified by <operand2> and store the result in register d.
             
@@ -619,7 +623,7 @@ namespace CPUVisNEA
         }
         
         //todo create Instruction method to deal w input ( also add description of how operator works, from NEA writeup ) 
-        protected internal override void executeInstruction(List<Argument> args )
+        protected internal override void executeInstruction(List<Argument> args, CPU cpu)
         {
 
             //ADD Rd, Rn, <operand2> Add the value specified in <operand2> to the value in register n and store the result in register d.
@@ -651,7 +655,7 @@ namespace CPUVisNEA
         }
         
         //todo create Instruction method to deal w input ( also add description of how operator works, from NEA writeup ) 
-        protected internal override void executeInstruction(List<Argument> args )
+        protected internal override void executeInstruction(List<Argument> args, CPU cpu)
         {
 
             //SUB Rd, Rn, <operand2> Subtract the value specified by <operand2> from the value in register n and store the result in register d.

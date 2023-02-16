@@ -22,9 +22,9 @@ namespace CPUVisNEA
         [Test] //tests if Compile function can transform single string into string array 
         public void CompileTest()
         {
-            cpu.Ram.UStringProgRam = new List<string>() { "compile" , "text","for","this test", ""};
+            cpu.Compiler.UStringProg = new List<string>() { "compile" , "text","for","this test", ""};
             cpu.Compile("addProgram\n\n test\nawooga");
-            foreach (var line in cpu.Ram.UStringProgRam)
+            foreach (var line in cpu.Compiler.UStringProg)
             {
                 Console.WriteLine(line);
             }

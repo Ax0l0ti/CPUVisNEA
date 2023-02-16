@@ -31,6 +31,7 @@ namespace CPUVisNEA
              I have then edited the UI class to take a CPU class as a parameter
             */
             var cpu = new CPU();
+
             var ui = new UI(cpu);
             
             Application.Run(ui);

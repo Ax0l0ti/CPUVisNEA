@@ -11,14 +11,31 @@ using NUnit.Framework.Internal;
 /*
 ____________________________________________________________________________________________________________
 Full method
-Initial
 
+Load Form  ---->  Edit Stage
 -----
 Compile stage
+Use Compile class
 
+---->  clean
+---->  validate
+--------->  If valid 
+-------------->  assign RAM with correspondence for user program
+-------------->  enter Running Stage 
+--------->  else  ---->  Edit Stage 
 -----
 Running Stage 
+Use CPU class 
 
+---->  Run() ==== while( ! halt ) do ...
+
+--------->  Fetch() Go to RAM class at index
+--------->  Decode()
+-------------->  Check how many indexes arguements takes
+-------------->  Fetch arguements
+--------->  Execute()
+-------------->  ExecuteInstruction()
+-------------->  Add new CPUState to History 
 
 ___________________________________________________________________________________________________________
 
@@ -31,7 +48,7 @@ namespace CPUVisNEA
         
         private bool Editstate = true; 
             private CPU cpu;
-            
+            private Compiler compiler;
 
             public UI(CPU cpu)
             {
@@ -80,23 +97,15 @@ namespace CPUVisNEA
             private void txt_uProg_TextChanged(object sender, EventArgs e)
             {
                 //current method is inefficient as it iterates round every line when updating
-                Regex blank = new Regex(@"\s*");
-                
-      
                 int i = 0;
                 bool validLine = true; 
                 //while there is still a line with text on it
                 while (validLine)
                 {
-                    //as there is no built in function for converting a text box from a big string to lines or
-                    
-                    try
-                    {
-                        if (txt_uProg.Lines != null)
-                        { 
-                            cpu.Ram.UStringProgRam[i] = txt_uProg.Lines[i];
-                        }
-                    }
+                    /*as there is no built in function for converting
+                     a text box from a string to array of lines, I cant use a foreach loop or for loop */
+                    //try to assign to-be compiled string the string value in the form's textbox
+                    try { if (txt_uProg.Lines != null) { cpu.Compiler.UStringProg[i] = txt_uProg.Lines[i]; } }
                     catch(Exception exception)
                     {
                         //if error stop compiling as this is either end of textbook string or incorrect syntax
@@ -106,7 +115,7 @@ namespace CPUVisNEA
                     i++;
                 }
 
-                //need to create function to update RAM class local variable of contents
+                //need to create function to update Compiler class local variable of contents
                 //
                 // int len = this.txt_uProg.Lines.Length;
                 // for(int line = 0, line<len;lin)
@@ -124,23 +133,19 @@ Notes Section
 ____________________________________________________________________________________________________________
 User Program
 
-    2 states, edit and run state. Run state has added RAM display and step button 
+    2 states, edit and run state. Run state has added Compiler display and step button 
 
     File Handling - 
         Creat dictionary that is maps executable file names to description/displayName of loadable files.
         stick files in the Bin > Debug > 
         messagebox.show
-        
-
-    USER RAM 
-        need to find
 
     Compile //is there error?
         yes --> output error line, reason for error and line content. Also return edit state 
         no --> Compile next Line OR return run state, remove edit access to User Program TextBox. 
                Compile Button turns to "return to edit" button 
                
-               Calculate number of RAM Lines Required
+               Calculate number of Compiler Lines Required
                Remove FDE Log Texts
 
         Create Method to read Line and check if acceptable structure, ?regular expression?
@@ -154,39 +159,15 @@ Erase Text after complete FDE log / when new compile
 
 Detailed FDE Cycle Log 
 Scrollable and continuously add to log. Only remove after Compile
-____________________________________________________________________________________________________________
-Classes
 
-class CPU 
-    Register Array
-    RAM class 
-    
-class RAM 
-    Contents {List of Text Arrays ( User input area ) } 
-    DisplayType ( Binary Assembly ) 
-    
-    Private String[] Binary2Ass
-    Private String[] Ass2Binary 
-    Private String[] GetContents( Contents )
-    
-class Register
-    display name
-    Content value 
-    bool Accept Assemble
-    
-    If Assemble true 
-        Method ConvertDisplay type  
-        
-Class ALU 
-    Mapping Dictionary of Binary and assembly 
-    
-    
-
-____________________________________________________________________________________________________________
-
+//---------------------------------------------------------------------------------------
  QUESTION MARK CIRCLE BOX WHEN CLICKED
+ 
 Class Query
     display image
-    contents ( simple text ) 
-    whenClicked
+    private string title
+    private string contents
+    public Clicked{ new MessageBox( content ) ) 
+        Title
+    
 */
