@@ -12,42 +12,44 @@ namespace CPUVisNEA
     
     public class TestConsole
     {
-        //generating new CPU
+        //generating new CPU to work with for all tests
         private CPU cpu = new CPU();
         [Test] public void TestofTests()
         {
             Console.WriteLine("Thou doth work with great fanciness ");
         }
 
-        [Test]
+        [Test] //tests if Compile function can transform single string into string array 
         public void CompileTest()
         {
-            cpu.Ram.UProgRAM = new List<string>() { "compile" , "text","for","this test", ""};
+            cpu.Ram.UStringProgRam = new List<string>() { "compile" , "text","for","this test", ""};
             cpu.Compile("addProgram\n\n test\nawooga");
-            foreach (var line in cpu.Ram.UProgRAM)
+            foreach (var line in cpu.Ram.UStringProgRam)
             {
                 Console.WriteLine(line);
             }
 
         }
 
-        [Test]
+        [Test] //test if instruction argument parsing wont break on unexpected argument type
         public void testInstructionParse()
         {
             Mov mov = new Mov();
             Console.WriteLine( typeof(CPU.Instructions) ) ; 
             Console.WriteLine(mov.Tag);
-            var valid = mov.validParamType(new RegisterArg() );
-            var notValid  = mov.validParamType(new IntegerArg() );
-            Console.WriteLine($"1st param = register should pass  {valid} as true ");
-            Console.WriteLine($"1st param = integer should pass  {notValid} as false ");
+            //test if used method correctly validates a first parameter type
+            var Reg = mov.validParamType(new RegisterArg() );
+            var Int  = mov.validParamType(new IntegerArg() );
+            Console.WriteLine($"1st param = register expected T ---  {Reg} ");
+            Console.WriteLine($"1st param = integer expected F ---  {Int}" , '\n');
             
-            // todo add more lines to test second param valid 
-            
-            // Instruction.addParsedArgs(mov, new string[]{"R1", "1234"}.ToList());
-            // Assert.Equals(mov.args.Count, 2);
-            // Instruction.addParsedArgs(mov, new string[]{"R1", "R1"}.ToList());
-            // Console.WriteLine(mov.args[0].GetType());
+            // add to mov and tests second parameters if valid 
+            mov.addArg(new RegisterArg());
+             Reg = mov.validParamType(new RegisterArg() );
+             Int  = mov.validParamType(new IntegerArg() );
+            Console.WriteLine($"2nd param = register expected F ---  {Reg}");
+            Console.WriteLine($"2nd param = integer expected T ---  {Int}" , '\n');
+
         }
         
 

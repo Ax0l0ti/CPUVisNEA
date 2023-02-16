@@ -10,6 +10,16 @@ using System.Text.RegularExpressions;
 namespace CPUVisNEA
 {     
     //rando todos 
+    /* General 
+     * ----> Execute
+     * ---------> Instructions need to edit Cpu registers
+     * --------------> Scope / pass CPU as parameter?
+     * ----> LineInstruction
+     * ---------> Add rest of options
+     * ---------> Regex for Instructions
+     
+     
+     */
     //----------------------------------------Main Class CPU------------------------------------------------
     // vast majority of classes are instantiated in CPU ( Composition relation )
     public class CPU
@@ -25,6 +35,7 @@ namespace CPUVisNEA
 
         private Register[] SPRegisters;
         private List<Register> BasicRegisters = new List<Register>(10);
+        
         
         public RAM Ram = new RAM();
         public ALU Alu = new ALU();
@@ -76,11 +87,11 @@ namespace CPUVisNEA
                  By looking for the new line character*/ 
                 var program = new List<string>(text.Split('\n'));
                 
-                Ram.UProgRAM = program;
+                Ram.UStringProgRam = program;
                 //TODO Remove blanks & Validate 
-                Trace.WriteLine($"Compiled: [{text}] into {Ram.UProgRAM.Count} instructions");
+                Trace.WriteLine($"Compiled: [{text}] into {Ram.UStringProgRam.Count} instructions");
                 Ram.Cleanse();
-                Trace.WriteLine($"removed blank space: to {Ram.UProgRAM.Count} instructions");
+                Trace.WriteLine($"removed blank space: to {Ram.UStringProgRam.Count} instructions");
             }
             catch (Exception ex)
             {
@@ -116,9 +127,10 @@ namespace CPUVisNEA
     //----------------------------------------Random Access Memory Class - Compiling methods ------------------------------------------------
     public class RAM
     {
-        private readonly bool binaryMode = false;
-        public List<string> UProgRAM = new List<string>();
-        private Instruction[] Program = new Instruction[] { };
+        private bool binaryMode = false;
+        public List<string> UStringProgRam = new List<string>();
+        public Instruction[] CompUProgRam_Instructions = new Instruction[] { };
+        
 
         //Local Convert function in RAM class to completely translate the users program between its binary representation
         //and its assembly language representation. This is completed by checking the local class variable binaryMode to
@@ -128,9 +140,10 @@ namespace CPUVisNEA
             var newContent = new List<string>();
             if (binaryMode)
             {
-                // newContent = Bin2Ass();
+                newContent = Bin2Ass();
+                binaryMode = false;
             }
-            //   else newContent = Ass2Bin();
+            else newContent = Ass2Bin(); binaryMode = true;
 
             return newContent;
         }
@@ -138,21 +151,21 @@ namespace CPUVisNEA
         private List<string> Ass2Bin()
         {
             //for all lines run algorithm to change assembely track to binary equivelant
-            return UProgRAM;
+            return UStringProgRam;
         }
 
         private List<string> Bin2Ass()
         {
             //opposite search of bin to ass for all lines
             //both stored as strings 
-            return UProgRAM;
+            return UStringProgRam;
         }
-        //Cleanse() used for removing all blank lines
         
+        //Cleanse() used for removing all lines comprised of blank characters (blank line) 
         public void Cleanse()
         {
             List<String> temporary = new List<string>();
-            foreach (string line in UProgRAM)
+            foreach (string line in UStringProgRam)
             {
                 if (!String.IsNullOrWhiteSpace(line))
                 {
@@ -160,7 +173,7 @@ namespace CPUVisNEA
                 }
             }
 
-            UProgRAM = temporary;
+            UStringProgRam = temporary;
         }
         //checks if valid format, called after cleanse
         public Instruction[] valid(List<String> program)
@@ -190,7 +203,8 @@ namespace CPUVisNEA
                 //it must be HALT command if only one word 
                 //return new Halt();
 
-            } else
+            }
+            else
             {
                 string instruction = tokens[0];
                 List<string> args = new List<string>();
@@ -204,11 +218,12 @@ namespace CPUVisNEA
                         args.Add(s);
                     }
                 }
-                var conditional = "";
+
+                
                 Instruction parsed;
-                switch (instruction) 
+                switch (instruction)
                 {
-                    
+
                     case "HALT":
                     {
                         //special case stop execution return to edit state 
@@ -216,134 +231,124 @@ namespace CPUVisNEA
                         break;
                     }
 
-                    /* as Branch can be a non conditional or conditional variant, I have decided to model all as a base Branch class but
-                     execution changes nature dependent on the condition passed down to the B constructor
-                     ( given by removing the B from switch case instruction to get add-on e.g EQ or NE) */ 
-                    case "B" : 
-                    case "BEQ" : 
-                    case "BNE" : 
-                    case "BLT" : 
-                    case "BMT" :
+                    /* as Branch can be a non conditional or conditional variant,
+                     I have decided to model all Instructions on a single class that changes 
+                     execution nature dependent on the condition passed down to the B constructor
+                     ( condition given by removing the B from switch case instruction to get add-on e.g EQ or NE) */
+                    case "B":
+                    case "BEQ":
+                    case "BNE":
+                    case "BLT":
+                    case "BMT":
                     {
+                        //remove the B from case. If B, returns null else returns remaining string
                         string condition = instruction.Replace("B", null);
-                        parsed = new B( condition );
+                        //pass condition down to override parseArgs
+                        //this in turn passes down the conditional to the constructor of the B
+                        parsed = B.parseArgs(args,condition);
                         break;
                     }
 
                     case "MOV":
                     {
-                        parsed = new Mov();
+                        parsed = Mov.parseArgs(args);
                         break;
                     }
 
                     case "CMP":
                     {
-                        parsed = new Cmp();
+                        parsed = Cmp.parseArgs(args);
                         break;
-                    } 
+                    }
 
                     case "MVN":
                     {
-                        parsed = new Mvn();
+                        parsed = Mvn.parseArgs(args);
                         break;
                     }
-                    
+
                     case "LDR":
                     {
-                        parsed = new Ldr();
+                        parsed = Ldr.parseArgs(args);
                         break;
                     }
-                    
+
                     case "AND":
                     {
-                        parsed = new And();
+                        parsed = And.parseArgs(args);
                         break;
                     }
-                    
+
                     case "ORR":
                     {
-                        parsed = new Orr();
+                        parsed = Orr.parseArgs(args);
                         break;
                     }
-                    
+
                     case "EOR":
                     {
-                        parsed = new Eor();
+                        parsed = Eor.parseArgs(args);
                         break;
                     }
-                    
+
                     case "LSL":
                     {
-                        parsed = new Lsl();
+                        parsed = Lsl.parseArgs(args);
                         break;
                     }
-                    
+
                     case "LSR":
                     {
-                        parsed = new Lsr();
+                        parsed = Lsr.parseArgs(args);
                         break;
                     }
-                    
+
                     case "ADD":
                     {
-                        parsed = new Add();
+                        parsed = Add.parseArgs(args);
                         break;
                     }
-                    
+
                     case "SUB":
                     {
-                        parsed = new Sub();
+                        parsed = Sub.parseArgs(args);
                         break;
                     }
                     //todo add rest of options
-                    
-                    
+
+
                     default: throw new Exception($"Unknown instruction: {instruction}");
                 }
+
                 // now add the arguments to the instruction:
                 Instruction.addParsedArgs(parsed, args);
                 return parsed;
             }
-            
-            //----- valid line formats ----- 
-            // ordered by input size
-            //HALT 
-            //B <label>
-            //B<condition> <label>
-            //MOV Rd, <operand2>
-            //CMP Rn, <operand2>
-            //MVN Rd, <operand2> 
-            //LDR Rd, <memory ref> 
-            //STR Rd, <memory ref> 
-            //AND Rd, Rn, <operand2>
-            //ORR Rd, Rn, <operand2>
-            //EOR Rd, Rn, <operand2>
-            //LSL Rd, Rn, <operand2>
-            //LSR Rd, Rn, <operand2>
-            //ADD Rd, Rn, <operand2>
-            //SUB Rd, Rn, <operand2>
-            
+
             //todo change line below to failsafe, move comment above 
             return new Mov();
         }
 
         //----------------------------------------Execute ------------------------------------------------
-        //todo fill in rest of cases
-        public void execute(Instruction instr)
+        
+        public void execute()
         {
-            switch (instr.Tag)
-            {
-                case CPU.Instructions.MOV:
-                    instr.executeInstruction(instr.args);
-                    break;
-                case CPU.Instructions.ADD:
-                    break;
-                case CPU.Instructions.SUB:
-                    break;
-                //todo add cases
-                default:
-                    throw new ArgumentOutOfRangeException();
+            //todo while still in executuion mode
+            while (true)
+            { 
+                foreach (Instruction AssembelyLine in CompUProgRam_Instructions)
+                {
+                    //is a user step required or weight time?
+                    executeLine( AssembelyLine );
+                }
             }
+        }
+        public void executeLine(Instruction instr)
+        {
+            //call the overriden instruction's execute command with its given arguements
+            //( Could be partically more efficient with passed args but this allows easy testing
+            //with my Unit testing interface for if executeInstruction works)
+            instr.executeInstruction(instr.args);
         }
     }
     
@@ -439,7 +444,7 @@ namespace CPUVisNEA
         //B <label> Always branch to the instruction at position <label> in the program.
         private void B( <label> ) {}
         
-        //B<condition> <label> Conditionally branch to the instruction at position <label> in the program if the last comparison met the criteria specified by the <condition>. Possible values for <condition> and their meaning are: EQ:Equal to, NE:Not equal to, GT:Greater than, LT:Less than.
+        //B<condition>  <label>  Conditionally branch to the instruction at position <label> in the program if the last comparison met the criteria specified by the <condition>. Possible values for <condition> and their meaning are: EQ:Equal to, NE:Not equal to, GT:Greater than, LT:Less than.
         //conditonal branch as method B already used
         private void B_if( <condition>, <label> ) {}
         
@@ -478,13 +483,13 @@ namespace CPUVisNEA
 //need to test access 
     public class AssProg
     {
-        private string fileName; //what to search when accessing
-        private string displayName;
+        private string fileLocation; //what to search when accessing file directory
+        private string displayName; //name shown in list (end of file ) 
         private string[] filecontent;
 
-        public AssProg(string fileName, string displayName, string[] filecontent)
+        public AssProg(string fileLocation, string displayName, string[] filecontent)
         {
-            this.fileName = fileName;
+            this.fileLocation = fileLocation;
             this.displayName = displayName;
             this.filecontent = filecontent;
         }

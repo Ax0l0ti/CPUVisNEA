@@ -8,11 +8,9 @@ using System.Text.RegularExpressions;
 //https://resources.jetbrains.com/storage/products/rider/docs/Rider_default_win_shortcuts.pdf?_gl=1*8v6mpv*_ga*Mzk0Njg2ODg3LjE2NjExMDU4MzA.*_ga_9J976DJZ68*MTY3NTAyNjgxNS4xNy4wLjE2NzUwMjY4MjAuMC4wLjA.&_ga=2.77451923.725299765.1675026816-394686887.1661105830
 
 /* basic todo list
- General
- ---->  Deal w parseArgs()
- --------->  Seems kinda wacko 
+ General 
  ---->  Take old and new method of param get acceptable and do writeup
- 
+ ---->  ExecuteInstruction whatnot
  
  Specialised 
  ---->  ExecuteInstruction whatnot
@@ -100,10 +98,8 @@ namespace CPUVisNEA
                 {new CPU.Instructions[] { CPU.Instructions.AND, CPU.Instructions.ORR , CPU.Instructions.EOR, CPU.Instructions.LSL, CPU.Instructions.LSR, CPU.Instructions.ADD, CPU.Instructions.SUB }, 
                  new Type[]{ typeof(RegisterArg), typeof(RegisterArg), typeof(IntegerArg) } },
                 {new CPU.Instructions[] { CPU.Instructions.HALT } , null }, // doesnt accept any additional text or parameters to statement
-                //B *=( acts for all branches
+                //B >> acts for all branches
                 {new CPU.Instructions[] { CPU.Instructions.B } , new Type[] {typeof(label)  } }
-                
-                
             };
     
         
@@ -124,7 +120,8 @@ namespace CPUVisNEA
                 //     case : "Integer" { Argument parsed = new IntegerArg(); break;
                 //     case : "label" { Argument parsed = new label(); break;
                 //     default : new ErrorMessage("unrecognised")
-                // }
+                // }"/
+               
                 
                 //temporary 
                 Argument parsed = new IntegerArg();
@@ -142,59 +139,42 @@ namespace CPUVisNEA
         protected internal void addArg(Argument arg)
         {
             if (validParamType(arg))
-            {
-                args.Add(arg);
-            }
-            else
-            {
-                throw new Exception($"= arg {args.Count + 1} can't be {arg.GetType()} ");
-            }
+            { 
+                //if its a valid argument, add it to the objects Arguments list
+                args.Add( arg   );
+            }//else output error saying the argument type cant be used as the nth parameter ( +1 to counter 0 first index) 
+            else { throw new Exception($"= arg {args.Count + 1} can't be {arg.GetType()} "); }
         }
         /*
         Checks if the arguement passed is a valid arguement to be passed to the instruction
-        protected and stored in Instruction class so all child classes can inherit
-        internal used so the Console interface can access the method 
-        whilst this method of solving the problem creates a public dictionary that takes up storage, it vastly reduces number
-        of repetitive methods and lines in the following child classes and programs in code below due to repetitive format of Instruction Parameters */
+        -- protected and stored in Instruction class so all child classes can inherit usage.
+        -- internal used so the Console interface can access the method 
+        (whilst this method of solving the problem creates a public dictionary that takes up storage, 
+        it vastly reduces number of repetitive methods and lines in the following child classes and programs 
+        due to repetitive format of Instruction Parameters */
         protected internal bool validParamType(Argument arg)
         {
+            //linear search through dictionary
             foreach (var InstructGrouping in dictionaryOfValidParams)
             {
+                //if the key array contains the Instruction Tag
                 if (InstructGrouping.Key.Contains(Tag) ){
+                    //now check if Correspondent defintion contains the passed argument type at index of the parameter 
                     if (arg.GetType() == InstructGrouping.Value[args.Count])
-                    {
+                    { //therefore valid input type at index for instruction class tag
                         return true;
                     }
                 }  
             }
+            //return false if requirements not met
             return false;
         }
-        // basic overridable call statement for all assembly operations to override to deal with individual arguments 
-        protected internal abstract void executeInstruction( List<Argument> args); 
+        // basic overridable call statement for all assembly operations to override to deal with individual arguments
+        //means CPU can call executeInstruction regardless of Child class to get unique behaviour
+        protected internal abstract void executeInstruction(List<Argument> args);
 
     }
-    // total acceptable statements 
-    // condition label IntegerArg RegisterArg, IntorReg = IntegerArg RegisterArg
-    //HALT 
-    //B <label>
-    //B<condition> <label>
-    //MOV RegisterArg, IntegerArg
-    //CMP RegisterArg, IntegerArg
-    //MVN RegisterArg, IntegerArg
-    //LDR RegisterArg, RegisterArg
-    //STR RegisterArg, RegisterArg
-    // Below will have multiple acceptable types in second addArg index
-    //AND RegisterArg, RegisterArg, IntegerArg
-    //ORR RegisterArg, RegisterArg, IntegerArg
-    //EOR RegisterArg, RegisterArg, IntegerArg
-    //LSL RegisterArg, RegisterArg, IntegerArg
-    //LSR RegisterArg, RegisterArg, IntegerArg
-    //ADD RegisterArg, RegisterArg, IntegerArg
-    //SUB RegisterArg, RegisterArg, IntegerArg
-    
-    
-    //todo create all instruction options
-    
+
     //---------------------------------------     HALT     Instruction ------------------------------------------------
 
     public class Halt : Instruction
@@ -206,16 +186,21 @@ namespace CPUVisNEA
         
         //todo create Instruction method to deal w input ( also add description of how operator works, from NEA writeup ) 
         protected internal override void executeInstruction(List<Argument> args )
-        {
-            //break out of program and enter frozen/ return to edit state
+        {        
+            //HALT Stop the execution of the program.
+
         }
-        
+        /*held locally in class but never used by class. Is used by CPU to instantiate instance
+         of Instruction type and pass arguments held by local CPU compiling function  */
         public static Halt parseArgs(List<string> args)
         {
+            //creates new local instance of a blank object correspondent to class
             var halt = new Halt();
-            //passes Instruction in Parameter 1 the arguments in args
-            //calls modified version of addArg (below) in child class 
+            /*passes string version of arguments given by parameter to use
+             Inherited addParsedArgs method to clean args and append to the 
+             protected Instructions local attribute args */
             addParsedArgs(halt, args);
+            // return modified and filled Instruction
             return halt;
         }
         
@@ -228,46 +213,64 @@ namespace CPUVisNEA
     //B class acts as all variants, conditional is seperated and stored as a local attribute of the Branch statement to switch case action in execute Instruction
     public class B : Instruction
     {
-
+        //Possible values for condition and their meaning are: EQ:Equal to, NE:Not equal to, GT:Greater than, LT:Less than.
+        //assigned in the overriden parseArgs method of B class
         private string condition;
         //takes condition as a parameter 
-        public B(string condition) : base(CPU.Instructions.B)
+        public B() : base(CPU.Instructions.B)
         {
-            this.condition = condition;
             
+
         }
         
         //todo create Instruction method to deal w input ( also add description of how operator works, from NEA writeup ) 
+        //B<condition>  <label> Conditionally branch to the instruction at position <label> in the program if the last comparison met the criteria specified by the <condition>.
+
         protected internal override void executeInstruction(List<Argument> args )
         {
+            int jump = 0;
+            
+            label label = (CPUVisNEA.label)args[0];
             //note to self, any executions they all do? e.g local variable assignement? SPR? 
             switch (condition)
             {
-                // basic unconditional B statment
+                // basic unconditional B statement always jumps to label 
                 case null :
                     // return a jump command to indicated index by label in args[0]
+                    
                     break;
+                // conditional B statement dependent on condition 'Less Than'
                 case "LT" :
                     
                     break;
+                // conditional B statement dependent on condition 'Greater Than'
                 case "GT" :
                     
                     break;
+                // conditional B statement dependent on condition 'Equal To'
                 case "EQ" :
                     
                     break;
+                // conditional B statement dependent on condition 'Not Equal'
                 case "NE" :
                     
                     break;
             }
+
             
-                
         }
-        
-        public B parseArgs(List<string> args)
+        /*held locally in class but never used by class. Is used by CPU to instantiate instance
+         of Instruction type and pass arguments held by local CPU compiling function  */
+        public static B parseArgs(List<string> args, string condition)
         {
-            var b = new B(condition );
-            addParsedArgs( b , args);
+            //creates new local instance of a blank object correspondent to class
+            var b = new B();
+            b.condition = condition;
+            /*passes string version of arguments given by parameter to use
+             Inherited addParsedArgs method to clean args and append to the 
+             protected Instructions local attribute args */
+            addParsedArgs(b, args);
+            // return modified and filled Instruction
             return b;
         }
         
@@ -288,16 +291,22 @@ namespace CPUVisNEA
         
         //todo create Instruction method to deal w input ( also add description of how operator works, from NEA writeup ) 
         protected internal override void executeInstruction(List<Argument> args )
-        {
-            
+        { 
+            //MOV Rd, <operand2> Copy the value specified by <operand2> into register d.
+
         }
         
+        /*held locally in class but never used by class. Is used by CPU to instantiate instance
+         of Instruction type and pass arguments held by local CPU compiling function  */
         public static Mov parseArgs(List<string> args)
         {
+            //creates new local instance of a blank object correspondent to class
             var mov = new Mov();
-            //passes Instruction in Parameter 1 the arguments in args
-            //calls modified version of addArg (below) in child class 
+            /*passes string version of arguments given by parameter to use
+             Inherited addParsedArgs method to clean args and append to the 
+             protected Instructions local attribute args */
             addParsedArgs(mov, args);
+            // return modified and filled Instruction
             return mov;
         }
         
@@ -316,15 +325,20 @@ namespace CPUVisNEA
         //todo create Instruction method to deal w input ( also add description of how operator works, from NEA writeup ) 
         protected internal override void executeInstruction(List<Argument> args )
         {
+            //CMP Rn, <operand2> Compare the value stored in register n with the value specified by <operand2>. 
             
         }
-        
+        /*held locally in class but never used by class. Is used by CPU to instantiate instance
+         of Instruction type and pass arguments held by local CPU compiling function  */
         public static Cmp parseArgs(List<string> args)
         {
+            //creates new local instance of a blank object correspondent to class
             var cmp = new Cmp();
-            //passes Instruction in Parameter 1 the arguments in args
-            //calls modified version of addArg (below) in child class 
+            /*passes string version of arguments given by parameter to use
+             Inherited addParsedArgs method to clean args and append to the 
+             protected Instructions local attribute args */
             addParsedArgs(cmp, args);
+            // return modified and filled Instruction
             return cmp;
         }
         
@@ -343,15 +357,21 @@ namespace CPUVisNEA
         //todo create Instruction method to deal w input ( also add description of how operator works, from NEA writeup ) 
         protected internal override void executeInstruction(List<Argument> args )
         {
-            
+            //MVN Rd, <operand2> Perform a bitwise logical NOT operation on the value specified by <operand2> and store the result in register d.
+
         }
-        
+        //todo move all comments to all valid loc - create, passes string... ,return modified
+        /*held locally in class but never used by class. Is used by CPU to instantiate instance
+         of Instruction type and pass arguments held by local CPU compiling function  */
         public static Mvn parseArgs(List<string> args)
         {
+            //creates new local instance of a blank object correspondent to class
             var mvn = new Mvn();
-            //passes Instruction in Parameter 1 the arguments in args
-            //calls modified version of addArg (below) in child class 
+            /*passes string version of arguments given by parameter to use
+             Inherited addParsedArgs method to clean args and append to the 
+             protected Instructions local attribute args */
             addParsedArgs(mvn, args);
+            // return modified and filled Instruction
             return mvn;
         }
         
@@ -369,15 +389,21 @@ namespace CPUVisNEA
         //todo create Instruction method to deal w input ( also add description of how operator works, from NEA writeup ) 
         protected internal override void executeInstruction(List<Argument> args )
         {
-            
+
+            //LDR Rd, <memory ref> Load the value stored in the memory location specified by <memory ref> into register d. 
+
         }
-        
+        /*held locally in class but never used by class. Is used by CPU to instantiate instance
+         of Instruction type and pass arguments held by local CPU compiling function  */
         public static Ldr parseArgs(List<string> args)
         {
+            //creates new local instance of a blank object correspondent to class
             var ldr = new Ldr();
-            //passes Instruction in Parameter 1 the arguments in args
-            //calls modified version of addArg (below) in child class 
+            /*passes string version of arguments given by parameter to use
+             Inherited addParsedArgs method to clean args and append to the 
+             protected Instructions local attribute args */
             addParsedArgs(ldr, args);
+            // return modified and filled Instruction
             return ldr;
         }
         
@@ -396,15 +422,20 @@ namespace CPUVisNEA
         //todo create Instruction method to deal w input ( also add description of how operator works, from NEA writeup ) 
         protected internal override void executeInstruction(List<Argument> args )
         {
+            //STR Rd, <memory ref> Store the value that is in register d into the memory location specified by <memory ref>.
             
         }
-        
+        /*held locally in class but never used by class. Is used by CPU to instantiate instance
+         of Instruction type and pass arguments held by local CPU compiling function  */
         public static Str parseArgs(List<string> args)
         {
+            //creates new local instance of a blank object correspondent to class
             var str = new Str();
-            //passes Instruction in Parameter 1 the arguments in args
-            //calls modified version of addArg (below) in child class 
+            /*passes string version of arguments given by parameter to use
+             Inherited addParsedArgs method to clean args and append to the 
+             protected Instructions local attribute args */
             addParsedArgs(str, args);
+            // return modified and filled Instruction
             return str;
         }
         
@@ -423,15 +454,21 @@ namespace CPUVisNEA
         //todo create Instruction method to deal w input ( also add description of how operator works, from NEA writeup ) 
         protected internal override void executeInstruction(List<Argument> args )
         {
+            //AND Rd, Rn, <operand2> Perform a bitwise logical AND operation between the value in register n and the value specified by <operand2> and store the result in register d.
+            
             
         }
-        
+        /*held locally in class but never used by class. Is used by CPU to instantiate instance
+         of Instruction type and pass arguments held by local CPU compiling function  */
         public static And parseArgs(List<string> args)
         {
+            //creates new local instance of a blank object correspondent to class
             var and = new And();
-            //passes Instruction in Parameter 1 the arguments in args
-            //calls modified version of addArg (below) in child class 
+            /*passes string version of arguments given by parameter to use
+             Inherited addParsedArgs method to clean args and append to the 
+             protected Instructions local attribute args */
             addParsedArgs(and, args);
+            // return modified and filled Instruction
             return and;
         }
         
@@ -451,15 +488,20 @@ namespace CPUVisNEA
         //todo create Instruction method to deal w input ( also add description of how operator works, from NEA writeup ) 
         protected internal override void executeInstruction(List<Argument> args )
         {
+            //ORR Rd, Rn, <operand2> Perform a bitwise logical OR operation between the value in register n and the value specified by <operand2> and store the result in register d.
             
         }
-        
+        /*held locally in class but never used by class. Is used by CPU to instantiate instance
+         of Instruction type and pass arguments held by local CPU compiling function  */
         public static Orr parseArgs(List<string> args)
         {
+            //creates new local instance of a blank object correspondent to class
             var orr = new Orr();
-            //passes Instruction in Parameter 1 the arguments in args
-            //calls modified version of addArg (below) in child class 
+            /*passes string version of arguments given by parameter to use
+             Inherited addParsedArgs method to clean args and append to the 
+             protected Instructions local attribute args */
             addParsedArgs(orr, args);
+            // return modified and filled Instruction
             return orr;
         }
         
@@ -479,15 +521,20 @@ namespace CPUVisNEA
         //todo create Instruction method to deal w input ( also add description of how operator works, from NEA writeup ) 
         protected internal override void executeInstruction(List<Argument> args )
         {
-            
+            //EOR Rd, Rn, <operand2> Perform a bitwise logical exclusive or (XOR) operation between the value in register n and the value specified by <operand2> and store the result in register d.
+
         }
-        
+        /*held locally in class but never used by class. Is used by CPU to instantiate instance
+         of Instruction type and pass arguments held by local CPU compiling function  */
         public static Eor parseArgs(List<string> args)
         {
+            //creates new local instance of a blank object correspondent to class
             var eor = new Eor();
-            //passes Instruction in Parameter 1 the arguments in args
-            //calls modified version of addArg (below) in child class 
+            /*passes string version of arguments given by parameter to use
+             Inherited addParsedArgs method to clean args and append to the 
+             protected Instructions local attribute args */
             addParsedArgs(eor, args);
+            // return modified and filled Instruction
             return eor;
         }
         
@@ -508,14 +555,20 @@ namespace CPUVisNEA
         protected internal override void executeInstruction(List<Argument> args )
         {
             
+            //LSL Rd, Rn, <operand2> Logically shift left the value stored in register n by the number of bits specified by <operand2> and store the result in register d.
+            
         }
-        
+        /*held locally in class but never used by class. Is used by CPU to instantiate instance
+         of Instruction type and pass arguments held by local CPU compiling function  */
         public static Lsl parseArgs(List<string> args)
         {
+            //creates new local instance of a blank object correspondent to class
             var lsl = new Lsl();
-            //passes Instruction in Parameter 1 the arguments in args
-            //calls modified version of addArg (below) in child class 
+            /*passes string version of arguments given by parameter to use
+             Inherited addParsedArgs method to clean args and append to the 
+             protected Instructions local attribute args */
             addParsedArgs(lsl, args);
+            // return modified and filled Instruction
             return lsl;
         }
         
@@ -535,15 +588,20 @@ namespace CPUVisNEA
         //todo create Instruction method to deal w input ( also add description of how operator works, from NEA writeup ) 
         protected internal override void executeInstruction(List<Argument> args )
         {
+            //LSR Rd, Rn, <operand2> Logically shift right the value stored in register n by the number of bits specified by <operand2> and store the result in register d.
             
         }
-        
+        /*held locally in class but never used by class. Is used by CPU to instantiate instance
+         of Instruction type and pass arguments held by local CPU compiling function  */
         public static Lsr parseArgs(List<string> args)
         {
+            //creates new local instance of a blank object correspondent to class
             var lsr = new Lsr();
-            //passes Instruction in Parameter 1 the arguments in args
-            //calls modified version of addArg (below) in child class 
+            /*passes string version of arguments given by parameter to use
+             Inherited addParsedArgs method to clean args and append to the 
+             protected Instructions local attribute args */
             addParsedArgs(lsr, args);
+            // return modified and filled Instruction
             return lsr;
         }
         
@@ -563,15 +621,20 @@ namespace CPUVisNEA
         //todo create Instruction method to deal w input ( also add description of how operator works, from NEA writeup ) 
         protected internal override void executeInstruction(List<Argument> args )
         {
-            
+
+            //ADD Rd, Rn, <operand2> Add the value specified in <operand2> to the value in register n and store the result in register d.
         }
-        
+        /*held locally in class but never used by class. Is used by CPU to instantiate instance
+         of Instruction type and pass arguments held by local CPU compiling function  */
         public static Add parseArgs(List<string> args)
         {
+            //creates new local instance of a blank object correspondent to class
             var add = new Add();
-            //passes Instruction in Parameter 1 the arguments in args
-            //calls modified version of addArg (below) in child class 
+            /*passes string version of arguments given by parameter to use
+             Inherited addParsedArgs method to clean args and append to the 
+             protected Instructions local attribute args */
             addParsedArgs(add, args);
+            // return modified and filled Instruction
             return add;
         }
         
@@ -590,15 +653,22 @@ namespace CPUVisNEA
         //todo create Instruction method to deal w input ( also add description of how operator works, from NEA writeup ) 
         protected internal override void executeInstruction(List<Argument> args )
         {
+
+            //SUB Rd, Rn, <operand2> Subtract the value specified by <operand2> from the value in register n and store the result in register d.
             
+          
         }
-        
+        /*held locally in class but never used by class. Is used by CPU to instantiate instance
+         of Instruction type and pass arguments held by local CPU compiling function  */
         public static Sub parseArgs(List<string> args)
         {
+            //creates new local instance of a blank object correspondent to class
             var sub = new Sub();
-            //passes Instruction in Parameter 1 the arguments in args
-            //calls modified version of addArg (below) in child class 
+            /*passes string version of arguments given by parameter to use
+             Inherited addParsedArgs method to clean args and append to the 
+             protected Instructions local attribute args */
             addParsedArgs(sub, args);
+            // return modified and filled Instruction
             return sub;
         }
         

@@ -94,7 +94,7 @@ namespace CPUVisNEA
                     {
                         if (txt_uProg.Lines != null)
                         { 
-                            cpu.Ram.UProgRAM[i] = txt_uProg.Lines[i];
+                            cpu.Ram.UStringProgRam[i] = txt_uProg.Lines[i];
                         }
                     }
                     catch(Exception exception)
