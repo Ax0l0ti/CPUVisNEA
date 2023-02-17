@@ -1,6 +1,7 @@
 using System;
 using System.Drawing;
 using System.Collections.Generic;
+using System.Deployment.Application;
 using System.Diagnostics;
 using System.Linq;
 using System.Windows.Forms;
@@ -29,7 +30,7 @@ namespace CPUVisNEA
             //enum number integer can be converted to represent binary value 
             //e.g Halt == 0 == 0000
             //e.g LDR == 5 == 0101
-            HALT, B, MOV, CMP, MVN, LDR, STR, AND, ORR, EOR, LSL, LSR, ADD, SUB
+            LDR, STR, HALT, B, BEQ, BNE, BLT, BGT,  MOV, CMP, MVN, AND, ORR, EOR, LSL, LSR, ADD, SUB
         }
 
 
@@ -40,7 +41,15 @@ namespace CPUVisNEA
                 case Instructions.HALT:
                     return new Halt();
                 case Instructions.B:
-                    return new B();
+                    return new B(Instructions.B);
+                case Instructions.BEQ:
+                    return new Beq();
+                case Instructions.BNE:
+                    return new Bne();
+                case Instructions.BLT:
+                    return new Blt();
+                case Instructions.BGT:
+                    return new Bgt();
                 case Instructions.MOV:
                     return new Mov();
                 case Instructions.CMP:
@@ -73,6 +82,7 @@ namespace CPUVisNEA
 
         // Special Purpose Registers used by a CPU 
         private Register[] SPRegisters;
+        // PC, MAR, MDR, ACC, CIR, MBR
         // Normal interactable 
         private Register[] BasicRegisters = new Register[10]; 
         // todo explain why line below is bs, how to fix - CPUState[] new class 
@@ -98,22 +108,54 @@ namespace CPUVisNEA
         {
             bool halted = false;
             while(!halted){
-             Fetch();
-             Decode();
-             Execute( );
+                // Searches from index in RAM for next Instruction
+                // calls Display Fetch Log
+                Fetch( ); 
+                // Checks How many Parameters Required
+                // calls ParameterFetch() to get Parameters
+                // calls Display Decode Log
+                
+                 
+                Tuple<Instruction, int> instruction_nextIndex = Decode(  );
+                instruction_nextIndex.Item2 = /*next Instruction index */
+                //
+                Execute( instruction_nextIndex.Item1 );
             }
              
         }
 
-        public void Fetch()
+        public void FillRam(Instruction[] FullInstructions)
         {
             
         }
 
-        public void Decode()
+        public void Fetch( int index )
         {
             
         }
+        // Decode returns the 
+        public Tuple<Instruction, int> Decode( byte[] BinaryInstruction )
+        {
+            int InstructionInt = BitConverter.ToInt32(BinaryInstruction, 0);
+            //todo convert Instruct to CPU Type via enum number
+            
+            Instruction TargetInstruction = null ;
+            int parameters = GetNumberOfParameters(TargetInstruction);
+            for (int i = 0; i < parameters - 1; i++)
+            {
+                //todo GetArg();
+            }
+
+            return 
+        }
+        
+        public int GetNumberOfParameters(Instruction TargetInstruction)
+        {
+            int parameters = 0;
+            parameters = TargetInstruction.NumberOfParameters();
+            return parameters;
+        }
+        
         public void Execute(Instruction instr)
         {
             //call the overriden instruction's execute command with its given arguements
@@ -155,7 +197,7 @@ namespace CPUVisNEA
             //Current Instruction Register
             var CIR = new CodeReg("CIR", "");
             // Memory Buffer Register 
-            var MBR = new IntReg("PC", 0);
+            var MBR = new IntReg("MBR", 0);
             //Adding all Registers to the Special Purpose Registers
             //as assigning can only happen in declaration, temporary holds the info before transfer
             Register[] temporary = { PC, MAR, MDR, ACC, CIR, MBR };
@@ -213,7 +255,7 @@ namespace CPUVisNEA
     {
         //todo mabye string that can be made byte OR all List<string> to smth else
         
-        private byte[][] Memory = new byte[5][] ;
+        private byte[][] Memory = new byte[][] {};
         private Instruction[] AssembelyProgram = new Instruction[] { };
         private bool binaryMode = false;
         
@@ -253,8 +295,6 @@ namespace CPUVisNEA
         
         public List<string> UStringProg = new List<string>();
         public Instruction[] CompUProg_Instructions = new Instruction[] { };
-        
-
         
         
         //Cleanse() used for removing all lines comprised of blank characters (blank line) 
@@ -336,16 +376,27 @@ namespace CPUVisNEA
                      execution nature dependent on the condition passed down to the B constructor
                      ( condition given by removing the B from switch case instruction to get add-on e.g EQ or NE) */
                     case "B":
-                    case "BEQ":
-                    case "BNE":
-                    case "BLT":
+                    {
+                        parsed = Mov.parseArgs(args);
+                        break;
+                    }
+                    case "Beq":{
+                        parsed = Mov.parseArgs(args);
+                        break;
+                    }
+                    case "Bne":
+                    {
+                        parsed = Mov.parseArgs(args);
+                        break;
+                    }
+                    case "Blt":
+                    {
+                        parsed = Mov.parseArgs(args);
+                        break;
+                    }
                     case "BMT":
                     {
-                        //remove the B from case. If B, returns null else returns remaining string
-                        string condition = instruction.Replace("B", null);
-                        //pass condition down to override parseArgs
-                        //this in turn passes down the conditional to the constructor of the B
-                        parsed = B.parseArgs(args,condition);
+                        parsed = Mov.parseArgs(args);
                         break;
                     }
 

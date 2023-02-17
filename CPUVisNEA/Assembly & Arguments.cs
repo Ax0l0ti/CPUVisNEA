@@ -171,6 +171,26 @@ namespace CPUVisNEA
             //return false if requirements not met
             return false;
         }
+        //called by CPU Decode to indicate how many bytes must be fetched to retrieve parameters
+        protected internal int NumberOfParameters()
+        {
+            int paramCount;
+            //linear search through dictionary
+            foreach (var InstructGrouping in dictionaryOfValidParams)
+            {
+                //if the key array contains the Instruction Tag
+                if (InstructGrouping.Key.Contains(Tag))
+                {
+                    //retrieve the total count of parameters required
+                    paramCount = InstructGrouping.Value.Count();
+                    return paramCount;
+
+                }
+            }
+            //as compiled should eliminate all illegal tags, this should never be reached
+            return 0;
+        }
+
         // basic overridable call statement for all assembly operations to override to deal with individual arguments
         //means CPU can call executeInstruction regardless of Child class to get unique behaviour
         protected internal abstract void executeInstruction(List<Argument> args, CPU cpu);
@@ -215,11 +235,7 @@ namespace CPUVisNEA
     //B class acts as all variants, conditional is seperated and stored as a local attribute of the Branch statement to switch case action in execute Instruction
     public class B : Instruction
     {
-        //Possible values for condition and their meaning are: EQ:Equal to, NE:Not equal to, GT:Greater than, LT:Less than.
-        //assigned in the overriden parseArgs method of B class
-        private string condition;
-        //takes condition as a parameter 
-        public B() : base(CPU.Instructions.B)
+        public B(CPU.Instructions instructions) : base(CPU.Instructions.B)
         {
             
 
@@ -231,43 +247,16 @@ namespace CPUVisNEA
         protected internal override void executeInstruction(List<Argument> args, CPU cpu)
         {
             int jump = 0;
-            
-            label label = (CPUVisNEA.label)args[0];
-            //note to self, any executions they all do? e.g local variable assignement? SPR? 
-            switch (condition)
-            {
-                // basic unconditional B statement always jumps to label 
-                case null :
-                    // return a jump command to indicated index by label in args[0]
-                    
-                    break;
-                // conditional B statement dependent on condition 'Less Than'
-                case "LT" :
-                    
-                    break;
-                // conditional B statement dependent on condition 'Greater Than'
-                case "GT" :
-                    
-                    break;
-                // conditional B statement dependent on condition 'Equal To'
-                case "EQ" :
-                    
-                    break;
-                // conditional B statement dependent on condition 'Not Equal'
-                case "NE" :
-                    
-                    break;
-            }
 
-            
+            label label = (CPUVisNEA.label)args[0];
+
         }
         /*held locally in class but never used by class. Is used by CPU to instantiate instance
          of Instruction type and pass arguments held by local CPU compiling function  */
-        public static B parseArgs(List<string> args, string condition)
+        public static B parseArgs(List<string> args)
         {
             //creates new local instance of a blank object correspondent to class
-            var b = new B();
-            b.condition = condition;
+            var b = new B(CPU.Instructions.B);
             /*passes string version of arguments given by parameter to use
              Inherited addParsedArgs method to clean args and append to the 
              protected Instructions local attribute args */
@@ -277,7 +266,142 @@ namespace CPUVisNEA
         }
         
     }
+    //Branch if Equal To
+    public class Beq : B
+    {
+        
+        public Beq() : base(CPU.Instructions.BEQ)
+        {
+            
 
+        }
+        
+        //todo create Instruction method to deal w input ( also add description of how operator works, from NEA writeup ) 
+        //B<condition>  <label> Conditionally branch to the instruction at position <label> in the program if the last comparison met the criteria specified by the <condition>.
+
+        protected internal override void executeInstruction(List<Argument> args, CPU cpu) 
+        {
+            int jump = 0;
+
+            label label = (CPUVisNEA.label)args[0];
+
+        }
+        /*held locally in class but never used by class. Is used by CPU to instantiate instance
+         of Instruction type and pass arguments held by local CPU compiling function  */
+        public static Beq parseArgs(List<string> args, string condition)
+        {
+            //creates new local instance of a blank object correspondent to class
+            var beq = new Beq();
+            /*passes string version of arguments given by parameter to use
+             Inherited addParsedArgs method to clean args and append to the 
+             protected Instructions local attribute args */
+            addParsedArgs(beq, args);
+            // return modified and filled Instruction
+            return beq;
+        }
+    }
+    // Branch if Not Equal to 
+    public class Bne : B
+    {
+        public Bne() : base(CPU.Instructions.BNE)
+        {
+            
+
+        }
+        
+        //todo create Instruction method to deal w input ( also add description of how operator works, from NEA writeup ) 
+        //Bne<condition>  <label> Conditionally branch to the instruction at position <label> in the program if the last comparison met the criteria specified by the <condition>.
+
+        protected internal override void executeInstruction(List<Argument> args, CPU cpu)
+        {
+            int jump = 0;
+
+            label label = (CPUVisNEA.label)args[0];
+
+        }
+        /*held locally in class but never used by class. Is used by CPU to instantiate instance
+         of Instruction type and pass arguments held by local CPU compiling function  */
+        public static Bne parseArgs(List<string> args, string condition)
+        {
+            //creates new local instance of a blank object correspondent to class
+            var bne = new Bne();
+            /*passes string version of arguments given by parameter to use
+             Inherited addParsedArgs method to clean args and append to the 
+             protected Instructions local attribute args */
+            addParsedArgs(bne, args);
+            // return modified and filled Instruction
+            return bne;
+        }
+        
+    }
+    // Branch if Less Than
+    public class Blt : B
+    {
+        public Blt() : base(CPU.Instructions.BLT)
+        {
+            
+
+        }
+        
+        //todo create Instruction method to deal w input ( also add description of how operator works, from NEA writeup ) 
+        //B<condition>  <label> Conditionally branch to the instruction at position <label> in the program if the last comparison met the criteria specified by the <condition>.
+
+        protected internal override void executeInstruction(List<Argument> args, CPU cpu) 
+        {
+            int jump = 0;
+
+            label label = (CPUVisNEA.label)args[0];
+
+        }
+        /*held locally in class but never used by class. Is used by CPU to instantiate instance
+         of Instruction type and pass arguments held by local CPU compiling function  */
+        public static Blt parseArgs(List<string> args, string condition)
+        {
+            //creates new local instance of a blank object correspondent to class
+            var blt = new Blt();
+            /*passes string version of arguments given by parameter to use
+             Inherited addParsedArgs method to clean args and append to the 
+             protected Instructions local attribute args */
+            addParsedArgs(blt, args);
+            // return modified and filled Instruction
+            return blt;
+        }
+        
+    }public class Bgt : B
+    {
+        public Bgt() : base(CPU.Instructions.BGT)
+        {
+            
+
+        }
+        
+        //todo create Instruction method to deal w input ( also add description of how operator works, from NEA writeup ) 
+        //B<condition>  <label> Conditionally branch to the instruction at position <label> in the program if the last comparison met the criteria specified by the <condition>.
+
+        protected internal override void executeInstruction(List<Argument> args, CPU cpu) 
+        {
+            int jump = 0;
+
+            label label = (CPUVisNEA.label)args[0];
+
+        }
+        /*held locally in class but never used by class. Is used by CPU to instantiate instance
+         of Instruction type and pass arguments held by local CPU compiling function  */
+        public static Bgt parseArgs(List<string> args, string condition)
+        {
+            //creates new local instance of a blank object correspondent to class
+            var bgt = new Bgt();
+            /*passes string version of arguments given by parameter to use
+             Inherited addParsedArgs method to clean args and append to the 
+             protected Instructions local attribute args */
+            addParsedArgs(bgt, args);
+            // return modified and filled Instruction
+            return bgt;
+        }
+        
+    }
+    
+    
 
 
     //---------------------------------------     MOV     Instruction ------------------------------------------------

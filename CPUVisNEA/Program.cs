@@ -26,19 +26,11 @@ namespace CPUVisNEA
             Trace.WriteLine("Welcome to CPU - Debug window");
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            /*
-             added new line in main entry point of application to instantiate new CPU object
-             I have then edited the UI class to take a CPU class as a parameter
-            */
+            // I have created a new Instance of the CPU class to interact with my User Interface
             var cpu = new CPU();
-
+            // the UI class has been modified to take a CPU as a parameter which uses the Instance above
             var ui = new UI(cpu);
-            
             Application.Run(ui);
-            
         }
-
     }
-    
-    
 }
