@@ -55,6 +55,7 @@ namespace CPUVisNEA
                 this.cpu = cpu;
                 InitializeComponent();
             }
+            
 
             private void gb_userInput_Enter(object sender, EventArgs e)
             {
@@ -86,10 +87,10 @@ namespace CPUVisNEA
 
             private void setEditState(bool edit)
             {
-                if (edit != this.Editstate)
+                if (edit != Editstate)
                 {
                     Trace.WriteLine($"Switched to {edit} mode");
-                    this.Editstate = edit;
+                    Editstate = edit;
                     txt_uProg.Enabled = edit;
                 }
             }

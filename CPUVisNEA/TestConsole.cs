@@ -5,15 +5,15 @@ using System.Linq;
 using NUnit.Framework;
 
 using CPUVisNEA.Properties;
-
 namespace CPUVisNEA
 {
     [TestFixture] 
-    
+    // for 
     public class TestConsole
     {
         //generating new CPU to work with for all tests
         private CPU cpu = new CPU();
+        
         [Test] public void TestofTests()
         {
             Console.WriteLine("Thou doth work with great fanciness ");
@@ -38,23 +38,30 @@ namespace CPUVisNEA
             Console.WriteLine( typeof(CPU.Instructions) ) ; 
             Console.WriteLine(mov.Tag);
             //test if used method correctly validates a first parameter type
-            var Reg = mov.validParamType(new RegisterArg() );
-            var Int  = mov.validParamType(new IntegerArg() );
+            var Reg = mov.validArgType(new RegisterArg( "R1" ) );
+            var Int  = mov.validArgType(new IntegerArg( "123" ) );
             Console.WriteLine($"1st param = register expected T ---  {Reg} ");
             Console.WriteLine($"1st param = integer expected F ---  {Int}" , '\n');
             
             // add to mov and tests second parameters if valid 
-            mov.addArg(new RegisterArg());
-             Reg = mov.validParamType(new RegisterArg() );
-             Int  = mov.validParamType(new IntegerArg() );
+            mov.addArg(new RegisterArg("R1"));
+            Reg = mov.validArgType(new RegisterArg( "R1" ) );
+            Int  = mov.validArgType(new IntegerArg( "456" ) );
             Console.WriteLine($"2nd param = register expected F ---  {Reg}");
             Console.WriteLine($"2nd param = integer expected T ---  {Int}" , '\n');
 
         }
-        
+
+        [Test] // I am uncertain if  TypeAndByteToArg works or contains logic errors
+        public void UncertaintytestForByte2ArgCast()
+        {
+            Argument test = cpu.TypeAndByteToArg(typeof(RegisterArg), 2);
+            Console.WriteLine(test.GetType().Name);
+        } //success hence valid logic 
+
 
         /* todo list of tests
-        file handling  
+        file handling  h
         ---->  reading
         ---->  writing 
         ---->  creating
@@ -66,7 +73,7 @@ namespace CPUVisNEA
         ---->  Branch
         --------->  Conditional
         --------->  Labels locations 
-        -------------->  correctly take label location followed by instruction     
+        -------------->  correctly take Label location followed by instruction     
         
         general Outputs LATER
         ---->  FDE Cycle

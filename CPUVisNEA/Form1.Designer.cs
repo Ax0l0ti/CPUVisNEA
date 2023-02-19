@@ -372,6 +372,10 @@ namespace CPUVisNEA
             // 
             // gb_userInput
             // 
+            if (Editstate)
+            {
+                
+            }
             this.gb_userInput.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
             this.gb_userInput.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(70)))), ((int)(((byte)(70)))), ((int)(((byte)(70)))));
             this.gb_userInput.Controls.Add(this.gb_UAssControls);

@@ -1,16 +1,14 @@
 using System;
-using System.Drawing;
 using System.Collections.Generic;
-using System.Deployment.Application;
 using System.Diagnostics;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Windows.Forms;
-using System.Text.RegularExpressions;  
+
 //https://resources.jetbrains.com/storage/products/rider/docs/Rider_default_win_shortcuts.pdf?_gl=1*8v6mpv*_ga*Mzk0Njg2ODg3LjE2NjExMDU4MzA.*_ga_9J976DJZ68*MTY3NTAyNjgxNS4xNy4wLjE2NzUwMjY4MjAuMC4wLjA.&_ga=2.77451923.725299765.1675026816-394686887.1661105830
 
 namespace CPUVisNEA
-{     
- 
+{
     /* General todos 
      * ----> Regex for Arguements
      * ----> LineInstruction
@@ -19,23 +17,81 @@ namespace CPUVisNEA
      * ----> Branch needs new Instruction subclasses ( overide Branch class)
      * 
      */
-    
+
+
     //----------------------------------------Main Class CPU------------------------------------------------
-    // vast majority of classes are instantiated in CPU 
+    // CPU acts as the main class that operates as the main bulk of class interactions and back end code
+
     public class CPU
     {
+        // Special Purpose Registers used by a CPU 
+        // PC, MAR, MDR, ACC, CIR, MBR
+
+        private Register[] SPRegisters = { /*PC, MAR, MDR, ACC, CIR, MBR*/ };
+
+        // Program Counter
+        private readonly IntReg PC = new IntReg("PC", 0);
+
+        // Memory Address Register
+        private readonly CodeReg MAR = new CodeReg("MAR", "");
+
+        // Memory Data Register
+        private readonly IntReg MDR = new IntReg("MDR", 0);
+
+        //Accumulator
+        private readonly IntReg ACC = new IntReg("ACC", 0);
+
+        //Current Instruction Register
+        private readonly CodeReg CIR = new CodeReg("CIR", "");
+
+        // Memory Buffer Register 
+        private readonly IntReg MBR = new IntReg("MBR", 0);
+
+
+        // readonly variable for me to modify in case more or less registers are needed for testing, final code, adjustments etc.
+        private static readonly int BasicRegisterNumber = 10;
+
+        // Normal User interactable Registers in a Computer
+        private Register[] BasicRegisters = new Register[BasicRegisterNumber];
+
+        // todo explain why line below is bs, how to 
+        //private Tuple<Register[], Register[], int>[] CPUHistory = new Tuple<Register[], Register[], int>[] {};
+        private CPUState[] History = { };
+
+
+        private readonly RAM ram = new RAM();
+        public Compiler Compiler = new Compiler();
+
         public enum Instructions : byte
         {
             //todo reorder to correct AQA order
             //enum number integer can be converted to represent binary value 
             //e.g Halt == 0 == 0000
             //e.g LDR == 5 == 0101
-            LDR, STR, HALT, B, BEQ, BNE, BLT, BGT,  MOV, CMP, MVN, AND, ORR, EOR, LSL, LSR, ADD, SUB
+            LDR,
+            STR,
+            ADD,
+            SUB,
+            MOV,
+            CMP,
+            B,
+            BEQ,
+            BNE,
+            BGT,
+            BLT,
+            AND,
+            ORR,
+            EOR,
+            MVN,
+            LSL,
+            LSR,
+            HALT
         }
 
-
+        //switch case that takes a enum from Instructions and translates it to a new instance of a correspondent Instruction class 
         public static Instruction newInstruction(Instructions instr)
         {
+            //switches on the enum byte value automatically allotted to each Instruction Tag 
             switch (instr)
             {
                 case Instructions.HALT:
@@ -75,23 +131,32 @@ namespace CPUVisNEA
                 case Instructions.SUB:
                     return new Sub();
                 default:
+                    //as it switches based on enum value, any value higher than the potential maxima ( SUB )
                     throw new ArgumentOutOfRangeException(nameof(instr), instr, null);
             }
         }
- 
 
-        // Special Purpose Registers used by a CPU 
-        private Register[] SPRegisters;
-        // PC, MAR, MDR, ACC, CIR, MBR
-        // Normal interactable 
-        private Register[] BasicRegisters = new Register[10]; 
-        // todo explain why line below is bs, how to fix - CPUState[] new class 
-        private Tuple<Register[], Register[], int>[] CPUHistory = new Tuple<Register[], Register[], int>[] {};
+        internal Argument TypeAndByteToArg(Type ArgType, byte ByteFormOfContent)
+        {
+            //C# doesnt allow the instantiation of a class using a Type variable
+            // hence I created a switchcase of the class name matched to the name of the type which is the same
+            switch (ArgType.Name)
+            {
+                case "RegisterArg":
+                    return new RegisterArg(ByteFormOfContent);
+                    break;
+                case "IntArg":
+                    return new IntegerArg(ByteFormOfContent);
+                    break;
+                case "Label":
+                    return new RegisterArg(ByteFormOfContent);
+                    break;
+                default:
+                    throw new Exception($"Invalid Type {ArgType.Name} ");
+            }
+        }
 
-        private RAM ram = new RAM();
-        public Compiler Compiler = new Compiler();
-        public ALU Alu = new ALU();
-        
+
         /*---------------------------------------- Run ------------------------------------------------
         |  BREAKDOWN
         |---->  Run() ==== while( ! halt ) do ...
@@ -106,57 +171,64 @@ namespace CPUVisNEA
         */
         public void Run()
         {
-            bool halted = false;
-            while(!halted){
+            var halted = false;
+            while (!halted)
+            {
                 // Searches from index in RAM for next Instruction
                 // calls Display Fetch Log
-                Fetch( ); 
+                var FetchedInstruction = Fetch(PC.content);
                 // Checks How many Parameters Required
                 // calls ParameterFetch() to get Parameters
                 // calls Display Decode Log
-                
-                 
-                Tuple<Instruction, int> instruction_nextIndex = Decode(  );
-                instruction_nextIndex.Item2 = /*next Instruction index */
-                //
-                Execute( instruction_nextIndex.Item1 );
+
+                var InstructionToExecute = Decode(FetchedInstruction);
+                Execute(InstructionToExecute);
             }
-             
         }
 
         public void FillRam(Instruction[] FullInstructions)
         {
-            
         }
 
-        public void Fetch( int index )
+        //CPU calls Instruction to access the byte representing the Instruction at the index of the Program Counter
+        private byte Fetch(int index)
         {
-            
+            return ram.GetByteAt(PC.content);
         }
+
         // Decode returns the 
-        public Tuple<Instruction, int> Decode( byte[] BinaryInstruction )
+        public Instruction Decode(byte BinaryInstruction)
         {
-            int InstructionInt = BitConverter.ToInt32(BinaryInstruction, 0);
-            //todo convert Instruct to CPU Type via enum number
-            
-            Instruction TargetInstruction = null ;
-            int parameters = GetNumberOfParameters(TargetInstruction);
-            for (int i = 0; i < parameters - 1; i++)
+            //Convert the bina
+            var InstructionInt = Convert.ToInt32(BinaryInstruction);
+
+            var TargetInstruction = newInstruction((Instructions)InstructionInt);
+            var parameters = GetNumberOfParameters(TargetInstruction);
+
+            for (var i = 0; i < parameters - 1; i++)
             {
-                //todo GetArg();
+                //use the Instruction class to retrieve the required type of arg at parameter index i 
+                var ArgType = TargetInstruction.GetReqArgType(i);
+                //Instanciate a new instance of the specific Argument 
+                // this uses the Argtype to indicate the subclass of Argument and accesses the ram to retrieve the byte representing the Arg's content
+                var FilledArg = TypeAndByteToArg(ArgType, ram.GetByteAt(PC.content + i));
+                TargetInstruction.addArg(FilledArg);
+
+                //incrementing the Program counter by number of bytes used to store parameters to access the next instruction assuming no branch condition
             }
 
-            return 
+            return TargetInstruction;
         }
-        
-        public int GetNumberOfParameters(Instruction TargetInstruction)
+
+        private int GetNumberOfParameters(Instruction TargetInstruction)
         {
-            int parameters = 0;
+            var parameters = 0;
             parameters = TargetInstruction.NumberOfParameters();
             return parameters;
         }
-        
-        public void Execute(Instruction instr)
+
+
+        private void Execute(Instruction instr)
         {
             //call the overriden instruction's execute command with its given arguements
             //( Could be partically more efficient with passed args but this allows easy testing
@@ -169,6 +241,7 @@ namespace CPUVisNEA
         {
             // 
         }
+
         /* TODO add 
          GetAssemblyFiles()  // for the menu of load programs
          SaveUserAssembly()  //calls Compiler.SaveProg calls create new instantiation of AssProg
@@ -210,9 +283,9 @@ namespace CPUVisNEA
             try
             {
                 /*split the string representing the content of the textbox into string[]
-                 By looking for the new line character*/ 
+                 By looking for the new line character*/
                 var program = new List<string>(text.Split('\n'));
-                
+
                 Compiler.UStringProg = program;
                 Trace.WriteLine($"Compiled: [{text}] into {Compiler.UStringProg.Count} instructions");
                 Compiler.Cleanse();
@@ -222,12 +295,12 @@ namespace CPUVisNEA
             {
                 MessageBox.Show(Convert.ToString(ex));
             }
-       
         }
+
         public bool Compile(string text)
         {
-            bool valid = false;
-            
+            var valid = false;
+
             try
             {
                 RamLoader(text);
@@ -238,10 +311,9 @@ namespace CPUVisNEA
             }
 
             // TODO: throw an exception if this isn't a valid program
-            
-            
-            return valid;
 
+
+            return valid;
         }
 
         public CPU()
@@ -254,16 +326,31 @@ namespace CPUVisNEA
     public class RAM
     {
         //todo mabye string that can be made byte OR all List<string> to smth else
-        
-        private byte[][] Memory = new byte[][] {};
-        private Instruction[] AssembelyProgram = new Instruction[] { };
-        private bool binaryMode = false;
-        
+
+        private readonly byte[] Memory = { };
+        private Instruction[] AssembelyProgram = { };
+        private bool binaryMode;
+
         //Local Convert function in RAM class to completely translate the users program displayed in RAm between its binary representation
         //and its assembly language representation. This is completed by checking the local class variable binaryMode to
         //select the direction on conversion - binary to Assembly ( Bin2Ass() ) or Assembly to binary ( Ass2Bin() ) 
-        
+
         //this is useful so students can see what is being held in RAM as values they can read and understand
+
+        internal byte GetByteAt(int index)
+        {
+            return Memory[index];
+        }
+
+        internal byte[] GetBytesAt(int index, int ByteSize)
+        {
+            byte[] BytesOfArgs = { };
+            for (var incriment = 0; incriment < ByteSize - 1; incriment++)
+                BytesOfArgs.Append(Memory[index + incriment]);
+
+            return BytesOfArgs;
+        }
+
         private List<string> Convert()
         {
             var newContent = new List<string>();
@@ -272,7 +359,12 @@ namespace CPUVisNEA
                 newContent = Bin2Ass();
                 binaryMode = false;
             }
-            else newContent = Ass2Bin(); binaryMode = true;
+            else
+            {
+                newContent = Ass2Bin();
+            }
+
+            binaryMode = true;
 
             return newContent;
         }
@@ -290,80 +382,74 @@ namespace CPUVisNEA
             return null;
         }
     }
+
     public class Compiler
     {
-        
         public List<string> UStringProg = new List<string>();
-        public Instruction[] CompUProg_Instructions = new Instruction[] { };
-        
-        
+        public Instruction[] CompUProg_Instructions = { };
+
+
         //Cleanse() used for removing all lines comprised of blank characters (blank line) 
         public void Cleanse()
         {
-            List<String> temporary = new List<string>();
-            foreach (string line in UStringProg)
-            {
-                if (!String.IsNullOrWhiteSpace(line))
-                {
+            var temporary = new List<string>();
+            foreach (var line in UStringProg)
+                if (!string.IsNullOrWhiteSpace(line))
                     temporary.Add(line);
-                }
-            }
 
             UStringProg = temporary;
         }
+
         //checks if valid format, called after cleanse
-        public Instruction[] valid(List<String> program)
+        public Instruction[] valid(List<string> program)
         {
-            Instruction[] InstrArray = new Instruction[] {} ;
-            
+            Instruction[] InstrArray = { };
+
             foreach (var line in program)
             {
                 //linearly iterate through Program and add correspondent Instruction to array of instruction with parameters
-                Instruction nextInstr = lineToInstruction(line);
+                var nextInstr = lineToInstruction(line);
                 InstrArray.Append(nextInstr);
             }
+
             return InstrArray;
         }
-        
-        public Instruction lineToInstruction (string line)
-        { //todo           
-            //Regular expressions of valid label / register / condition / memory reference / operand
-            Regex VmemRef = new Regex("R[0-9]");
-            string Vlabel = "";
-            string VReg = @"(B)";
-            string Vcondition = "";
-            
+
+        public Instruction lineToInstruction(string line)
+        {
+            //todo           
+            //Regular expressions of valid Label / register / condition / memory reference / operand
+            var VmemRef = new Regex("R[0-9]");
+            var Vlabel = "";
+            var VReg = @"(B)";
+            var Vcondition = "";
+
             var tokens = line.Split(new char[0], StringSplitOptions.RemoveEmptyEntries);
             if (tokens.Length == 1)
             {
                 //it must be HALT command if only one word 
                 //return new Halt();
-
             }
             else
             {
-                string instruction = tokens[0];
-                List<string> args = new List<string>();
+                var instruction = tokens[0];
+                var args = new List<string>();
                 // we have split on whitespace, but we need to split on comma too
-                for (int i = 1; i < tokens.Length; i++)
+                for (var i = 1; i < tokens.Length; i++)
                 {
                     var token = tokens[i];
                     var strings = token.Split(",".ToCharArray(), StringSplitOptions.RemoveEmptyEntries);
-                    foreach (var s in strings)
-                    {
-                        args.Add(s);
-                    }
+                    foreach (var s in strings) args.Add(s);
                 }
 
-                
+
                 CPU.Instructions instrType;
-                CPU.Instructions.TryParse(instruction, out instrType);
+                Enum.TryParse(instruction, out instrType);
                 byte testFromMem = 1;
-                CPU.Instructions inst = (CPU.Instructions)testFromMem;
-                Instruction parsed = CPU.newInstruction(instrType);
+                var inst = (CPU.Instructions)testFromMem;
+                var parsed = CPU.newInstruction(instrType);
                 switch (instruction)
                 {
-
                     case "HALT":
                     {
                         //special case stop execution return to edit state 
@@ -380,7 +466,8 @@ namespace CPUVisNEA
                         parsed = Mov.parseArgs(args);
                         break;
                     }
-                    case "Beq":{
+                    case "Beq":
+                    {
                         parsed = Mov.parseArgs(args);
                         break;
                     }
@@ -479,10 +566,8 @@ namespace CPUVisNEA
             //todo change line below to failsafe, move comment above 
             return new Mov();
         }
-
-
     }
-    
+
 //----------------------------------------Class of user interactable Registers  ------------------------------------------------
 
 /*basic class of a register. As a register can store either a string or integer I have
@@ -495,16 +580,21 @@ namespace CPUVisNEA
         //determines if Assembly language is allowed or integers. useful to determine what data type the content is
         // doesnt have to be passed as a parameter as child class influences assAllowed value
         protected bool assAllowed;
+        private readonly object content;
 
         //protected constructor so inherited classes can use class
-        protected Register(string name)
+        //by using content as an object, this allows different registers to assign strings or integers to content
+        protected Register(string name, object content)
         {
+            this.name = name;
+            this.content = content;
         }
 
         //function to extract value of Register's assAllowed value due to local scope
-        protected bool getAllow()
+        protected object RetContent()
         {
-            return assAllowed;
+            //todo overrided
+            return content;
         }
 
         //function to extract value of Register's name value due to local scope
@@ -517,101 +607,42 @@ namespace CPUVisNEA
     //class for Integer only registers that hold opcode values
     public class IntReg : Register
     {
-        private readonly int content;
+        internal int content;
 
-        public IntReg(string name, int content) : base(name)
+        public IntReg(string name, int content) : base(name, content)
         {
             assAllowed = false;
             this.content = content;
         }
-
-        protected int RetContent()
-        {
-            return content;
-        }
     }
+
     //class for Assembly opcode only registers that hold opcode values
     public class CodeReg : Register
     {
-        private readonly string content;
+        internal string content;
 
-        public CodeReg(string name, string content) : base(name)
+        public CodeReg(string name, string content) : base(name, content)
         {
             assAllowed = true;
             this.content = content;
         }
-
-        protected string RetContent()
-        {
-            return content;
-        }
     }
+
     //needs to be improved below 
 
     //special case registers created due to Special Purpose needing to store Opcode instructions from assembly language as a string to display 
     //mabye delete below? Methods stored in individual classes instead
-    public class ALU
-    {
-        /*
-        
-        //LDR Rd, <memory ref> Load the value stored in the memory location specified by <memory ref> into register d.
-        private void LDR( Rd, <memory ref> ) {} 
-        
-        //STR Rd, <memory ref> Store the value that is in register d into the memory location specified by <memory ref>.
-        private void STR( Rd, <memory ref> ) {}
-        
-        //ADD Rd, Rn, <operand2> Add the value specified in <operand2> to the value in register n and store the result in register d.
-        private void ADD( Rd, Rn, <operand2> ) {}
-        
-        //SUB Rd, Rn, <operand2> Subtract the value specified by <operand2> from the value in register n and store the result in register d.
-        private void SUB( Rd, Rn, <operand2> ) {}
-        
-        //MOV Rd, <operand2> Copy the value specified by <operand2> into register d.
-        private void MOV( Rd, <operand2> ) {}
-        
-        //CMP Rn, <operand2> Compare the value stored in register n with the value specified by <operand2>.
-        private void CMP( Rn, <operand2> ) {}
-        
-        //B <label> Always branch to the instruction at position <label> in the program.
-        private void B( <label> ) {}
-        
-        //B<condition>  <label>  Conditionally branch to the instruction at position <label> in the program if the last comparison met the criteria specified by the <condition>. Possible values for <condition> and their meaning are: EQ:Equal to, NE:Not equal to, GT:Greater than, LT:Less than.
-        //conditonal branch as method B already used
-        private void B_if( <condition>, <label> ) {}
-        
-        //AND Rd, Rn, <operand2> Perform a bitwise logical AND operation between the value in register n and the value specified by <operand2> and store the result in register d.
-        private void AND( Rd, Rn, <operand2> )
-        
-        //ORR Rd, Rn, <operand2> Perform a bitwise logical OR operation between the value in register n and the value specified by <operand2> and store the result in register d.
-        private void ORR( Rd, Rn, <operand2> ) {}
-        
-        //EOR Rd, Rn, <operand2> Perform a bitwise logical exclusive or (XOR) operation between the value in register n and the value specified by <operand2> and store the result in register d.
-        private void EOR( Rd, Rn, <operand2>) {}
-        
-        //MVN Rd, <operand2> Perform a bitwise logical NOT operation on the value specified by <operand2> and store the result in register d.
-        private void MVN( Rd, <operand2> ) {}
-        
-        //LSL Rd, Rn, <operand2> Logically shift left the value stored in register n by the number of bits specified by <operand2> and store the result in register d.
-        private void LSL( Rd, Rn, <operand2>){}
-        
-        //LSR Rd, Rn, <operand2> Logically shift right the value stored in register n by the number of bits specified by <operand2> and store the result in register d.
-        private void LSR( Rd, Rn, <operand2> ){}
-        
-        //HALT Stop the execution of the program.
-        //Basically change state to edit 
-        private void Halt(){}
-        
-
-        
-        
-        <operand2> can be #nnn or Rm to use either a constant or the contents of register Rm.
-        Registers are R0 to R12.
-         */
-    }
 
     public class CPUState
     {
-        
+        private Register[] SpecialPurpose;
+        private Register[] Basic;
+
+        public CPUState(Register[] specialPurpose, Register[] basic)
+        {
+            SpecialPurpose = specialPurpose;
+            Basic = basic;
+        }
     }
 
     //--------------------------------------Assembely Program classes - files -----------------------------------------------
@@ -629,8 +660,5 @@ namespace CPUVisNEA
             this.displayName = displayName;
             this.filecontent = filecontent;
         }
-        
     } // maybe have a list of AssProgs? Then call append(Compiler.saveProg()) 
-    
-     
 }
