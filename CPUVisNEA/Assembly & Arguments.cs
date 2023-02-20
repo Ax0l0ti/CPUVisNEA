@@ -63,6 +63,10 @@ namespace CPUVisNEA
         
         //protected int byteLength ;
         // todo decide IntegerArg byteLength = ( value % 255 ) + 1; 1 for others 
+        protected virtual internal byte ToByte()
+        {
+            return 0;
+        }
     }
 
     public class RegisterArg : Argument
@@ -74,13 +78,18 @@ namespace CPUVisNEA
         public RegisterArg(string StringArg)
         {
             // from is R(index) or r(index) to allow for user Mistakes. Hence Memory Index is string minus first index of string 
-            index = int.Parse(StringArg.Remove(1, 1));
+            index = (int) int.Parse(StringArg.Remove(0, 1)) ;
         }
 
         //second constructor for FDE Cycle retrieving from RAM 
         public RegisterArg(byte ByteForm)
         {
             index = Convert.ToInt32(ByteForm);
+        }
+
+        protected internal override byte ToByte()
+        {
+            return (byte)index;
         }
     }
 
@@ -100,6 +109,10 @@ namespace CPUVisNEA
         {
             value = Convert.ToInt32(ByteForm);
         }
+        protected internal override byte ToByte()
+        {
+            return (byte)value;
+        }
     }
 
     public class Label : Argument //todo maybe create linked class between Label argument and desitnation location
@@ -112,6 +125,10 @@ namespace CPUVisNEA
         public void setLabelLocation(int LabelLocation)
         {
             location = LabelLocation;
+        }
+        protected internal override byte ToByte()
+        {
+            return (byte)location;
         }
 
         private int location; // destination

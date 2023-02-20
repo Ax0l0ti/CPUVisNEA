@@ -52,15 +52,17 @@ namespace CPUVisNEA
         private static readonly int BasicRegisterNumber = 10;
 
         // Normal User interactable Registers in a Computer
-        private Register[] BasicRegisters = new Register[BasicRegisterNumber];
+        private Register[] BasicRegisters; 
 
         // todo explain why line below is bs, how to 
         //private Tuple<Register[], Register[], int>[] CPUHistory = new Tuple<Register[], Register[], int>[] {};
-        private CPUState[] History = { };
-
-
-        private readonly RAM ram = new RAM();
-        public Compiler Compiler = new Compiler();
+        private List<CPUState> History = new List<CPUState>();
+        private CPUState CurrentState;
+        
+        
+        private RAM ram = new RAM();
+        // used to compile User string to Cleaned Instruction[]. This confirms the program is valid before trying to compile the code in technically correct CPU assembly translation 
+        public Compiler Compiler = new Compiler();   
 
         public enum Instructions : byte
         {
@@ -91,7 +93,7 @@ namespace CPUVisNEA
         //switch case that takes a enum from Instructions and translates it to a new instance of a correspondent Instruction class 
         public static Instruction newInstruction(Instructions instr)
         {
-            //switches on the enum byte value automatically allotted to each Instruction Tag 
+            //switches on the enum byte value automatically allotted to each Instruction Tag in the enum above
             switch (instr)
             {
                 case Instructions.HALT:
@@ -159,6 +161,9 @@ namespace CPUVisNEA
 
         /*---------------------------------------- Run ------------------------------------------------
         |  BREAKDOWN
+        |
+        |----> FillRam() Takes Compiled Version of List
+        |
         |---->  Run() ==== while( ! halt ) do ...
         |
         |--------->  Fetch() Go to RAM class at index
@@ -171,6 +176,8 @@ namespace CPUVisNEA
         */
         public void Run()
         {
+            FillRam(); 
+            
             var halted = false;
             while (!halted)
             {
@@ -185,9 +192,24 @@ namespace CPUVisNEA
                 Execute(InstructionToExecute);
             }
         }
-
-        public void FillRam(Instruction[] FullInstructions)
+        //use compiled version of assembly program to correctly store all values of program into RAM 
+        public void FillRam()
         {
+            int index = 0;
+            foreach (var instruction in Compiler.CompUProg_Instructions)
+            {
+                // for every instruction in the compiled program, fill 
+                ram.Memory[index] = (byte)instruction.Tag;
+                index++;
+                
+                foreach (var argument in instruction.args)
+                {
+                    ram.Memory[index] = argument.ToByte();
+                    index++;
+                }
+            }
+
+            
         }
 
         //CPU calls Instruction to access the byte representing the Instruction at the index of the Program Counter
@@ -196,7 +218,7 @@ namespace CPUVisNEA
             return ram.GetByteAt(PC.content);
         }
 
-        // Decode returns the 
+        // Decode returns the Instruction to be ran with the correspondent arguments decoded
         public Instruction Decode(byte BinaryInstruction)
         {
             //Convert the bina
@@ -233,7 +255,7 @@ namespace CPUVisNEA
             //call the overriden instruction's execute command with its given arguements
             //( Could be partically more efficient with passed args but this allows easy testing
             //with my Unit testing interface for if executeInstruction works)
-            instr.executeInstruction(instr.args, /*todo*/null);
+            instr.executeInstruction(instr.args, CurrentState /*todo*/);
         }
 
 
@@ -257,6 +279,7 @@ namespace CPUVisNEA
          DisplayLongFDE()
          ReturnToEdit() 
          */
+        // function used in CPU constructor to generate initial values with the index at the first byte of RAM 
         private void SetUp()
         {
             // Program Counter
@@ -275,6 +298,14 @@ namespace CPUVisNEA
             //as assigning can only happen in declaration, temporary holds the info before transfer
             Register[] temporary = { PC, MAR, MDR, ACC, CIR, MBR };
             SPRegisters = temporary;
+            
+            BasicRegisters = new Register[BasicRegisterNumber];
+            for (int i = 0; i < BasicRegisters.Length; i++)
+            {
+                BasicRegisters[i] = new IntReg($"R{i}", 0);
+            }
+            //create a default Current State for the CPU to execute first instructions 
+            CurrentState = new CPUState(SPRegisters, BasicRegisters);
         }
 
 
@@ -320,6 +351,7 @@ namespace CPUVisNEA
         {
             SetUp();
         }
+        
     }
     //----------------------------------------Random Access Memory Class - Compiling methods ------------------------------------------------
 
@@ -327,7 +359,7 @@ namespace CPUVisNEA
     {
         //todo mabye string that can be made byte OR all List<string> to smth else
 
-        private readonly byte[] Memory = { };
+        public byte[] Memory = { };
         private Instruction[] AssembelyProgram = { };
         private bool binaryMode;
 
@@ -351,7 +383,8 @@ namespace CPUVisNEA
             return BytesOfArgs;
         }
 
-        private List<string> Convert()
+
+        private List<string> FormRamDisplay_Convert()
         {
             var newContent = new List<string>();
             if (binaryMode)
@@ -393,15 +426,22 @@ namespace CPUVisNEA
         public void Cleanse()
         {
             var temporary = new List<string>();
+            //foreach line in s
             foreach (var line in UStringProg)
+            {
                 if (!string.IsNullOrWhiteSpace(line))
+                {
                     temporary.Add(line);
+                }
+            }
+
+            
 
             UStringProg = temporary;
         }
 
         //checks if valid format, called after cleanse
-        public Instruction[] valid(List<string> program)
+        public Instruction[] Valid(List<string> program)
         {
             Instruction[] InstrArray = { };
 
@@ -576,7 +616,7 @@ namespace CPUVisNEA
     {
         //display name of Register Instance
         protected string name;
-
+// TODO give an ID (byte value)
         //determines if Assembly language is allowed or integers. useful to determine what data type the content is
         // doesnt have to be passed as a parameter as child class influences assAllowed value
         protected bool assAllowed;
@@ -635,10 +675,17 @@ namespace CPUVisNEA
 
     public class CPUState
     {
+        // the SpecialPurpose Register array contains all required data for immediate execution and testing of any instruction
         private Register[] SpecialPurpose;
         private Register[] Basic;
 
         public CPUState(Register[] specialPurpose, Register[] basic)
+        {
+            SpecialPurpose = specialPurpose;
+            Basic = basic;
+        }
+
+        public void update(Register[] specialPurpose, Register[] basic)
         {
             SpecialPurpose = specialPurpose;
             Basic = basic;
