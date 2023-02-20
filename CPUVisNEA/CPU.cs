@@ -11,11 +11,9 @@ namespace CPUVisNEA
 {
     /* General todos 
      * ----> Regex for Arguements
-     * ----> LineInstruction
-     * ---------> Instructions need to edit Cpu registers / pass CPU as parameter?
-     * ---------> Add rest of options
-     * ----> Branch needs new Instruction subclasses ( overide Branch class)
-     * 
+     * ----> Make Register Dictionary SP Basic ( used to find register for given string )
+     * ----> Check if direct or indirect addressing
+     * ----> 
      */
 
 
@@ -30,22 +28,22 @@ namespace CPUVisNEA
         private Register[] SPRegisters = { /*PC, MAR, MDR, ACC, CIR, MBR*/ };
 
         // Program Counter
-        private readonly IntReg PC = new IntReg("PC", 0);
+        private IntReg PC = new IntReg("PC", 0);
 
         // Memory Address Register
-        private readonly CodeReg MAR = new CodeReg("MAR", "");
+        private CodeReg MAR = new CodeReg("MAR", "");
 
         // Memory Data Register
-        private readonly IntReg MDR = new IntReg("MDR", 0);
+        private IntReg MDR = new IntReg("MDR", 0);
 
         //Accumulator
-        private readonly IntReg ACC = new IntReg("ACC", 0);
+        private IntReg ACC = new IntReg("ACC", 0);
 
         //Current Instruction Register
-        private readonly CodeReg CIR = new CodeReg("CIR", "");
+        private CodeReg CIR = new CodeReg("CIR", "");
 
         // Memory Buffer Register 
-        private readonly IntReg MBR = new IntReg("MBR", 0);
+        private IntReg MBR = new IntReg("MBR", 0);
 
 
         // readonly variable for me to modify in case more or less registers are needed for testing, final code, adjustments etc.
@@ -62,14 +60,11 @@ namespace CPUVisNEA
         
         private RAM ram = new RAM();
         // used to compile User string to Cleaned Instruction[]. This confirms the program is valid before trying to compile the code in technically correct CPU assembly translation 
-        public Compiler Compiler = new Compiler();   
+        public Compiler Compiler = new Compiler();
 
         public enum Instructions : byte
         {
-            //todo reorder to correct AQA order
-            //enum number integer can be converted to represent binary value 
-            //e.g Halt == 0 == 0000
-            //e.g LDR == 5 == 0101
+            //enum number integer can be converted to represent binary value
             LDR,
             STR,
             ADD,
@@ -157,8 +152,8 @@ namespace CPUVisNEA
                     throw new Exception($"Invalid Type {ArgType.Name} ");
             }
         }
-
-
+        
+        //As the Form must Compile before executing Run, the Main Entrance of Run doesnt need to Compile the code but simply Fillram
         /*---------------------------------------- Run ------------------------------------------------
         |  BREAKDOWN
         |
@@ -189,12 +184,20 @@ namespace CPUVisNEA
                 // calls Display Decode Log
 
                 var InstructionToExecute = Decode(FetchedInstruction);
-                Execute(InstructionToExecute);
+                CurrentState = Execute(InstructionToExecute);
+                halted = CheckHalted();
             }
         }
+
+        private bool CheckHalted()
+        {
+            return CurrentState.PC.content < 0;
+        }
+
         //use compiled version of assembly program to correctly store all values of program into RAM 
         public void FillRam()
         {
+            
             int index = 0;
             foreach (var instruction in Compiler.CompUProg_Instructions)
             {
@@ -250,12 +253,13 @@ namespace CPUVisNEA
         }
 
 
-        private void Execute(Instruction instr)
+        private CPUState Execute(Instruction instr)
         {
             //call the overriden instruction's execute command with its given arguements
             //( Could be partically more efficient with passed args but this allows easy testing
             //with my Unit testing interface for if executeInstruction works)
-            instr.executeInstruction(instr.args, CurrentState /*todo*/);
+            var NewState = instr.executeInstruction(instr.args, CurrentState);
+            return NewState;
         }
 
 
@@ -282,69 +286,43 @@ namespace CPUVisNEA
         // function used in CPU constructor to generate initial values with the index at the first byte of RAM 
         private void SetUp()
         {
-            // Program Counter
-            var PC = new IntReg("PC", 0);
-            // Memory Address Register
-            var MAR = new CodeReg("MAR", "");
-            // Memory Data Register
-            var MDR = new IntReg("MDR", 0);
-            //Accumulator
-            var ACC = new IntReg("ACC", 0);
-            //Current Instruction Register
-            var CIR = new CodeReg("CIR", "");
-            // Memory Buffer Register 
-            var MBR = new IntReg("MBR", 0);
-            //Adding all Registers to the Special Purpose Registers
-            //as assigning can only happen in declaration, temporary holds the info before transfer
-            Register[] temporary = { PC, MAR, MDR, ACC, CIR, MBR };
-            SPRegisters = temporary;
-            
-            BasicRegisters = new Register[BasicRegisterNumber];
-            for (int i = 0; i < BasicRegisters.Length; i++)
-            {
-                BasicRegisters[i] = new IntReg($"R{i}", 0);
-            }
             //create a default Current State for the CPU to execute first instructions 
-            CurrentState = new CPUState(SPRegisters, BasicRegisters);
+            CurrentState = new CPUState();
         }
-
-
-        public void RamLoader(string text)
-        {
-            try
-            {
-                /*split the string representing the content of the textbox into string[]
-                 By looking for the new line character*/
-                var program = new List<string>(text.Split('\n'));
-
-                Compiler.UStringProg = program;
-                Trace.WriteLine($"Compiled: [{text}] into {Compiler.UStringProg.Count} instructions");
-                Compiler.Cleanse();
-                Trace.WriteLine($"removed blank space: to {Compiler.UStringProg.Count} instructions");
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(Convert.ToString(ex));
-            }
-        }
-
+        
         public bool Compile(string text)
         {
             var valid = false;
 
             try
             {
-                RamLoader(text);
+                CompileLoader(text);
             }
             catch (Exception ex)
             {
-                MessageBox.Show(" failed to shorten code");
+                MessageBox.Show("Compile failed");
             }
 
             // TODO: throw an exception if this isn't a valid program
 
 
             return valid;
+        }
+        public void CompileLoader(string text)
+        {
+            try
+            {
+                /*split the string representing the content of the textbox into string[]
+                 By looking for the new line character*/
+                var program = new List<string>(text.Split('\n'));
+                Trace.WriteLine($"Start Compiling: [{text}] into {Compiler.StringProgram.Count} instructions");
+                Compiler.fullCompile( program );
+                
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(Convert.ToString(ex));
+            }
         }
 
         public CPU()
@@ -418,26 +396,32 @@ namespace CPUVisNEA
 
     public class Compiler
     {
-        public List<string> UStringProg = new List<string>();
+        
+        public List<string> StringProgram = new List<string>();
         public Instruction[] CompUProg_Instructions = { };
 
+        public void fullCompile( List<string> program )
+        {
+            StringProgram = program;
 
+            CleanseStringProg( program );
+            Trace.WriteLine($"removed blank space: to {StringProgram.Count} instructions");
+
+           CompUProg_Instructions = Valid(StringProgram);
+        }
         //Cleanse() used for removing all lines comprised of blank characters (blank line) 
-        public void Cleanse()
+        public void CleanseStringProg( List<string> StringsProg )
         {
             var temporary = new List<string>();
             //foreach line in s
-            foreach (var line in UStringProg)
+            foreach (var line in StringsProg)
             {
                 if (!string.IsNullOrWhiteSpace(line))
                 {
                     temporary.Add(line);
                 }
             }
-
-            
-
-            UStringProg = temporary;
+            StringProgram = temporary;
         }
 
         //checks if valid format, called after cleanse
@@ -457,36 +441,21 @@ namespace CPUVisNEA
 
         public Instruction lineToInstruction(string line)
         {
-            //todo           
-            //Regular expressions of valid Label / register / condition / memory reference / operand
-            var VmemRef = new Regex("R[0-9]");
-            var Vlabel = "";
-            var VReg = @"(B)";
-            var Vcondition = "";
-
             var tokens = line.Split(new char[0], StringSplitOptions.RemoveEmptyEntries);
-            if (tokens.Length == 1)
-            {
-                //it must be HALT command if only one word 
-                //return new Halt();
-            }
-            else
-            {
-                var instruction = tokens[0];
+            var instruction = tokens[0];
                 var args = new List<string>();
-                // we have split on whitespace, but we need to split on comma too
+                // iterate through all seperated tokens 
                 for (var i = 1; i < tokens.Length; i++)
                 {
                     var token = tokens[i];
+                    // we have split on whitespace, but we need to split on comma too. this may lead a token to become multiple tokens 
                     var strings = token.Split(",".ToCharArray(), StringSplitOptions.RemoveEmptyEntries);
+                    //for every new token add to argument array
                     foreach (var s in strings) args.Add(s);
                 }
-
-
+                
                 CPU.Instructions instrType;
                 Enum.TryParse(instruction, out instrType);
-                byte testFromMem = 1;
-                var inst = (CPU.Instructions)testFromMem;
                 var parsed = CPU.newInstruction(instrType);
                 switch (instruction)
                 {
@@ -496,11 +465,6 @@ namespace CPUVisNEA
                         parsed = new Halt();
                         break;
                     }
-
-                    /* as Branch can be a non conditional or conditional variant,
-                     I have decided to model all Instructions on a single class that changes 
-                     execution nature dependent on the condition passed down to the B constructor
-                     ( condition given by removing the B from switch case instruction to get add-on e.g EQ or NE) */
                     case "B":
                     {
                         parsed = Mov.parseArgs(args);
@@ -592,7 +556,6 @@ namespace CPUVisNEA
                         parsed = Sub.parseArgs(args);
                         break;
                     }
-                    //todo add rest of options
 
 
                     default: throw new Exception($"Unknown instruction: {instruction}");
@@ -601,10 +564,6 @@ namespace CPUVisNEA
                 // now add the arguments to the instruction:
                 Instruction.addParsedArgs(parsed, args);
                 return parsed;
-            }
-
-            //todo change line below to failsafe, move comment above 
-            return new Mov();
         }
     }
 
@@ -620,7 +579,7 @@ namespace CPUVisNEA
         //determines if Assembly language is allowed or integers. useful to determine what data type the content is
         // doesnt have to be passed as a parameter as child class influences assAllowed value
         protected bool assAllowed;
-        private readonly object content;
+        protected object content;
 
         //protected constructor so inherited classes can use class
         //by using content as an object, this allows different registers to assign strings or integers to content
@@ -675,20 +634,59 @@ namespace CPUVisNEA
 
     public class CPUState
     {
+        
         // the SpecialPurpose Register array contains all required data for immediate execution and testing of any instruction
-        private Register[] SpecialPurpose;
-        private Register[] Basic;
+        // needs to be public so any index in arrays can be quickly accessed for both Instruction classes and Test Console
+        
+        // Program Counter
+        public IntReg PC;
 
-        public CPUState(Register[] specialPurpose, Register[] basic)
+        // Memory Address Register
+        public CodeReg MAR;
+
+        // Memory Data Register
+        public IntReg MDR;
+
+        //Accumulator
+        public IntReg ACC;
+
+        //Current Instruction Register
+        public CodeReg CIR;
+
+        // Memory Buffer Register 
+        public IntReg MBR;
+            
+        public IntReg[] Basic;
+
+        public CPUState()
         {
-            SpecialPurpose = specialPurpose;
-            Basic = basic;
+            PC = new IntReg("PC", 0);
+            MAR = new CodeReg("MAR", "");
+            MDR = new IntReg("MDR", 0);
+            ACC = new IntReg("ACC", 0);
+            CIR = new CodeReg("CIR", "");
+            MBR = new IntReg("MBR", 0);
+            Basic = new IntReg[6];
+            for (int i = 0; i < Basic.Length; i++)
+            {
+                Basic[i] = new IntReg($"R{i}", 0);
+            }
         }
 
-        public void update(Register[] specialPurpose, Register[] basic)
+        public CPUState Copy()
         {
-            SpecialPurpose = specialPurpose;
-            Basic = basic;
+            var cpuState = new CPUState();
+            cpuState.PC.content = PC.content; 
+            cpuState.MAR.content = MAR.content; 
+            cpuState.MDR.content = MDR.content; 
+            cpuState.ACC.content = ACC.content; 
+            cpuState.CIR.content = CIR.content; 
+            cpuState.MBR.content = MBR.content;
+            for (int i = 0; i < Basic.Length; i++)
+            {
+                cpuState.Basic[i].content = Basic[i].content;
+            }
+            return cpuState;
         }
     }
 

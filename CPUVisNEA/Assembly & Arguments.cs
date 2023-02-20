@@ -10,7 +10,8 @@ using System.Windows.Forms;
 /* basic todo list
  General 
  ---->  Take old and new method of param get acceptable and do writeup
- ---->  ExecuteInstruction 
+ ---->  ExecuteInstruction
+ ---->  Change operands to Memory Or Int 
  --------->  returns CPUState
  --------->  Takes CPUState
  
@@ -57,6 +58,25 @@ namespace CPUVisNEA
             if( validArgType( arg ) ) {  args.append( arg ) ;   } }
             
     */
+    //todo Create operand Arguement 
+    // when done refactor for (IntegerArgs)args[2] and (IntegerArgs)args[2]
+    /*
+    public class OperandArg : Argument
+    {
+        public bool RegOrInt;
+        public OperandArg(string StringArg)
+        {
+            if(StringArg[0] == '#'){
+                
+            }
+            else
+            {
+                index = (int) int.Parse(StringArg.Remove(0, 1)) ;
+            }
+            // from is R(index) or r(index) to allow for user Mistakes. Hence Memory Index is string minus first index of string 
+            index = (int) int.Parse(StringArg.Remove(0, 1)) ;
+        }
+    } */
 
     public abstract class Argument
     {
@@ -64,6 +84,11 @@ namespace CPUVisNEA
         //protected int byteLength ;
         // todo decide IntegerArg byteLength = ( value % 255 ) + 1; 1 for others 
         protected virtual internal byte ToByte()
+        {
+            return 0;
+        }
+        //all arguements have a 
+        protected virtual internal int RetInt()
         {
             return 0;
         }
@@ -78,7 +103,7 @@ namespace CPUVisNEA
         public RegisterArg(string StringArg)
         {
             // from is R(index) or r(index) to allow for user Mistakes. Hence Memory Index is string minus first index of string 
-            index = (int) int.Parse(StringArg.Remove(0, 1)) ;
+            index = int.Parse(StringArg.Remove(0, 1)) ;
         }
 
         //second constructor for FDE Cycle retrieving from RAM 
@@ -91,6 +116,11 @@ namespace CPUVisNEA
         {
             return (byte)index;
         }
+
+        protected internal override int RetInt()
+        {
+            return index;
+        }
     }
 
     public class IntegerArg : Argument
@@ -99,9 +129,9 @@ namespace CPUVisNEA
 
         //user may need to deal with integers above 255, therefore the required value representable value must be represented by variable bytes 
 
-        public IntegerArg(string StringForm)
+        public IntegerArg(string StringArg)
         {
-            value = int.Parse(StringForm);
+            value = int.Parse(StringArg.Remove(0, 1));
             //byte length isn't a parameter as it can be worked out from value
         }
 
@@ -112,6 +142,11 @@ namespace CPUVisNEA
         protected internal override byte ToByte()
         {
             return (byte)value;
+        }
+
+        protected internal override int RetInt()
+        {
+            return value;
         }
     }
 
@@ -130,8 +165,12 @@ namespace CPUVisNEA
         {
             return (byte)location;
         }
+        protected internal override int RetInt()
+        {
+            return location;
+        }
 
-        private int location; // destination
+        public int location; // destination
         private string name; // correspondent string for display purpose
     }
 
@@ -190,7 +229,7 @@ namespace CPUVisNEA
             //for each argument, create a new correspondent instance of argument type
             foreach (var StringArg in StringArguments) instruc.addArg(GenerateArg(StringArg));
 
-            MessageBox.Show($"successfully passed all {instruc.Tag}");
+            MessageBox.Show($"successfully passed all {instruc.Tag} arguements");
         }
 
         protected internal void addArg(Argument arg)
@@ -218,13 +257,14 @@ namespace CPUVisNEA
             switch (argumentStringForm)
             {
                 // Register Argument - lower or uppercase R followed by a single digit number
-                case var s when Regex.IsMatch(s, @"(R|r)\\d"):
+                
+                case var s when Regex.IsMatch(s, "^(R|r)\\d$"):
                     return new RegisterArg(s);
                 // Integer Argument - 1 or more digits
-                case var s when Regex.IsMatch(s, @"(\\d)*"):
+                case var s when Regex.IsMatch(s, "^#(\\d)*$"):
                     return new IntegerArg(s);
                 // Label argument - 1 or more word characters
-                case var s when Regex.IsMatch(s, @"(\\w)*"):
+                case var s when Regex.IsMatch(s, "^(\\w)*$"):
                     return new Label(s);
 
                 default:
@@ -294,7 +334,8 @@ namespace CPUVisNEA
         protected internal override CPUState executeInstruction(List<Argument> args, CPUState CurrentCpuState)
         {
             //HALT Stop the execution of the program.
-            CPUState NewState = CurrentCpuState;
+            CPUState NewState = CurrentCpuState.Copy();
+            NewState.PC.content = -1;
             return NewState;
         }
 
@@ -329,7 +370,7 @@ namespace CPUVisNEA
 
         protected internal override CPUState executeInstruction(List<Argument> args, CPUState CurrentCpuState)
         {
-            CPUState NewState = CurrentCpuState;
+            CPUState NewState = CurrentCpuState.Copy();
             
             var jump = 0;
 
@@ -365,7 +406,7 @@ namespace CPUVisNEA
 
         protected internal override CPUState executeInstruction(List<Argument> args, CPUState CurrentCpuState)
         {
-            CPUState NewState = CurrentCpuState;
+            CPUState NewState = CurrentCpuState.Copy();
             
             var jump = 0;
 
@@ -400,7 +441,7 @@ namespace CPUVisNEA
 
         protected internal override CPUState executeInstruction(List<Argument> args, CPUState CurrentCpuState)
         {
-            CPUState NewState = CurrentCpuState;
+            CPUState NewState = CurrentCpuState.Copy();
             
             var jump = 0;
 
@@ -436,7 +477,7 @@ namespace CPUVisNEA
 
         protected internal override CPUState executeInstruction(List<Argument> args, CPUState CurrentCpuState)
         {
-            CPUState NewState = CurrentCpuState;
+            CPUState NewState = CurrentCpuState.Copy();
             
             var jump = 0;
 
@@ -470,7 +511,7 @@ namespace CPUVisNEA
 
         protected internal override CPUState executeInstruction(List<Argument> args, CPUState CurrentCpuState)
         {
-            CPUState NewState = CurrentCpuState;
+            CPUState NewState = CurrentCpuState.Copy();
             
             var jump = 0;
 
@@ -508,7 +549,9 @@ namespace CPUVisNEA
         protected internal override CPUState executeInstruction(List<Argument> args, CPUState CurrentCpuState)
         {
             //MOV Rd, <operand2> Copy the value specified by <operand2> into register d.
-            CPUState NewState = CurrentCpuState;
+            CPUState NewState = CurrentCpuState.Copy();
+            //Register content indicated by args[0] = value indicated by operand
+            NewState.Basic[((RegisterArg)args[0]).RetInt()].content  =  ( (IntegerArg)args[1] ).RetInt() ;  
             return NewState;
         }
 
@@ -540,7 +583,7 @@ namespace CPUVisNEA
         protected internal override CPUState executeInstruction(List<Argument> args, CPUState CurrentCpuState)
         {
             //CMP Rn, <operand2> Compare the value stored in register n with the value specified by <operand2>. 
-            CPUState NewState = CurrentCpuState;
+            CPUState NewState = CurrentCpuState.Copy().Copy();
             return NewState;
         }
 
@@ -572,7 +615,9 @@ namespace CPUVisNEA
         protected internal override CPUState executeInstruction(List<Argument> args, CPUState CurrentCpuState)
         {
             //MVN Rd, <operand2> Perform a bitwise logical NOT operation on the value specified by <operand2> and store the result in register d.
-            CPUState NewState = CurrentCpuState;
+            CPUState NewState = CurrentCpuState.Copy();
+            
+           //NewState.Basic[ ( (RegisterArg)args[0] ).RetInt() ] = args[1]. 
             return NewState;
         }
 
@@ -604,7 +649,7 @@ namespace CPUVisNEA
         protected internal override CPUState executeInstruction(List<Argument> args, CPUState CurrentCpuState)
         {
             //LDR Rd, <memory ref> Load the value stored in the memory location specified by <memory ref> into register d. 
-            CPUState NewState = CurrentCpuState;
+            CPUState NewState = CurrentCpuState.Copy();
             return NewState;
         }
 
@@ -636,7 +681,7 @@ namespace CPUVisNEA
         protected internal override CPUState executeInstruction(List<Argument> args, CPUState CurrentCpuState)
         {
             //STR Rd, <memory ref> Store the value that is in register d into the memory location specified by <memory ref>.
-            CPUState NewState = CurrentCpuState;
+            CPUState NewState = CurrentCpuState.Copy();
             return NewState;
         }
 
@@ -668,7 +713,7 @@ namespace CPUVisNEA
         protected internal override CPUState executeInstruction(List<Argument> args, CPUState CurrentCpuState)
         {
             //AND Rd, Rn, <operand2> Perform a bitwise logical AND operation between the value in register n and the value specified by <operand2> and store the result in register d.
-            CPUState NewState = CurrentCpuState;
+            CPUState NewState = CurrentCpuState.Copy();
             return NewState;
             
         }
@@ -702,7 +747,7 @@ namespace CPUVisNEA
         protected internal override CPUState executeInstruction(List<Argument> args, CPUState CurrentCpuState)
         {
             //ORR Rd, Rn, <operand2> Perform a bitwise logical OR operation between the value in register n and the value specified by <operand2> and store the result in register d.
-            CPUState NewState = CurrentCpuState;
+            CPUState NewState = CurrentCpuState.Copy();
             return NewState;
             
         }
@@ -736,7 +781,7 @@ namespace CPUVisNEA
         protected internal override CPUState executeInstruction(List<Argument> args, CPUState CurrentCpuState)
         {
             //EOR Rd, Rn, <operand2> Perform a bitwise logical exclusive or (XOR) operation between the value in register n and the value specified by <operand2> and store the result in register d.
-            CPUState NewState = CurrentCpuState;
+            CPUState NewState = CurrentCpuState.Copy();
             return NewState;
         }
 
@@ -769,7 +814,7 @@ namespace CPUVisNEA
         protected internal override CPUState executeInstruction(List<Argument> args, CPUState CurrentCpuState)
         {
             //LSL Rd, Rn, <operand2> Logically shift left the value stored in register n by the number of bits specified by <operand2> and store the result in register d.
-            CPUState NewState = CurrentCpuState;
+            CPUState NewState = CurrentCpuState.Copy();
             return NewState;
             
         }
@@ -803,7 +848,7 @@ namespace CPUVisNEA
         protected internal override CPUState executeInstruction(List<Argument> args, CPUState CurrentCpuState)
         {
             //LSR Rd, Rn, <operand2> Logically shift right the value stored in register n by the number of bits specified by <operand2> and store the result in register d.
-            CPUState NewState = CurrentCpuState;
+            CPUState NewState = CurrentCpuState.Copy();
             return NewState;
         }
 
@@ -836,7 +881,7 @@ namespace CPUVisNEA
         protected internal override CPUState executeInstruction(List<Argument> args, CPUState CurrentCpuState)
         {
             //ADD Rd, Rn, <operand2> Add the value specified in <operand2> to the value in register n and store the result in register d.
-            CPUState NewState = CurrentCpuState;
+            CPUState NewState = CurrentCpuState.Copy();
             return NewState;
             
         }
@@ -869,7 +914,7 @@ namespace CPUVisNEA
         protected internal override CPUState executeInstruction(List<Argument> args, CPUState CurrentCpuState)
         {
             //SUB Rd, Rn, <operand2> Subtract the value specified by <operand2> from the value in register n and store the result in register d.
-            CPUState NewState = CurrentCpuState;
+            CPUState NewState = CurrentCpuState.Copy();
             return NewState;
             
         }

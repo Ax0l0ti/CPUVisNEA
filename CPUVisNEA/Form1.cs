@@ -106,7 +106,7 @@ namespace CPUVisNEA
                     /*as there is no built in function for converting
                      a text box from a string to array of lines, I cant use a foreach loop or for loop */
                     //try to assign to-be compiled string the string value in the form's textbox
-                    try { if (txt_uProg.Lines != null) { cpu.Compiler.UStringProg[i] = txt_uProg.Lines[i]; } }
+                    try { if (txt_uProg.Lines != null) { cpu.Compiler.StringProgram[i] = txt_uProg.Lines[i]; } }
                     catch(Exception exception)
                     {
                         //if error stop compiling as this is either end of textbook string or incorrect syntax
@@ -124,6 +124,7 @@ namespace CPUVisNEA
                 //     
                 // }
                 //
+                
             }
         }
      

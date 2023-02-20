@@ -41,7 +41,6 @@ namespace CPUVisNEA
             this.gb_Display = new System.Windows.Forms.GroupBox();
             this.gb_InpOut = new System.Windows.Forms.GroupBox();
             this.txt_out = new System.Windows.Forms.TextBox();
-            this.txt_Inp = new System.Windows.Forms.TextBox();
             this.groupBox4 = new System.Windows.Forms.GroupBox();
             this.pnl_uCodeManip = new System.Windows.Forms.Panel();
             this.txt_uProg = new System.Windows.Forms.TextBox();
@@ -174,7 +173,6 @@ namespace CPUVisNEA
             // 
             this.gb_InpOut.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(62)))), ((int)(((byte)(84)))), ((int)(((byte)(151)))));
             this.gb_InpOut.Controls.Add(this.txt_out);
-            this.gb_InpOut.Controls.Add(this.txt_Inp);
             this.gb_InpOut.Controls.Add(this.groupBox4);
             this.gb_InpOut.ForeColor = System.Drawing.Color.White;
             this.gb_InpOut.Location = new System.Drawing.Point(37, 36);
@@ -192,31 +190,15 @@ namespace CPUVisNEA
             this.txt_out.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(90)))), ((int)(((byte)(90)))), ((int)(((byte)(90)))));
             this.txt_out.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.txt_out.ForeColor = System.Drawing.Color.White;
-            this.txt_out.Location = new System.Drawing.Point(394, 36);
+            this.txt_out.Location = new System.Drawing.Point(29, 36);
             this.txt_out.Margin = new System.Windows.Forms.Padding(6);
             this.txt_out.Multiline = true;
             this.txt_out.Name = "txt_out";
             this.txt_out.ReadOnly = true;
             this.txt_out.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.txt_out.Size = new System.Drawing.Size(300, 200);
+            this.txt_out.Size = new System.Drawing.Size(665, 200);
             this.txt_out.TabIndex = 3;
             this.txt_out.Text = "Output\r\n-----------------\r\nTextBox to record Program Outputs/Prints whilst runnin" + "g user program\r\n\r\n\r\n";
-            // 
-            // txt_Inp
-            // 
-            this.txt_Inp.AllowDrop = true;
-            this.txt_Inp.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(90)))), ((int)(((byte)(90)))), ((int)(((byte)(90)))));
-            this.txt_Inp.BorderStyle = System.Windows.Forms.BorderStyle.None;
-            this.txt_Inp.ForeColor = System.Drawing.Color.White;
-            this.txt_Inp.Location = new System.Drawing.Point(27, 36);
-            this.txt_Inp.Margin = new System.Windows.Forms.Padding(6);
-            this.txt_Inp.Multiline = true;
-            this.txt_Inp.Name = "txt_Inp";
-            this.txt_Inp.ReadOnly = true;
-            this.txt_Inp.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.txt_Inp.Size = new System.Drawing.Size(300, 200);
-            this.txt_Inp.TabIndex = 2;
-            this.txt_Inp.Text = "Input\r\n-----------------\r\nTextBox to record user inputs whilst running the assemb" + "ely program";
             // 
             // groupBox4
             // 
@@ -372,10 +354,6 @@ namespace CPUVisNEA
             // 
             // gb_userInput
             // 
-            if (Editstate)
-            {
-                
-            }
             this.gb_userInput.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
             this.gb_userInput.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(70)))), ((int)(((byte)(70)))), ((int)(((byte)(70)))));
             this.gb_userInput.Controls.Add(this.gb_UAssControls);
@@ -435,7 +413,6 @@ namespace CPUVisNEA
         private System.Windows.Forms.GroupBox gb_Display;
         private System.Windows.Forms.GroupBox gb_InpOut;
         private System.Windows.Forms.TextBox txt_out;
-        private System.Windows.Forms.TextBox txt_Inp;
         private System.Windows.Forms.GroupBox groupBox4;
         private System.Windows.Forms.Panel pnl_uCodeManip;
         private System.Windows.Forms.TextBox txt_uProg;
