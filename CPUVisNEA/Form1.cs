@@ -55,7 +55,6 @@ namespace CPUVisNEA
                 this.cpu = cpu;
                 InitializeComponent();
             }
-            
 
             private void gb_userInput_Enter(object sender, EventArgs e)
             {
@@ -72,8 +71,9 @@ namespace CPUVisNEA
             {
                 try
                 {
+                    
                     var valid = cpu.Compile(txt_uProg.Text);
-                    MessageBox.Show($"compiled: {txt_uProg.Text}");
+                    Trace.WriteLine($"compiled: {txt_uProg.Text}");
                     setEditState(false);
                 }
                 catch (Exception ex)
@@ -94,6 +94,7 @@ namespace CPUVisNEA
                     txt_uProg.Enabled = edit;
                 }
             }
+            
 
             private void txt_uProg_TextChanged(object sender, EventArgs e)
             {
@@ -126,7 +127,11 @@ namespace CPUVisNEA
                 //
                 
             }
-        }
+
+            private void txt_Labels_TextChanged(object sender, EventArgs e)
+            {
+            }
+    }
      
 }
 /*

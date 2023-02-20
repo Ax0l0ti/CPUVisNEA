@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
@@ -80,7 +81,7 @@ namespace CPUVisNEA
 
     public abstract class Argument
     {
-        
+        protected internal string name;
         //protected int byteLength ;
         // todo decide IntegerArg byteLength = ( value % 255 ) + 1; 1 for others 
         protected virtual internal byte ToByte()
@@ -104,12 +105,14 @@ namespace CPUVisNEA
         {
             // from is R(index) or r(index) to allow for user Mistakes. Hence Memory Index is string minus first index of string 
             index = int.Parse(StringArg.Remove(0, 1)) ;
+            name = $"R{index}";
         }
 
         //second constructor for FDE Cycle retrieving from RAM 
         public RegisterArg(byte ByteForm)
         {
             index = Convert.ToInt32(ByteForm);
+            name = $"R{index}";
         }
 
         protected internal override byte ToByte()
@@ -132,12 +135,14 @@ namespace CPUVisNEA
         public IntegerArg(string StringArg)
         {
             value = int.Parse(StringArg.Remove(0, 1));
+            name = $"{value}";
             //byte length isn't a parameter as it can be worked out from value
         }
 
         public IntegerArg(byte ByteForm)
         {
             value = Convert.ToInt32(ByteForm);
+            name = $"{value}";
         }
         protected internal override byte ToByte()
         {
@@ -150,17 +155,20 @@ namespace CPUVisNEA
         }
     }
 
-    public class Label : Argument //todo maybe create linked class between Label argument and desitnation location
+    public class Label : Argument //todo maybe create linked class between Label argument and destination location
     {
         public Label(string name)
         {
             this.name = name;
+            
         }
 
-        public void setLabelLocation(int LabelLocation)
+        public int Location
         {
-            location = LabelLocation;
+            get => location;
+            set => location = value;
         }
+        
         protected internal override byte ToByte()
         {
             return (byte)location;
@@ -171,7 +179,7 @@ namespace CPUVisNEA
         }
 
         public int location; // destination
-        private string name; // correspondent string for display purpose
+        public string name; // correspondent string for display purpose
     }
 
 
@@ -196,7 +204,6 @@ namespace CPUVisNEA
         protected internal static Dictionary<CPU.Instructions[], Type[]> dictionaryOfValidParams =
             new Dictionary<CPU.Instructions[], Type[]>
             {
-                //todo fill in 
                 //MOV CMP MVN LDR STR
                 {
                     new[]
@@ -222,6 +229,8 @@ namespace CPUVisNEA
                 { new[] { CPU.Instructions.B }, new[] { typeof(Label) } }
             };
 
+        protected string label;
+
 
         //add Parsed Argument takes takes the instruction its a
         public static void addParsedArgs(Instruction instruc, List<string> StringArguments)
@@ -229,7 +238,7 @@ namespace CPUVisNEA
             //for each argument, create a new correspondent instance of argument type
             foreach (var StringArg in StringArguments) instruc.addArg(GenerateArg(StringArg));
 
-            MessageBox.Show($"successfully passed all {instruc.Tag} arguements");
+            Trace.WriteLine($"successfully passed all {instruc.Tag} arguements");
         }
 
         protected internal void addArg(Argument arg)
@@ -318,7 +327,15 @@ namespace CPUVisNEA
 
         // basic overridable call statement for all assembly operations to override to deal with individual arguments
         //means CPU can call executeInstruction regardless of Child class to get unique behaviour
-        protected internal abstract CPUState executeInstruction(List<Argument> args, CPUState CurrentCpuState);
+        protected internal abstract CPUState executeInstruction(List<Argument> args, CPUState NewState);
+        //NewState.changeLog.Add( $" ");
+        //NewState.DetailedChangeLog.Add( $"XXX instruction - {args[1].name} ... register {args[0].name} ");
+
+        public string Label
+        {
+            get => label;
+            set => label = value;
+        }
     }
 
 
@@ -331,10 +348,10 @@ namespace CPUVisNEA
         }
 
         //todo create Instruction method to deal w input ( also add description of how operator works, from NEA writeup ) 
-        protected internal override CPUState executeInstruction(List<Argument> args, CPUState CurrentCpuState)
+        protected internal override CPUState executeInstruction(List<Argument> args, CPUState NewState)
         {
             //HALT Stop the execution of the program.
-            CPUState NewState = CurrentCpuState.Copy();
+
             NewState.PC.content = -1;
             return NewState;
         }
@@ -359,18 +376,19 @@ namespace CPUVisNEA
 
     // todo special due to condition
     //B class acts as all variants, conditional is seperated and stored as a local attribute of the Branch statement to switch case action in execute Instruction
-    public class B : Instruction
+    public abstract class Branch : Instruction
     {
-        public B(CPU.Instructions instructions) : base(CPU.Instructions.B)
+        // there are different branch types
+        public Branch(CPU.Instructions bType) : base(bType)
         {
         }
 
         //todo create Instruction method to deal w input ( also add description of how operator works, from NEA writeup ) 
         //B<condition>  <Label> Conditionally branch to the instruction at position <Label> in the program if the last comparison met the criteria specified by the <condition>.
 
-        protected internal override CPUState executeInstruction(List<Argument> args, CPUState CurrentCpuState)
+        protected internal override CPUState executeInstruction(List<Argument> args, CPUState NewState)
         {
-            CPUState NewState = CurrentCpuState.Copy();
+
             
             var jump = 0;
 
@@ -378,13 +396,31 @@ namespace CPUVisNEA
             
             return NewState;
         }
+    }
+
+    //Branch if Equal To
+    public class B : Branch
+    {
+        public B() : base(CPU.Instructions.B)
+        {
+        }
+        protected internal override CPUState executeInstruction(List<Argument> args, CPUState NewState)
+        {
+            //B<condition>  <Label> Conditionally branch to the instruction at position <Label> in the program if the last comparison met the criteria specified by the <condition>.
+
+            NewState.PC.content = ((Label)args[0]).location ;
+            return NewState;
+        }
+
+        //todo create Instruction method to deal w input ( also add description of how operator works, from NEA writeup ) 
+        
 
         /*held locally in class but never used by class. Is used by CPU to instantiate instance
-         of Instruction type and pass arguments held by local CPU compiling function  */
+ of Instruction type and pass arguments held by local CPU compiling function  */
         public static B parseArgs(List<string> args)
         {
             //creates new local instance of a blank object correspondent to class
-            var b = new B(CPU.Instructions.B);
+            var b = new B();
             /*passes string version of arguments given by parameter to use
              Inherited addParsedArgs method to clean args and append to the 
              protected Instructions local attribute args */
@@ -392,10 +428,9 @@ namespace CPUVisNEA
             // return modified and filled Instruction
             return b;
         }
-    }
 
-    //Branch if Equal To
-    public class Beq : B
+    }
+    public class Beq : Branch
     {
         public Beq() : base(CPU.Instructions.BEQ)
         {
@@ -404,9 +439,12 @@ namespace CPUVisNEA
         //todo create Instruction method to deal w input ( also add description of how operator works, from NEA writeup ) 
         //B<condition>  <Label> Conditionally branch to the instruction at position <Label> in the program if the last comparison met the criteria specified by the <condition>.
 
-        protected internal override CPUState executeInstruction(List<Argument> args, CPUState CurrentCpuState)
+        protected internal override CPUState executeInstruction(List<Argument> args, CPUState NewState)
         {
-            CPUState NewState = CurrentCpuState.Copy();
+            //check accumulator to find last CMP relationship
+            //EQ NE LT GT
+            //0     1  2 
+
             
             var jump = 0;
 
@@ -430,7 +468,7 @@ namespace CPUVisNEA
     }
 
     // Branch if Not Equal to 
-    public class Bne : B
+    public class Bne : Branch
     {
         public Bne() : base(CPU.Instructions.BNE)
         {
@@ -439,9 +477,12 @@ namespace CPUVisNEA
         //todo create Instruction method to deal w input ( also add description of how operator works, from NEA writeup ) 
         //Bne<condition>  <Label> Conditionally branch to the instruction at position <Label> in the program if the last comparison met the criteria specified by the <condition>.
 
-        protected internal override CPUState executeInstruction(List<Argument> args, CPUState CurrentCpuState)
+        protected internal override CPUState executeInstruction(List<Argument> args, CPUState NewState)
         {
-            CPUState NewState = CurrentCpuState.Copy();
+            //check accumulator to find last CMP relationship
+            //EQ NE LT GT
+            //0     1  2 
+
             
             var jump = 0;
 
@@ -466,7 +507,7 @@ namespace CPUVisNEA
     }
 
     // Branch if Less Than
-    public class Blt : B
+    public class Blt : Branch
     {
         public Blt() : base(CPU.Instructions.BLT)
         {
@@ -475,9 +516,12 @@ namespace CPUVisNEA
         //todo create Instruction method to deal w input ( also add description of how operator works, from NEA writeup ) 
         //B<condition>  <Label> Conditionally branch to the instruction at position <Label> in the program if the last comparison met the criteria specified by the <condition>.
 
-        protected internal override CPUState executeInstruction(List<Argument> args, CPUState CurrentCpuState)
+        protected internal override CPUState executeInstruction(List<Argument> args, CPUState NewState)
         {
-            CPUState NewState = CurrentCpuState.Copy();
+            //check accumulator to find last CMP relationship
+            //EQ NE LT GT
+            //0     1  2
+
             
             var jump = 0;
 
@@ -500,7 +544,7 @@ namespace CPUVisNEA
         }
     }
 
-    public class Bgt : B
+    public class Bgt : Branch
     {
         public Bgt() : base(CPU.Instructions.BGT)
         {
@@ -509,9 +553,12 @@ namespace CPUVisNEA
         //todo create Instruction method to deal w input ( also add description of how operator works, from NEA writeup ) 
         //B<condition>  <Label> Conditionally branch to the instruction at position <Label> in the program if the last comparison met the criteria specified by the <condition>.
 
-        protected internal override CPUState executeInstruction(List<Argument> args, CPUState CurrentCpuState)
+        protected internal override CPUState executeInstruction(List<Argument> args, CPUState NewState)
         {
-            CPUState NewState = CurrentCpuState.Copy();
+            //check accumulator to find last CMP relationship
+            //EQ NE LT GT
+            //0     1  2 
+
             
             var jump = 0;
 
@@ -546,12 +593,17 @@ namespace CPUVisNEA
         }
 
         //todo create Instruction method to deal w input ( also add description of how operator works, from NEA writeup ) 
-        protected internal override CPUState executeInstruction(List<Argument> args, CPUState CurrentCpuState)
+        protected internal override CPUState executeInstruction(List<Argument> args, CPUState NewState)
         {
             //MOV Rd, <operand2> Copy the value specified by <operand2> into register d.
-            CPUState NewState = CurrentCpuState.Copy();
+
             //Register content indicated by args[0] = value indicated by operand
             NewState.Basic[((RegisterArg)args[0]).RetInt()].content  =  ( (IntegerArg)args[1] ).RetInt() ;  
+            NewState.changeLog.Add( $" {args[0].name} assigned {args[1].name} value ");
+            // Trace Line to test code 
+            Trace.WriteLine($" {args[0].name} assigned {args[1].name} value ");
+            NewState.DetailedChangeLog.Add( $"Mov instruction executed - copies over the value of {args[1].name} into register {args[0].name} ");
+            
             return NewState;
         }
 
@@ -568,6 +620,7 @@ namespace CPUVisNEA
             // return modified and filled Instruction
             return mov;
         }
+        
     }
 
     //---------------------------------------     CMP      Instruction ------------------------------------------------
@@ -580,10 +633,27 @@ namespace CPUVisNEA
         }
 
         //todo create Instruction method to deal w input ( also add description of how operator works, from NEA writeup ) 
-        protected internal override CPUState executeInstruction(List<Argument> args, CPUState CurrentCpuState)
+        protected internal override CPUState executeInstruction(List<Argument> args, CPUState NewState)
         {
             //CMP Rn, <operand2> Compare the value stored in register n with the value specified by <operand2>. 
-            CPUState NewState = CurrentCpuState.Copy().Copy();
+            //stores resultant relation in accumulator for next instruction 
+
+            //EQ NE LT GT
+            //0     1  2 
+            //if equal to 
+            if (NewState.Basic[((RegisterArg)args[0]).index].content == ((IntegerArg)args[1]).value)
+            {
+                NewState.ACC.content = 0;
+            } else 
+                //else if less than
+            if (NewState.Basic[((RegisterArg)args[0]).index].content <= ((IntegerArg)args[1]).value)
+            {
+                NewState.ACC.content = 1;
+            } else //else if Greater than
+            {
+                NewState.ACC.content = 2;
+            }
+
             return NewState;
         }
 
@@ -612,10 +682,10 @@ namespace CPUVisNEA
         }
 
         //todo create Instruction method to deal w input ( also add description of how operator works, from NEA writeup ) 
-        protected internal override CPUState executeInstruction(List<Argument> args, CPUState CurrentCpuState)
+        protected internal override CPUState executeInstruction(List<Argument> args, CPUState NewState)
         {
             //MVN Rd, <operand2> Perform a bitwise logical NOT operation on the value specified by <operand2> and store the result in register d.
-            CPUState NewState = CurrentCpuState.Copy();
+
             
            //NewState.Basic[ ( (RegisterArg)args[0] ).RetInt() ] = args[1]. 
             return NewState;
@@ -646,10 +716,9 @@ namespace CPUVisNEA
         }
 
         //todo create Instruction method to deal w input ( also add description of how operator works, from NEA writeup ) 
-        protected internal override CPUState executeInstruction(List<Argument> args, CPUState CurrentCpuState)
+        protected internal override CPUState executeInstruction(List<Argument> args, CPUState NewState)
         {
             //LDR Rd, <memory ref> Load the value stored in the memory location specified by <memory ref> into register d. 
-            CPUState NewState = CurrentCpuState.Copy();
             return NewState;
         }
 
@@ -678,10 +747,9 @@ namespace CPUVisNEA
         }
 
         //todo create Instruction method to deal w input ( also add description of how operator works, from NEA writeup ) 
-        protected internal override CPUState executeInstruction(List<Argument> args, CPUState CurrentCpuState)
+        protected internal override CPUState executeInstruction(List<Argument> args, CPUState NewState)
         {
             //STR Rd, <memory ref> Store the value that is in register d into the memory location specified by <memory ref>.
-            CPUState NewState = CurrentCpuState.Copy();
             return NewState;
         }
 
@@ -710,10 +778,9 @@ namespace CPUVisNEA
         }
 
         //todo create Instruction method to deal w input ( also add description of how operator works, from NEA writeup ) 
-        protected internal override CPUState executeInstruction(List<Argument> args, CPUState CurrentCpuState)
+        protected internal override CPUState executeInstruction(List<Argument> args, CPUState NewState)
         {
             //AND Rd, Rn, <operand2> Perform a bitwise logical AND operation between the value in register n and the value specified by <operand2> and store the result in register d.
-            CPUState NewState = CurrentCpuState.Copy();
             return NewState;
             
         }
@@ -744,10 +811,9 @@ namespace CPUVisNEA
         }
 
         //todo create Instruction method to deal w input ( also add description of how operator works, from NEA writeup ) 
-        protected internal override CPUState executeInstruction(List<Argument> args, CPUState CurrentCpuState)
+        protected internal override CPUState executeInstruction(List<Argument> args, CPUState NewState)
         {
             //ORR Rd, Rn, <operand2> Perform a bitwise logical OR operation between the value in register n and the value specified by <operand2> and store the result in register d.
-            CPUState NewState = CurrentCpuState.Copy();
             return NewState;
             
         }
@@ -778,10 +844,9 @@ namespace CPUVisNEA
         }
 
         //todo create Instruction method to deal w input ( also add description of how operator works, from NEA writeup ) 
-        protected internal override CPUState executeInstruction(List<Argument> args, CPUState CurrentCpuState)
+        protected internal override CPUState executeInstruction(List<Argument> args, CPUState NewState)
         {
             //EOR Rd, Rn, <operand2> Perform a bitwise logical exclusive or (XOR) operation between the value in register n and the value specified by <operand2> and store the result in register d.
-            CPUState NewState = CurrentCpuState.Copy();
             return NewState;
         }
 
@@ -811,10 +876,9 @@ namespace CPUVisNEA
         }
 
         //todo create Instruction method to deal w input ( also add description of how operator works, from NEA writeup ) 
-        protected internal override CPUState executeInstruction(List<Argument> args, CPUState CurrentCpuState)
+        protected internal override CPUState executeInstruction(List<Argument> args, CPUState NewState)
         {
             //LSL Rd, Rn, <operand2> Logically shift left the value stored in register n by the number of bits specified by <operand2> and store the result in register d.
-            CPUState NewState = CurrentCpuState.Copy();
             return NewState;
             
         }
@@ -845,10 +909,9 @@ namespace CPUVisNEA
         }
 
         //todo create Instruction method to deal w input ( also add description of how operator works, from NEA writeup ) 
-        protected internal override CPUState executeInstruction(List<Argument> args, CPUState CurrentCpuState)
+        protected internal override CPUState executeInstruction(List<Argument> args, CPUState NewState)
         {
             //LSR Rd, Rn, <operand2> Logically shift right the value stored in register n by the number of bits specified by <operand2> and store the result in register d.
-            CPUState NewState = CurrentCpuState.Copy();
             return NewState;
         }
 
@@ -878,10 +941,9 @@ namespace CPUVisNEA
         }
 
         //todo create Instruction method to deal w input ( also add description of how operator works, from NEA writeup ) 
-        protected internal override CPUState executeInstruction(List<Argument> args, CPUState CurrentCpuState)
+        protected internal override CPUState executeInstruction(List<Argument> args, CPUState NewState)
         {
             //ADD Rd, Rn, <operand2> Add the value specified in <operand2> to the value in register n and store the result in register d.
-            CPUState NewState = CurrentCpuState.Copy();
             return NewState;
             
         }
@@ -911,10 +973,9 @@ namespace CPUVisNEA
         }
 
         //todo create Instruction method to deal w input ( also add description of how operator works, from NEA writeup ) 
-        protected internal override CPUState executeInstruction(List<Argument> args, CPUState CurrentCpuState)
+        protected internal override CPUState executeInstruction(List<Argument> args, CPUState NewState)
         {
             //SUB Rd, Rn, <operand2> Subtract the value specified by <operand2> from the value in register n and store the result in register d.
-            CPUState NewState = CurrentCpuState.Copy();
             return NewState;
             
         }

@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
+using NUnit.Framework;
 
 //https://resources.jetbrains.com/storage/products/rider/docs/Rider_default_win_shortcuts.pdf?_gl=1*8v6mpv*_ga*Mzk0Njg2ODg3LjE2NjExMDU4MzA.*_ga_9J976DJZ68*MTY3NTAyNjgxNS4xNy4wLjE2NzUwMjY4MjAuMC4wLjA.&_ga=2.77451923.725299765.1675026816-394686887.1661105830
 
@@ -26,25 +27,7 @@ namespace CPUVisNEA
         // PC, MAR, MDR, ACC, CIR, MBR
 
         private Register[] SPRegisters = { /*PC, MAR, MDR, ACC, CIR, MBR*/ };
-
-        // Program Counter
-        private IntReg PC = new IntReg("PC", 0);
-
-        // Memory Address Register
-        private CodeReg MAR = new CodeReg("MAR", "");
-
-        // Memory Data Register
-        private IntReg MDR = new IntReg("MDR", 0);
-
-        //Accumulator
-        private IntReg ACC = new IntReg("ACC", 0);
-
-        //Current Instruction Register
-        private CodeReg CIR = new CodeReg("CIR", "");
-
-        // Memory Buffer Register 
-        private IntReg MBR = new IntReg("MBR", 0);
-
+        private Dictionary<Instruction, int> LabelToRamIndex = new Dictionary<Instruction, int>() { };
 
         // readonly variable for me to modify in case more or less registers are needed for testing, final code, adjustments etc.
         private static readonly int BasicRegisterNumber = 10;
@@ -60,7 +43,7 @@ namespace CPUVisNEA
         
         private RAM ram = new RAM();
         // used to compile User string to Cleaned Instruction[]. This confirms the program is valid before trying to compile the code in technically correct CPU assembly translation 
-        public Compiler Compiler = new Compiler();
+        public Compiler Compiler = null;
 
         public enum Instructions : byte
         {
@@ -94,7 +77,7 @@ namespace CPUVisNEA
                 case Instructions.HALT:
                     return new Halt();
                 case Instructions.B:
-                    return new B(Instructions.B);
+                    return new B();
                 case Instructions.BEQ:
                     return new Beq();
                 case Instructions.BNE:
@@ -156,7 +139,7 @@ namespace CPUVisNEA
         //As the Form must Compile before executing Run, the Main Entrance of Run doesnt need to Compile the code but simply Fillram
         /*---------------------------------------- Run ------------------------------------------------
         |  BREAKDOWN
-        |
+        |----> SetUp() Sets a default for Current CPU state
         |----> FillRam() Takes Compiled Version of List
         |
         |---->  Run() ==== while( ! halt ) do ...
@@ -171,20 +154,24 @@ namespace CPUVisNEA
         */
         public void Run()
         {
-            FillRam(); 
+            SetUp();
+            FillRam();
+            
             
             var halted = false;
             while (!halted)
             {
                 // Searches from index in RAM for next Instruction
                 // calls Display Fetch Log
-                var FetchedInstruction = Fetch(PC.content);
+                var FetchedInstruction = Fetch(CurrentState.PC.content);
                 // Checks How many Parameters Required
                 // calls ParameterFetch() to get Parameters
                 // calls Display Decode Log
 
                 var InstructionToExecute = Decode(FetchedInstruction);
                 CurrentState = Execute(InstructionToExecute);
+                //add to the CPU History
+                History.Add(CurrentState);
                 halted = CheckHalted();
             }
         }
@@ -197,28 +184,43 @@ namespace CPUVisNEA
         //use compiled version of assembly program to correctly store all values of program into RAM 
         public void FillRam()
         {
-            
+            // write the program as bytes in ram
             int index = 0;
             foreach (var instruction in Compiler.CompUProg_Instructions)
             {
-                // for every instruction in the compiled program, fill 
+                // for every instruction in the compiled program, fill RAM index with instruction signiture 
                 ram.Memory[index] = (byte)instruction.Tag;
+                ram.InstructionLocations[instruction] = index;
+                //increment and for each argument of instruction store operand and increment again
                 index++;
-                
                 foreach (var argument in instruction.args)
                 {
                     ram.Memory[index] = argument.ToByte();
                     index++;
                 }
             }
-
+            // fill in branch targets
+            foreach (var instruction in Compiler.CompUProg_Instructions)
+            {
+                if (instruction.GetType().IsInstanceOfType( typeof(Branch)))
+                {
+                    var firstArg = instruction.args[0];
+                    if (firstArg.GetType().IsInstanceOfType(typeof(Label)))
+                    {
+                        var label = (Label)firstArg;
+                        var jumpTarget = Compiler.LabelledInstructions[label.name];
+                        var jumpLocation = ram.InstructionLocations[jumpTarget];
+                        label.location = jumpLocation;
+                    }
+                }
+            }
             
         }
 
         //CPU calls Instruction to access the byte representing the Instruction at the index of the Program Counter
         private byte Fetch(int index)
         {
-            return ram.GetByteAt(PC.content);
+            return ram.GetByteAt(index);
         }
 
         // Decode returns the Instruction to be ran with the correspondent arguments decoded
@@ -229,14 +231,14 @@ namespace CPUVisNEA
 
             var TargetInstruction = newInstruction((Instructions)InstructionInt);
             var parameters = GetNumberOfParameters(TargetInstruction);
-
-            for (var i = 0; i < parameters - 1; i++)
+            // start at the index after Instruction RAM index and iterate for all parameters
+            for (var i = 1; i < parameters; i++)
             {
                 //use the Instruction class to retrieve the required type of arg at parameter index i 
                 var ArgType = TargetInstruction.GetReqArgType(i);
                 //Instanciate a new instance of the specific Argument 
                 // this uses the Argtype to indicate the subclass of Argument and accesses the ram to retrieve the byte representing the Arg's content
-                var FilledArg = TypeAndByteToArg(ArgType, ram.GetByteAt(PC.content + i));
+                var FilledArg = TypeAndByteToArg(ArgType, ram.GetByteAt( CurrentState.PC.content + i));
                 TargetInstruction.addArg(FilledArg);
 
                 //incrementing the Program counter by number of bytes used to store parameters to access the next instruction assuming no branch condition
@@ -258,7 +260,9 @@ namespace CPUVisNEA
             //call the overriden instruction's execute command with its given arguements
             //( Could be partically more efficient with passed args but this allows easy testing
             //with my Unit testing interface for if executeInstruction works)
-            var NewState = instr.executeInstruction(instr.args, CurrentState);
+            
+            var NewState = instr.executeInstruction(instr.args, CurrentState.Copy());
+            
             return NewState;
         }
 
@@ -300,10 +304,9 @@ namespace CPUVisNEA
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Compile failed");
+                Trace.WriteLine($"Compile failed: {ex}");
+                MessageBox.Show($"Compile failed {ex} ");
             }
-
-            // TODO: throw an exception if this isn't a valid program
 
 
             return valid;
@@ -312,12 +315,15 @@ namespace CPUVisNEA
         {
             try
             {
+                var newProgram = new Compiler();
                 /*split the string representing the content of the textbox into string[]
                  By looking for the new line character*/
                 var program = new List<string>(text.Split('\n'));
-                Trace.WriteLine($"Start Compiling: [{text}] into {Compiler.StringProgram.Count} instructions");
-                Compiler.fullCompile( program );
+                //todo label mapping
                 
+                Trace.WriteLine($"Start Compiling: [{text}] into {newProgram.StringProgram.Count} instructions");
+                newProgram.fullCompile( program );
+                Compiler = newProgram;
             }
             catch (Exception ex)
             {
@@ -335,10 +341,9 @@ namespace CPUVisNEA
 
     public class RAM
     {
-        //todo mabye string that can be made byte OR all List<string> to smth else
-
         public byte[] Memory = { };
         private Instruction[] AssembelyProgram = { };
+        public Dictionary<Instruction, int> InstructionLocations = new Dictionary<Instruction, int>() ;
         private bool binaryMode;
 
         //Local Convert function in RAM class to completely translate the users program displayed in RAm between its binary representation
@@ -351,17 +356,7 @@ namespace CPUVisNEA
         {
             return Memory[index];
         }
-
-        internal byte[] GetBytesAt(int index, int ByteSize)
-        {
-            byte[] BytesOfArgs = { };
-            for (var incriment = 0; incriment < ByteSize - 1; incriment++)
-                BytesOfArgs.Append(Memory[index + incriment]);
-
-            return BytesOfArgs;
-        }
-
-
+        
         private List<string> FormRamDisplay_Convert()
         {
             var newContent = new List<string>();
@@ -398,172 +393,111 @@ namespace CPUVisNEA
     {
         
         public List<string> StringProgram = new List<string>();
+        
         public Instruction[] CompUProg_Instructions = { };
+        // maps a Dictionary of Label names to correct Instruction index in CompUProg_Instructions
+        public Dictionary<string, Instruction> LabelledInstructions = new Dictionary<string, Instruction>();
 
-        public void fullCompile( List<string> program )
+
+
+        public void fullCompile( List<string> program)
         {
             StringProgram = program;
 
-            CleanseStringProg( program );
+            CleanseProg(program);
             Trace.WriteLine($"removed blank space: to {StringProgram.Count} instructions");
-
-           CompUProg_Instructions = Valid(StringProgram);
-        }
-        //Cleanse() used for removing all lines comprised of blank characters (blank line) 
-        public void CleanseStringProg( List<string> StringsProg )
-        {
-            var temporary = new List<string>();
-            //foreach line in s
-            foreach (var line in StringsProg)
+            CompUProg_Instructions = Valid(StringProgram);
+            // now resolve labels
+            for (int i = 0; i < CompUProg_Instructions.Length; i++)
             {
-                if (!string.IsNullOrWhiteSpace(line))
+                var maybeBranch = CompUProg_Instructions[i];
+                //if any subclass of branch, assign branch label value 
+                if (maybeBranch.GetType().IsInstanceOfType(typeof(Branch)))
                 {
-                    temporary.Add(line);
+                    // branch instructions need to know where their label points to
+                    Label target = (Label)maybeBranch.args[0];
+                    if (!LabelledInstructions.ContainsKey(target.name))
+                    {
+                        throw new Exception($"Label: {target.name} not defined");
+                    }
                 }
             }
-            StringProgram = temporary;
+        }
+        //Cleanse() used for removing all lines comprised of blank characters (blank line) 
+        public void CleanseProg(List<string> StringsProg)
+        {
+            var tempProg = new List<string>();
+
+            string line = "";
+            //foreach line in s
+            for (int i = 0; i < StringsProg.Count-1; i++)
+            {
+                line = StringsProg[i];
+                if (!string.IsNullOrWhiteSpace(line))
+                {
+                    tempProg.Add(line);
+                }
+            }
+            StringProgram = tempProg;
+
         }
 
         //checks if valid format, called after cleanse
         public Instruction[] Valid(List<string> program)
         {
             Instruction[] InstrArray = { };
-
+            int i = 0;
             foreach (var line in program)
             {
+                i++;
                 //linearly iterate through Program and add correspondent Instruction to array of instruction with parameters
                 var nextInstr = lineToInstruction(line);
                 InstrArray.Append(nextInstr);
+                if (nextInstr.Label != null)
+                {
+                    LabelledInstructions.Add(nextInstr.Label, nextInstr);
+                }
             }
-
+// TODO: now for any instuction with an arg that is a jump label, make sure you can find it in the dictionary
             return InstrArray;
         }
 
+
         public Instruction lineToInstruction(string line)
         {
-            var tokens = line.Split(new char[0], StringSplitOptions.RemoveEmptyEntries);
-            var instruction = tokens[0];
-                var args = new List<string>();
-                // iterate through all seperated tokens 
-                for (var i = 1; i < tokens.Length; i++)
+            // split on whitespace and comma means split whitespace
+            var tokens = line.Split(new char[]{' ','\t', '\n', '\r', ','}, StringSplitOptions.RemoveEmptyEntries);
+            String label = null;
+            String instruction = null;
+            var args = new List<string>();
+            // iterate through all seperated tokens 
+            for (int i = 0; i < tokens.Length; i++)
+            {
+                var token = tokens[i];
+                if (i == 0 && token.EndsWith(":"))
                 {
-                    var token = tokens[i];
-                    // we have split on whitespace, but we need to split on comma too. this may lead a token to become multiple tokens 
-                    var strings = token.Split(",".ToCharArray(), StringSplitOptions.RemoveEmptyEntries);
-                    //for every new token add to argument array
-                    foreach (var s in strings) args.Add(s);
-                }
-                
-                CPU.Instructions instrType;
-                Enum.TryParse(instruction, out instrType);
-                var parsed = CPU.newInstruction(instrType);
-                switch (instruction)
+                    label = token.Remove(token.Length-1);
+                } else if (instruction == null)
                 {
-                    case "HALT":
-                    {
-                        //special case stop execution return to edit state 
-                        parsed = new Halt();
-                        break;
-                    }
-                    case "B":
-                    {
-                        parsed = Mov.parseArgs(args);
-                        break;
-                    }
-                    case "Beq":
-                    {
-                        parsed = Mov.parseArgs(args);
-                        break;
-                    }
-                    case "Bne":
-                    {
-                        parsed = Mov.parseArgs(args);
-                        break;
-                    }
-                    case "Blt":
-                    {
-                        parsed = Mov.parseArgs(args);
-                        break;
-                    }
-                    case "BMT":
-                    {
-                        parsed = Mov.parseArgs(args);
-                        break;
-                    }
-
-                    case "MOV":
-                    {
-                        parsed = Mov.parseArgs(args);
-                        break;
-                    }
-
-                    case "CMP":
-                    {
-                        parsed = Cmp.parseArgs(args);
-                        break;
-                    }
-
-                    case "MVN":
-                    {
-                        parsed = Mvn.parseArgs(args);
-                        break;
-                    }
-
-                    case "LDR":
-                    {
-                        parsed = Ldr.parseArgs(args);
-                        break;
-                    }
-
-                    case "AND":
-                    {
-                        parsed = And.parseArgs(args);
-                        break;
-                    }
-
-                    case "ORR":
-                    {
-                        parsed = Orr.parseArgs(args);
-                        break;
-                    }
-
-                    case "EOR":
-                    {
-                        parsed = Eor.parseArgs(args);
-                        break;
-                    }
-
-                    case "LSL":
-                    {
-                        parsed = Lsl.parseArgs(args);
-                        break;
-                    }
-
-                    case "LSR":
-                    {
-                        parsed = Lsr.parseArgs(args);
-                        break;
-                    }
-
-                    case "ADD":
-                    {
-                        parsed = Add.parseArgs(args);
-                        break;
-                    }
-
-                    case "SUB":
-                    {
-                        parsed = Sub.parseArgs(args);
-                        break;
-                    }
-
-
-                    default: throw new Exception($"Unknown instruction: {instruction}");
+                    instruction = token;
                 }
+                else
+                {
+                    // not a label or an instruction so it must be an arg
+                    args.Add(token);
+                }
+            }
+            CPU.Instructions instrType;
+            Enum.TryParse(instruction, out instrType);
+            var parsed = CPU.newInstruction(instrType);
+            if (label != null)
+            {
+                parsed.Label = label;
+            }
 
-                // now add the arguments to the instruction:
-                Instruction.addParsedArgs(parsed, args);
-                return parsed;
+            // now add the arguments to the instruction:
+            Instruction.addParsedArgs(parsed, args);
+            return parsed;
         }
     }
 
@@ -575,7 +509,6 @@ namespace CPUVisNEA
     {
         //display name of Register Instance
         protected string name;
-// TODO give an ID (byte value)
         //determines if Assembly language is allowed or integers. useful to determine what data type the content is
         // doesnt have to be passed as a parameter as child class influences assAllowed value
         protected bool assAllowed;
@@ -592,7 +525,6 @@ namespace CPUVisNEA
         //function to extract value of Register's assAllowed value due to local scope
         protected object RetContent()
         {
-            //todo overrided
             return content;
         }
 
@@ -634,10 +566,12 @@ namespace CPUVisNEA
 
     public class CPUState
     {
-        
+        //todo create list of changes
         // the SpecialPurpose Register array contains all required data for immediate execution and testing of any instruction
         // needs to be public so any index in arrays can be quickly accessed for both Instruction classes and Test Console
-        
+        public List<string> changeLog = new List<string>();
+
+        public List<string> DetailedChangeLog = new List<string>();
         // Program Counter
         public IntReg PC;
 
@@ -672,6 +606,8 @@ namespace CPUVisNEA
                 Basic[i] = new IntReg($"R{i}", 0);
             }
         }
+
+
 
         public CPUState Copy()
         {

@@ -53,6 +53,7 @@ namespace CPUVisNEA
         }//Completed 
 
         [Test] // I am uncertain if  TypeAndByteToArg works or contains logic errors
+        //proves Argument can be successfully generated with given arg type and byte data 
         public void UncertaintytestForByte2ArgCast()
         {
             Argument test = cpu.TypeAndByteToArg(typeof(RegisterArg), 2);
@@ -60,6 +61,10 @@ namespace CPUVisNEA
         } //Completed
 
         [Test] //Provides a Test Interface to individually test Execute of a single instruction successfully change a CPU state correctlly 
+        //proves string to arguement works 
+        //proves parse Arguements works
+        //proves execute instruction works
+        //proves Valid parameter dictionary methods work
         public void TestExecuteSingleInstruction()
         {
             // args to deal with

@@ -93,7 +93,6 @@ namespace CPUVisNEA
             this.txt_longFDE.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
             this.txt_longFDE.Size = new System.Drawing.Size(756, 381);
             this.txt_longFDE.TabIndex = 3;
-            this.txt_longFDE.Text = "\r\nEntire Console Log of CPU FDE Cycle. \r\nScrollable \r\nDoesnt overwrite\r\n\r\nReadOnl" + "y Textbox\r\n\r\n\r\n";
             // 
             // txt_shortFDE
             // 
@@ -110,7 +109,6 @@ namespace CPUVisNEA
             this.txt_shortFDE.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
             this.txt_shortFDE.Size = new System.Drawing.Size(756, 381);
             this.txt_shortFDE.TabIndex = 2;
-            this.txt_shortFDE.Text = "\r\nSingle Cycle Detailed Log of current CPU FDE Cycle. \r\nScrollable \r\nwill overwri" + "te with each cycle \r\n\r\nReadOnly Textbox";
             // 
             // groupBox3
             // 
@@ -121,7 +119,6 @@ namespace CPUVisNEA
             this.groupBox3.Size = new System.Drawing.Size(800, 1346);
             this.groupBox3.TabIndex = 1;
             this.groupBox3.TabStop = false;
-            this.groupBox3.Text = "User Input";
             // 
             // gb_registers
             // 
@@ -151,7 +148,6 @@ namespace CPUVisNEA
             this.txt_TEMPORARY.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
             this.txt_TEMPORARY.Size = new System.Drawing.Size(682, 165);
             this.txt_TEMPORARY.TabIndex = 4;
-            this.txt_TEMPORARY.Text = "TEMPORARY DEMINSTRATION\r\nPC        MAR      MDR \r\nValue    Value    Value \r\n\r\nACC" + "      CIR        MBR\r\nValue    Value    Value \r\n";
             this.txt_TEMPORARY.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             // 
             // gb_Display
@@ -182,7 +178,6 @@ namespace CPUVisNEA
             this.gb_InpOut.Size = new System.Drawing.Size(721, 257);
             this.gb_InpOut.TabIndex = 3;
             this.gb_InpOut.TabStop = false;
-            this.gb_InpOut.Text = "CPU inputs and outputs";
             // 
             // txt_out
             // 
@@ -198,7 +193,6 @@ namespace CPUVisNEA
             this.txt_out.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
             this.txt_out.Size = new System.Drawing.Size(665, 200);
             this.txt_out.TabIndex = 3;
-            this.txt_out.Text = "Output\r\n-----------------\r\nTextBox to record Program Outputs/Prints whilst runnin" + "g user program\r\n\r\n\r\n";
             // 
             // groupBox4
             // 
@@ -209,7 +203,6 @@ namespace CPUVisNEA
             this.groupBox4.Size = new System.Drawing.Size(800, 1346);
             this.groupBox4.TabIndex = 1;
             this.groupBox4.TabStop = false;
-            this.groupBox4.Text = "User Input";
             // 
             // pnl_uCodeManip
             // 
@@ -229,14 +222,14 @@ namespace CPUVisNEA
             this.txt_uProg.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.txt_uProg.Font = new System.Drawing.Font("Microsoft New Tai Lue", 15.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.txt_uProg.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(224)))), ((int)(((byte)(224)))), ((int)(((byte)(224)))));
-            this.txt_uProg.Location = new System.Drawing.Point(10, 200);
+            this.txt_uProg.Location = new System.Drawing.Point(20, 200);
             this.txt_uProg.Margin = new System.Windows.Forms.Padding(0);
             this.txt_uProg.Multiline = true;
             this.txt_uProg.Name = "txt_uProg";
             this.txt_uProg.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.txt_uProg.Size = new System.Drawing.Size(784, 766);
+            this.txt_uProg.Size = new System.Drawing.Size(774, 766);
             this.txt_uProg.TabIndex = 3;
-            this.txt_uProg.Text = "flaggle waggle\r\nempty line test below\r\n\r\nshould output\r\n4 not 5 \r\n\r\n\r\n\r\n";
+            this.txt_uProg.Text = "Test: MOV R0, #69\r\nB Test\r\nMOV R0, #10\r\nHALT";
             this.txt_uProg.TextChanged += new System.EventHandler(this.txt_uProg_TextChanged);
             // 
             // gb_Execute
@@ -264,7 +257,7 @@ namespace CPUVisNEA
             this.DD_Scheme.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.DD_Scheme.Font = new System.Drawing.Font("Microsoft Sans Serif", 16.125F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.DD_Scheme.FormattingEnabled = true;
-            this.DD_Scheme.Items.AddRange(new object[] { "Dark Mode", "Light Mode", "Colour Blind", "Hacker ", "Custom" });
+            this.DD_Scheme.Items.AddRange(new object[] { "Dark Mode", "Light Mode", "Colour Blind", "Hacker ", "Custom", "Dark Mode", "Light Mode", "Colour Blind", "Hacker ", "Custom", "Dark Mode", "Light Mode", "Colour Blind", "Hacker ", "Custom", "Dark Mode", "Light Mode", "Colour Blind", "Hacker ", "Custom" });
             this.DD_Scheme.Location = new System.Drawing.Point(390, 126);
             this.DD_Scheme.Name = "DD_Scheme";
             this.DD_Scheme.Size = new System.Drawing.Size(346, 59);
@@ -278,7 +271,7 @@ namespace CPUVisNEA
             this.DD_Speed.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.DD_Speed.Font = new System.Drawing.Font("Microsoft Sans Serif", 16.125F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.DD_Speed.FormattingEnabled = true;
-            this.DD_Speed.Items.AddRange(new object[] { "Real time execution", "Fast", "Medium", "Slow", "User Controlled Step" });
+            this.DD_Speed.Items.AddRange(new object[] { "Real time execution", "Fast", "Medium", "Slow", "User Controlled Step", "Real time execution", "Fast", "Medium", "Slow", "User Controlled Step", "Real time execution", "Fast", "Medium", "Slow", "User Controlled Step", "Real time execution", "Fast", "Medium", "Slow", "User Controlled Step" });
             this.DD_Speed.Location = new System.Drawing.Point(390, 32);
             this.DD_Speed.Name = "DD_Speed";
             this.DD_Speed.Size = new System.Drawing.Size(346, 59);
@@ -323,7 +316,7 @@ namespace CPUVisNEA
             this.DD_LoadProg.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.DD_LoadProg.Font = new System.Drawing.Font("Microsoft Sans Serif", 16.125F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.DD_LoadProg.FormattingEnabled = true;
-            this.DD_LoadProg.Items.AddRange(new object[] { "Km ", "We vibe ", "NOt again" });
+            this.DD_LoadProg.Items.AddRange(new object[] { "Km ", "We vibe ", "NOt again", "Km ", "We vibe ", "NOt again", "Km ", "We vibe ", "NOt again", "Km ", "We vibe ", "NOt again" });
             this.DD_LoadProg.Location = new System.Drawing.Point(28, 35);
             this.DD_LoadProg.Name = "DD_LoadProg";
             this.DD_LoadProg.Size = new System.Drawing.Size(278, 59);
@@ -377,16 +370,16 @@ namespace CPUVisNEA
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.AutoScroll = true;
             this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
-            this.ClientSize = new System.Drawing.Size(2374, 1329);
+            this.ClientSize = new System.Drawing.Size(2424, 1329);
             this.Controls.Add(this.gb_userInput);
             this.Controls.Add(this.gb_outputs);
             this.Controls.Add(this.gb_Display);
             this.HelpButton = true;
+            this.Location = new System.Drawing.Point(15, 15);
             this.Margin = new System.Windows.Forms.Padding(4);
             this.MaximumSize = new System.Drawing.Size(2450, 1400);
             this.Name = "UI";
             this.Padding = new System.Windows.Forms.Padding(20, 5, 5, 5);
-            this.Text = "NEA Assembly Interface";
             this.gb_outputs.ResumeLayout(false);
             this.gb_outputs.PerformLayout();
             this.gb_registers.ResumeLayout(false);
