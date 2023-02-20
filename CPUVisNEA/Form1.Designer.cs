@@ -53,6 +53,8 @@ namespace CPUVisNEA
             this.btn_UIType = new System.Windows.Forms.Button();
             this.btn_Save = new System.Windows.Forms.Button();
             this.gb_userInput = new System.Windows.Forms.GroupBox();
+            this.btn_Run = new System.Windows.Forms.Button();
+            this.btn_ReturnToEdit = new System.Windows.Forms.Button();
             this.gb_outputs.SuspendLayout();
             this.gb_registers.SuspendLayout();
             this.gb_Display.SuspendLayout();
@@ -229,7 +231,7 @@ namespace CPUVisNEA
             this.txt_uProg.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
             this.txt_uProg.Size = new System.Drawing.Size(774, 766);
             this.txt_uProg.TabIndex = 3;
-            this.txt_uProg.Text = "Test: MOV R0, #69\r\nB Test\r\nMOV R0, #10\r\nHALT";
+            this.txt_uProg.Text = "B Test\r\nMOV R0, #10\r\nTest: MOV R0, #69\r\nHALT";
             this.txt_uProg.TextChanged += new System.EventHandler(this.txt_uProg_TextChanged);
             // 
             // gb_Execute
@@ -237,6 +239,8 @@ namespace CPUVisNEA
             this.gb_Execute.AutoSize = true;
             this.gb_Execute.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
             this.gb_Execute.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(62)))), ((int)(((byte)(84)))), ((int)(((byte)(151)))));
+            this.gb_Execute.Controls.Add(this.btn_ReturnToEdit);
+            this.gb_Execute.Controls.Add(this.btn_Run);
             this.gb_Execute.Controls.Add(this.DD_Scheme);
             this.gb_Execute.Controls.Add(this.DD_Speed);
             this.gb_Execute.Controls.Add(this.btn_Compile);
@@ -245,7 +249,7 @@ namespace CPUVisNEA
             this.gb_Execute.Margin = new System.Windows.Forms.Padding(6);
             this.gb_Execute.Name = "gb_Execute";
             this.gb_Execute.Padding = new System.Windows.Forms.Padding(6);
-            this.gb_Execute.Size = new System.Drawing.Size(745, 218);
+            this.gb_Execute.Size = new System.Drawing.Size(746, 239);
             this.gb_Execute.TabIndex = 3;
             this.gb_Execute.TabStop = false;
             this.gb_Execute.Text = "Execution Buttons";
@@ -257,8 +261,28 @@ namespace CPUVisNEA
             this.DD_Scheme.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.DD_Scheme.Font = new System.Drawing.Font("Microsoft Sans Serif", 16.125F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.DD_Scheme.FormattingEnabled = true;
-            this.DD_Scheme.Items.AddRange(new object[] { "Dark Mode", "Light Mode", "Colour Blind", "Hacker ", "Custom", "Dark Mode", "Light Mode", "Colour Blind", "Hacker ", "Custom", "Dark Mode", "Light Mode", "Colour Blind", "Hacker ", "Custom", "Dark Mode", "Light Mode", "Colour Blind", "Hacker ", "Custom" });
-            this.DD_Scheme.Location = new System.Drawing.Point(390, 126);
+            this.DD_Scheme.Items.AddRange(new object[] {
+            "Dark Mode",
+            "Light Mode",
+            "Colour Blind",
+            "Hacker ",
+            "Custom",
+            "Dark Mode",
+            "Light Mode",
+            "Colour Blind",
+            "Hacker ",
+            "Custom",
+            "Dark Mode",
+            "Light Mode",
+            "Colour Blind",
+            "Hacker ",
+            "Custom",
+            "Dark Mode",
+            "Light Mode",
+            "Colour Blind",
+            "Hacker ",
+            "Custom"});
+            this.DD_Scheme.Location = new System.Drawing.Point(391, 144);
             this.DD_Scheme.Name = "DD_Scheme";
             this.DD_Scheme.Size = new System.Drawing.Size(346, 59);
             this.DD_Scheme.TabIndex = 7;
@@ -271,7 +295,27 @@ namespace CPUVisNEA
             this.DD_Speed.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.DD_Speed.Font = new System.Drawing.Font("Microsoft Sans Serif", 16.125F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.DD_Speed.FormattingEnabled = true;
-            this.DD_Speed.Items.AddRange(new object[] { "Real time execution", "Fast", "Medium", "Slow", "User Controlled Step", "Real time execution", "Fast", "Medium", "Slow", "User Controlled Step", "Real time execution", "Fast", "Medium", "Slow", "User Controlled Step", "Real time execution", "Fast", "Medium", "Slow", "User Controlled Step" });
+            this.DD_Speed.Items.AddRange(new object[] {
+            "Real time execution",
+            "Fast",
+            "Medium",
+            "Slow",
+            "User Controlled Step",
+            "Real time execution",
+            "Fast",
+            "Medium",
+            "Slow",
+            "User Controlled Step",
+            "Real time execution",
+            "Fast",
+            "Medium",
+            "Slow",
+            "User Controlled Step",
+            "Real time execution",
+            "Fast",
+            "Medium",
+            "Slow",
+            "User Controlled Step"});
             this.DD_Speed.Location = new System.Drawing.Point(390, 32);
             this.DD_Speed.Name = "DD_Speed";
             this.DD_Speed.Size = new System.Drawing.Size(346, 59);
@@ -316,7 +360,19 @@ namespace CPUVisNEA
             this.DD_LoadProg.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.DD_LoadProg.Font = new System.Drawing.Font("Microsoft Sans Serif", 16.125F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.DD_LoadProg.FormattingEnabled = true;
-            this.DD_LoadProg.Items.AddRange(new object[] { "Km ", "We vibe ", "NOt again", "Km ", "We vibe ", "NOt again", "Km ", "We vibe ", "NOt again", "Km ", "We vibe ", "NOt again" });
+            this.DD_LoadProg.Items.AddRange(new object[] {
+            "Km ",
+            "We vibe ",
+            "NOt again",
+            "Km ",
+            "We vibe ",
+            "NOt again",
+            "Km ",
+            "We vibe ",
+            "NOt again",
+            "Km ",
+            "We vibe ",
+            "NOt again"});
             this.DD_LoadProg.Location = new System.Drawing.Point(28, 35);
             this.DD_LoadProg.Name = "DD_LoadProg";
             this.DD_LoadProg.Size = new System.Drawing.Size(278, 59);
@@ -364,6 +420,34 @@ namespace CPUVisNEA
             this.gb_userInput.Text = "User Input";
             this.gb_userInput.Enter += new System.EventHandler(this.gb_userInput_Enter);
             // 
+            // btn_Run
+            // 
+            this.btn_Run.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(90)))), ((int)(((byte)(90)))), ((int)(((byte)(90)))));
+            this.btn_Run.ForeColor = System.Drawing.Color.White;
+            this.btn_Run.Location = new System.Drawing.Point(12, 32);
+            this.btn_Run.Margin = new System.Windows.Forms.Padding(6);
+            this.btn_Run.Name = "btn_Run";
+            this.btn_Run.Size = new System.Drawing.Size(178, 77);
+            this.btn_Run.TabIndex = 8;
+            this.btn_Run.Text = "Run Program\r\n\r\n";
+            this.btn_Run.UseVisualStyleBackColor = false;
+            this.btn_Run.Visible = false;
+            this.btn_Run.Click += new System.EventHandler(this.btn_Run_Click);
+            // 
+            // btn_ReturnToEdit
+            // 
+            this.btn_ReturnToEdit.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(90)))), ((int)(((byte)(90)))), ((int)(((byte)(90)))));
+            this.btn_ReturnToEdit.ForeColor = System.Drawing.Color.White;
+            this.btn_ReturnToEdit.Location = new System.Drawing.Point(12, 121);
+            this.btn_ReturnToEdit.Margin = new System.Windows.Forms.Padding(6);
+            this.btn_ReturnToEdit.Name = "btn_ReturnToEdit";
+            this.btn_ReturnToEdit.Size = new System.Drawing.Size(178, 82);
+            this.btn_ReturnToEdit.TabIndex = 9;
+            this.btn_ReturnToEdit.Text = "Return to Edit (Cancel Run ) ";
+            this.btn_ReturnToEdit.UseVisualStyleBackColor = false;
+            this.btn_ReturnToEdit.Visible = false;
+            this.btn_ReturnToEdit.Click += new System.EventHandler(this.btn_ReturnToEdit_Click);
+            // 
             // UI
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(12F, 25F);
@@ -392,6 +476,7 @@ namespace CPUVisNEA
             this.gb_userInput.ResumeLayout(false);
             this.gb_userInput.PerformLayout();
             this.ResumeLayout(false);
+
         }
 
         #endregion
@@ -418,6 +503,8 @@ namespace CPUVisNEA
         private System.Windows.Forms.Button btn_UIType;
         private System.Windows.Forms.Button btn_Save;
         private System.Windows.Forms.GroupBox gb_userInput;
+        private System.Windows.Forms.Button btn_ReturnToEdit;
+        private System.Windows.Forms.Button btn_Run;
     }
     
     

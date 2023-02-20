@@ -43,7 +43,7 @@ namespace CPUVisNEA
         
         private RAM ram = new RAM();
         // used to compile User string to Cleaned Instruction[]. This confirms the program is valid before trying to compile the code in technically correct CPU assembly translation 
-        public Compiler Compiler = null;
+        public Compiler Compiler = new Compiler();
 
         public enum Instructions : byte
         {
@@ -189,6 +189,7 @@ namespace CPUVisNEA
             foreach (var instruction in Compiler.CompUProg_Instructions)
             {
                 // for every instruction in the compiled program, fill RAM index with instruction signiture 
+                //todo appemnds??? or byte Listfdfsf
                 ram.Memory[index] = (byte)instruction.Tag;
                 ram.InstructionLocations[instruction] = index;
                 //increment and for each argument of instruction store operand and increment again
@@ -293,14 +294,20 @@ namespace CPUVisNEA
             //create a default Current State for the CPU to execute first instructions 
             CurrentState = new CPUState();
         }
-        
+        //todo check if fills Memory
         public bool Compile(string text)
         {
             var valid = false;
 
             try
             {
-                CompileLoader(text);
+                /*split the string representing the content of the textbox into string[]
+                 By looking for the new line character*/
+                var program = new List<string>(text.Split('\n'));
+                //todo label mapping
+                
+                Trace.WriteLine($"Start Compiling: [{text}] into {Compiler.StringProgram.Count} instructions");
+                Compiler.fullCompile( program );
             }
             catch (Exception ex)
             {
@@ -310,25 +317,6 @@ namespace CPUVisNEA
 
 
             return valid;
-        }
-        public void CompileLoader(string text)
-        {
-            try
-            {
-                var newProgram = new Compiler();
-                /*split the string representing the content of the textbox into string[]
-                 By looking for the new line character*/
-                var program = new List<string>(text.Split('\n'));
-                //todo label mapping
-                
-                Trace.WriteLine($"Start Compiling: [{text}] into {newProgram.StringProgram.Count} instructions");
-                newProgram.fullCompile( program );
-                Compiler = newProgram;
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(Convert.ToString(ex));
-            }
         }
 
         public CPU()
@@ -341,7 +329,7 @@ namespace CPUVisNEA
 
     public class RAM
     {
-        public byte[] Memory = { };
+        public byte[] Memory = new byte[256] ;
         private Instruction[] AssembelyProgram = { };
         public Dictionary<Instruction, int> InstructionLocations = new Dictionary<Instruction, int>() ;
         private bool binaryMode;

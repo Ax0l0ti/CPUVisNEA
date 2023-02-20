@@ -45,12 +45,11 @@ namespace CPUVisNEA
     
     public partial class UI : Form
     {
-        
-        private bool Editstate = true; 
-            private CPU cpu;
-            private Compiler compiler;
 
-            public UI(CPU cpu)
+        private bool Editstate = true;
+        private CPU cpu;
+
+        public UI(CPU cpu)
             {
                 this.cpu = cpu;
                 InitializeComponent();
@@ -71,7 +70,7 @@ namespace CPUVisNEA
             {
                 try
                 {
-                    
+                    cpu.Compiler = new Compiler();
                     var valid = cpu.Compile(txt_uProg.Text);
                     Trace.WriteLine($"compiled: {txt_uProg.Text}");
                     setEditState(false);
@@ -87,13 +86,13 @@ namespace CPUVisNEA
 
             private void setEditState(bool edit)
             {
-                if (edit != Editstate)
-                {
-                    Trace.WriteLine($"Switched to {edit} mode");
-                    Editstate = edit;
-                    txt_uProg.Enabled = edit;
-                }
-            }
+                Trace.WriteLine($"Switched to {edit} mode");
+                Editstate = edit;
+                txt_uProg.Enabled = edit;
+                btn_Compile.Visible = edit;
+                btn_ReturnToEdit.Visible = !edit;
+                btn_Run.Visible = !edit;
+        }
             
 
             private void txt_uProg_TextChanged(object sender, EventArgs e)
@@ -131,6 +130,16 @@ namespace CPUVisNEA
             private void txt_Labels_TextChanged(object sender, EventArgs e)
             {
             }
+
+        private void btn_ReturnToEdit_Click(object sender, EventArgs e)
+        {
+            setEditState(true);
+        }
+
+        private void btn_Run_Click( object sender, EventArgs e )
+        {
+            cpu.Run();
+        }
     }
      
 }
