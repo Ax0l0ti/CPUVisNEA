@@ -157,11 +157,14 @@ namespace CPUVisNEA
 
     public class Label : Argument //todo maybe create linked class between Label argument and destination location
     {
+        public int location; // destination
+        public string name; // correspondent string for display purpose
         public Label(string name)
         {
             this.name = name;
             
         }
+        
 
         public int Location
         {
@@ -178,8 +181,7 @@ namespace CPUVisNEA
             return location;
         }
 
-        public int location; // destination
-        public string name; // correspondent string for display purpose
+        
     }
 
 
@@ -358,7 +360,7 @@ namespace CPUVisNEA
 
         /*held locally in class but never used by class. Is used by CPU to instantiate instance
          of Instruction type and pass arguments held by local CPU compiling function  */
-        public static Halt parseArgs(List<string> args)
+        public static  Halt parseArgs(List<string> args)
         {
             //creates new local instance of a blank object correspondent to class
             var halt = new Halt();

@@ -11,10 +11,11 @@ using NUnit.Framework;
 namespace CPUVisNEA
 {
     /* General todos 
-     * ----> Regex for Arguements
      * ----> Make Register Dictionary SP Basic ( used to find register for given string )
      * ----> Check if direct or indirect addressing
-     * ----> 
+     * ----> LABELS
+     * ----> Fill InstructionLocations
+     * ----> use LabelToRAMIndex, LabelledInstructions, Instruction Locations
      */
 
 
@@ -27,24 +28,24 @@ namespace CPUVisNEA
         // PC, MAR, MDR, ACC, CIR, MBR
 
         private Register[] SPRegisters = { /*PC, MAR, MDR, ACC, CIR, MBR*/ };
-        private Dictionary<Instruction, int> LabelToRamIndex = new Dictionary<Instruction, int>() { };
+        private Dictionary<string, int> LabelToRamIndex = new Dictionary<string, int>() { };
 
         // readonly variable for me to modify in case more or less registers are needed for testing, final code, adjustments etc.
         private static readonly int BasicRegisterNumber = 10;
-
         // Normal User interactable Registers in a Computer
-        private Register[] BasicRegisters; 
+        private Register[] BasicRegisters;
 
+        private int PCNonBranchIncriment = 0;
+        
         // todo explain why line below is bs, how to 
         //private Tuple<Register[], Register[], int>[] CPUHistory = new Tuple<Register[], Register[], int>[] {};
         private List<CPUState> History = new List<CPUState>();
         private CPUState CurrentState;
-        
-        
+
         private RAM ram = new RAM();
         // used to compile User string to Cleaned Instruction[]. This confirms the program is valid before trying to compile the code in technically correct CPU assembly translation 
         public Compiler Compiler = new Compiler();
-
+        
         public enum Instructions : byte
         {
             //enum number integer can be converted to represent binary value
@@ -125,11 +126,11 @@ namespace CPUVisNEA
                 case "RegisterArg":
                     return new RegisterArg(ByteFormOfContent);
                     break;
-                case "IntArg":
+                case "IntegerArg":
                     return new IntegerArg(ByteFormOfContent);
                     break;
                 case "Label":
-                    return new RegisterArg(ByteFormOfContent);
+                    return new Label("Test" /*VFat todo*/ );
                     break;
                 default:
                     throw new Exception($"Invalid Type {ArgType.Name} ");
@@ -156,23 +157,28 @@ namespace CPUVisNEA
         {
             SetUp();
             FillRam();
-            
-            
+
             var halted = false;
             while (!halted)
             {
                 // Searches from index in RAM for next Instruction
                 // calls Display Fetch Log
+
                 var FetchedInstruction = Fetch(CurrentState.PC.content);
+                
                 // Checks How many Parameters Required
                 // calls ParameterFetch() to get Parameters
+                // Incriments Program Counter 
                 // calls Display Decode Log
+                
 
                 var InstructionToExecute = Decode(FetchedInstruction);
+                
                 CurrentState = Execute(InstructionToExecute);
                 //add to the CPU History
                 History.Add(CurrentState);
                 halted = CheckHalted();
+
             }
         }
 
@@ -189,7 +195,7 @@ namespace CPUVisNEA
             foreach (var instruction in Compiler.CompUProg_Instructions)
             {
                 // for every instruction in the compiled program, fill RAM index with instruction signiture 
-                //todo appemnds??? or byte Listfdfsf
+                //todo appemnds??? or byte List
                 ram.Memory[index] = (byte)instruction.Tag;
                 ram.InstructionLocations[instruction] = index;
                 //increment and for each argument of instruction store operand and increment again
@@ -206,13 +212,10 @@ namespace CPUVisNEA
                 if (instruction.GetType().IsInstanceOfType( typeof(Branch)))
                 {
                     var firstArg = instruction.args[0];
-                    if (firstArg.GetType().IsInstanceOfType(typeof(Label)))
-                    {
-                        var label = (Label)firstArg;
+                    var label = (Label)firstArg;
                         var jumpTarget = Compiler.LabelledInstructions[label.name];
                         var jumpLocation = ram.InstructionLocations[jumpTarget];
                         label.location = jumpLocation;
-                    }
                 }
             }
             
@@ -232,18 +235,25 @@ namespace CPUVisNEA
 
             var TargetInstruction = newInstruction((Instructions)InstructionInt);
             var parameters = GetNumberOfParameters(TargetInstruction);
+            
             // start at the index after Instruction RAM index and iterate for all parameters
-            for (var i = 1; i < parameters; i++)
+            for (var i = 0; i < parameters; i++)
             {
                 //use the Instruction class to retrieve the required type of arg at parameter index i 
                 var ArgType = TargetInstruction.GetReqArgType(i);
                 //Instanciate a new instance of the specific Argument 
                 // this uses the Argtype to indicate the subclass of Argument and accesses the ram to retrieve the byte representing the Arg's content
-                var FilledArg = TypeAndByteToArg(ArgType, ram.GetByteAt( CurrentState.PC.content + i));
+                if (ArgType.GetType() == typeof(Label))
+                {
+                    //FilledArg = GetNewLabelDetails();
+                }
+                var FilledArg = TypeAndByteToArg(ArgType, ram.GetByteAt(CurrentState.PC.content + i));
                 TargetInstruction.addArg(FilledArg);
 
                 //incrementing the Program counter by number of bytes used to store parameters to access the next instruction assuming no branch condition
             }
+
+            PCIncriment( parameters );
 
             return TargetInstruction;
         }
@@ -253,6 +263,18 @@ namespace CPUVisNEA
             var parameters = 0;
             parameters = TargetInstruction.NumberOfParameters();
             return parameters;
+        }
+
+        /* todo private Label GetNewLabelDetails()
+        {
+            return n;
+        } */
+        
+        private void PCIncriment( int parameters)
+        {
+            /* increment the Program Counter by 1 for instruction and all parameters for next execution
+             However a branch command will overwrite this Increment to the branched location*/
+            CurrentState.PC.content =+ parameters + 1;
         }
 
 
@@ -306,7 +328,7 @@ namespace CPUVisNEA
                 var program = new List<string>(text.Split('\n'));
                 //todo label mapping
                 
-                Trace.WriteLine($"Start Compiling: [{text}] into {Compiler.StringProgram.Count} instructions");
+                Trace.WriteLine($"Start Compiling: [ '\n'{text}'\n']");
                 Compiler.fullCompile( program );
             }
             catch (Exception ex)
@@ -314,8 +336,6 @@ namespace CPUVisNEA
                 Trace.WriteLine($"Compile failed: {ex}");
                 MessageBox.Show($"Compile failed {ex} ");
             }
-
-
             return valid;
         }
 
@@ -382,7 +402,7 @@ namespace CPUVisNEA
         
         public List<string> StringProgram = new List<string>();
         
-        public Instruction[] CompUProg_Instructions = { };
+        public List<Instruction> CompUProg_Instructions = new List<Instruction>() ;
         // maps a Dictionary of Label names to correct Instruction index in CompUProg_Instructions
         public Dictionary<string, Instruction> LabelledInstructions = new Dictionary<string, Instruction>();
 
@@ -396,7 +416,7 @@ namespace CPUVisNEA
             Trace.WriteLine($"removed blank space: to {StringProgram.Count} instructions");
             CompUProg_Instructions = Valid(StringProgram);
             // now resolve labels
-            for (int i = 0; i < CompUProg_Instructions.Length; i++)
+            for (int i = 0; i < CompUProg_Instructions.Count; i++)
             {
                 var maybeBranch = CompUProg_Instructions[i];
                 //if any subclass of branch, assign branch label value 
@@ -418,7 +438,7 @@ namespace CPUVisNEA
 
             string line = "";
             //foreach line in s
-            for (int i = 0; i < StringsProg.Count-1; i++)
+            for (int i = 0; i < StringsProg.Count; i++)
             {
                 line = StringsProg[i];
                 if (!string.IsNullOrWhiteSpace(line))
@@ -431,16 +451,14 @@ namespace CPUVisNEA
         }
 
         //checks if valid format, called after cleanse
-        public Instruction[] Valid(List<string> program)
+        public List<Instruction> Valid(List<string> program)
         {
-            Instruction[] InstrArray = { };
-            int i = 0;
+            List<Instruction> InstrArray = new List<Instruction>() ;
             foreach (var line in program)
             {
-                i++;
                 //linearly iterate through Program and add correspondent Instruction to array of instruction with parameters
                 var nextInstr = lineToInstruction(line);
-                InstrArray.Append(nextInstr);
+                InstrArray.Add(nextInstr);
                 if (nextInstr.Label != null)
                 {
                     LabelledInstructions.Add(nextInstr.Label, nextInstr);
