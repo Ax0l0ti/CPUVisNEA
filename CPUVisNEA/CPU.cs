@@ -24,10 +24,7 @@ namespace CPUVisNEA
 
     public class CPU
     {
-        // Special Purpose Registers used by a CPU 
-        // PC, MAR, MDR, ACC, CIR, MBR
 
-        private Register[] SPRegisters = { /*PC, MAR, MDR, ACC, CIR, MBR*/ };
         private Dictionary<string, int> LabelToRamIndex = new Dictionary<string, int>() { };
 
         // readonly variable for me to modify in case more or less registers are needed for testing, final code, adjustments etc.
@@ -130,11 +127,20 @@ namespace CPUVisNEA
                     return new IntegerArg(ByteFormOfContent);
                     break;
                 case "Label":
-                    return new Label("Test" /*VFat todo*/ );
+                    return GetNewLabelDetails(ByteFormOfContent);
                     break;
                 default:
                     throw new Exception($"Invalid Type {ArgType.Name} ");
             }
+        }
+        private Label GetNewLabelDetails( int TargetLocation )
+        {
+            //whilst this looping method has Time Complexity O( n ), labelsDictionary has a very limited size and hence will be efficient enough to search through
+            string labelTag = LabelToRamIndex.FirstOrDefault(x => x.Value == TargetLocation).Key;
+            if (labelTag == null) { MessageBox.Show("Ram to Instruction Execute - Branch label not found"); }
+            Label LabelToAdd = new Label(labelTag);
+            LabelToAdd.location = TargetLocation;
+            return LabelToAdd;
         }
         
         //As the Form must Compile before executing Run, the Main Entrance of Run doesnt need to Compile the code but simply Fillram
@@ -173,18 +179,20 @@ namespace CPUVisNEA
                 
 
                 var InstructionToExecute = Decode(FetchedInstruction);
-                
+                Trace.WriteLine($"Executing {InstructionToExecute.Tag} with parameters: {string.Join(", ", InstructionToExecute.args.Select(arg => $"{arg.name}"))}");
                 CurrentState = Execute(InstructionToExecute);
+
                 //add to the CPU History
                 History.Add(CurrentState);
                 halted = CheckHalted();
 
             }
+            Trace.WriteLine($"Finished Execution"); 
         }
 
         private bool CheckHalted()
         {
-            return CurrentState.PC.content < 0;
+            return (CurrentState.PC.content < 0)  ;
         }
 
         //use compiled version of assembly program to correctly store all values of program into RAM 
@@ -206,16 +214,18 @@ namespace CPUVisNEA
                     index++;
                 }
             }
-            // fill in branch targets
+            // fill in all branch targets to Ram after full compile analyses and records any ppotentail branch locations
             foreach (var instruction in Compiler.CompUProg_Instructions)
             {
-                if (instruction.GetType().IsInstanceOfType( typeof(Branch)))
+                if (instruction.GetType().IsSubclassOf(typeof(Branch)))
                 {
                     var firstArg = instruction.args[0];
                     var label = (Label)firstArg;
                         var jumpTarget = Compiler.LabelledInstructions[label.name];
                         var jumpLocation = ram.InstructionLocations[jumpTarget];
-                        label.location = jumpLocation;
+                        LabelToRamIndex.Add(label.name, jumpLocation);
+                        ((Label)instruction.args[0]).location = jumpLocation;
+                        ram.Memory[ram.InstructionLocations[instruction] + 1] = instruction.args[0].ToByte(); 
                 }
             }
             
@@ -236,39 +246,34 @@ namespace CPUVisNEA
             var TargetInstruction = newInstruction((Instructions)InstructionInt);
             var parameters = GetNumberOfParameters(TargetInstruction);
             
-            // start at the index after Instruction RAM index and iterate for all parameters
+            // start at the index after Instruction RAM index and iterate for all parameters 
             for (var i = 0; i < parameters; i++)
             {
-                //use the Instruction class to retrieve the required type of arg at parameter index i 
+                //use the Instruction class to retrieve the required type of arg at parameter index i
                 var ArgType = TargetInstruction.GetReqArgType(i);
                 //Instanciate a new instance of the specific Argument 
-                // this uses the Argtype to indicate the subclass of Argument and accesses the ram to retrieve the byte representing the Arg's content
-                if (ArgType.GetType() == typeof(Label))
-                {
-                    //FilledArg = GetNewLabelDetails();
-                }
-                var FilledArg = TypeAndByteToArg(ArgType, ram.GetByteAt(CurrentState.PC.content + i));
+                /* TypeAndByteToArg creates a new Argument the Argtype to indicate the subclass of Argument and accesses
+                 the ram to retrieve the byte at the index of instruction incrimented by the parameter number dsd representing the Arg's content
+                */
+                var FilledArg = TypeAndByteToArg(ArgType, ram.GetByteAt(CurrentState.PC.content + i + 1 ));
                 TargetInstruction.addArg(FilledArg);
 
                 //incrementing the Program counter by number of bytes used to store parameters to access the next instruction assuming no branch condition
             }
 
-            PCIncriment( parameters );
+            CurrentState.PC.content += parameters + 1;
 
             return TargetInstruction;
         }
 
         private int GetNumberOfParameters(Instruction TargetInstruction)
         {
-            var parameters = 0;
+            int parameters;
             parameters = TargetInstruction.NumberOfParameters();
             return parameters;
         }
 
-        /* todo private Label GetNewLabelDetails()
-        {
-            return n;
-        } */
+         
         
         private void PCIncriment( int parameters)
         {
@@ -326,8 +331,7 @@ namespace CPUVisNEA
                 /*split the string representing the content of the textbox into string[]
                  By looking for the new line character*/
                 var program = new List<string>(text.Split('\n'));
-                //todo label mapping
-                
+
                 Trace.WriteLine($"Start Compiling: [ '\n'{text}'\n']");
                 Compiler.fullCompile( program );
             }

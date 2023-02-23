@@ -158,13 +158,10 @@ namespace CPUVisNEA
     public class Label : Argument //todo maybe create linked class between Label argument and destination location
     {
         public int location; // destination
-        public string name; // correspondent string for display purpose
         public Label(string name)
         {
             this.name = name;
-            
         }
-        
 
         public int Location
         {
@@ -224,11 +221,9 @@ namespace CPUVisNEA
                     },
                     new[] { typeof(RegisterArg), typeof(RegisterArg), typeof(IntegerArg) }
                 },
-                {
-                    new[] { CPU.Instructions.HALT }, null
-                }, // doesnt accept any additional text or parameters to statement
+                // doesnt accept any additional text or parameters to statement
                 //B >> acts for all branches
-                { new[] { CPU.Instructions.B }, new[] { typeof(Label) } }
+                { new[] { CPU.Instructions.B, CPU.Instructions.BEQ, CPU.Instructions.BLT, CPU.Instructions.BNE, CPU.Instructions.BGT   }, new[] { typeof(Label) } }
             };
 
         protected string label;

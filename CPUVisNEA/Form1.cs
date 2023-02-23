@@ -72,7 +72,7 @@ namespace CPUVisNEA
                 {
                     cpu.Compiler = new Compiler();
                     var valid = cpu.Compile(txt_uProg.Text);
-                    Trace.WriteLine($"compiled: {txt_uProg.Text}");
+                    Trace.WriteLine($"compiled: \n {txt_uProg.Text}");
                     setEditState(false);
                 }
                 catch (Exception ex)
@@ -86,7 +86,7 @@ namespace CPUVisNEA
 
             private void setEditState(bool edit)
             {
-                Trace.WriteLine($"Switched to {edit} mode");
+                Trace.WriteLine($"Switched to Edit Mode to {edit} \n");
                 Editstate = edit;
                 txt_uProg.Enabled = edit;
                 btn_Compile.Visible = edit;

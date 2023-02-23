@@ -83,6 +83,12 @@ namespace CPUVisNEA
             Console.WriteLine($"The end value stored in {arg1} after {Test.Tag} instruction is {newCPUState.Basic[targetIndex].content} ");
 
         }
+
+        [Test]
+        public void LabelTesting()
+        {
+            
+        }
         
 
 
