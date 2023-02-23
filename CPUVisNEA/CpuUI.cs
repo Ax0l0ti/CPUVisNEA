@@ -138,6 +138,7 @@ namespace CPUVisNEA
 
         private void btn_Run_Click( object sender, EventArgs e )
         {
+            
             cpu.Run();
         }
     }

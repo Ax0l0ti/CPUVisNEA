@@ -147,47 +147,56 @@ namespace CPUVisNEA
         /*---------------------------------------- Run ------------------------------------------------
         |  BREAKDOWN
         |----> SetUp() Sets a default for Current CPU state
-        |----> FillRam() Takes Compiled Version of List
-        |
-        |---->  Run() ==== while( ! halt ) do ...
-        |
-        |--------->  Fetch() Go to RAM class at index
+        |----> FillRam() Takes Compiled Version of User Program
+        
+        |----> todo Cycle Halt
+        |----> FDECycle()  ( Preforms 1 full cycle of Fetch Decode Execute CPU Cycle )
+        |--------->  Fetch() 
+        |-------------->  access RAM and retrieve the memory index at Program Counter
         |--------->  Decode()
-        |-------------->  Check how many indexes arguements takes
-        |-------------->  Fetch arguements
+        |-------------->  Decode byte value and create Instruction
+        |-------------->  Check how many arguments Instruction takes
+        |-------------->  Retrieve and append parameters to Instruction
         |--------->  Execute()
         |-------------->  ExecuteInstruction()
         |-------------->  Add new CPUState to History 
+        |----> CheckHalted() 
+        |----> todo  DisplayConsoleLogs() 
+        
         */
         public void Run()
         {
-            SetUp();
+            //set up and refresh all variables for new Run Command
+            SetUpFresh();
             FillRam();
-
             var halted = false;
             while (!halted)
             {
-                // Searches from index in RAM for next Instruction
-                // calls Display Fetch Log
-
-                var FetchedInstruction = Fetch(CurrentState.PC.content);
-                
-                // Checks How many Parameters Required
-                // calls ParameterFetch() to get Parameters
-                // Incriments Program Counter 
-                // calls Display Decode Log
-                
-
-                var InstructionToExecute = Decode(FetchedInstruction);
-                Trace.WriteLine($"Executing {InstructionToExecute.Tag} with parameters: {string.Join(", ", InstructionToExecute.args.Select(arg => $"{arg.name}"))}");
-                CurrentState = Execute(InstructionToExecute);
-
-                //add to the CPU History
-                History.Add(CurrentState);
-                halted = CheckHalted();
-
+                FDECycle(); // Complete 1 cycle
+                halted = CheckHalted(); // stop execution if Halt is called
             }
-            Trace.WriteLine($"Finished Execution"); 
+        }
+
+        public void FDECycle()
+        {
+            // Searches from index in RAM for next Instruction
+            // calls Display Fetch Log
+
+            var FetchedInstruction = Fetch(CurrentState.PC.content);
+                
+            // Checks How many Parameters Required
+            // calls ParameterFetch() to get Parameters
+            // Incriments Program Counter 
+            // calls Display Decode Log
+                
+
+            var InstructionToExecute = Decode(FetchedInstruction);
+            Trace.WriteLine($"Executing {InstructionToExecute.Tag} with parameters: {string.Join(", ", InstructionToExecute.args.Select(arg => $"{arg.name}"))}");
+            CurrentState = Execute(InstructionToExecute);
+
+            //add to the CPU History
+            History.Add(CurrentState);
+
         }
 
         private bool CheckHalted()
@@ -228,7 +237,7 @@ namespace CPUVisNEA
                         ram.Memory[ram.InstructionLocations[instruction] + 1] = instruction.args[0].ToByte(); 
                 }
             }
-            
+     
         }
 
         //CPU calls Instruction to access the byte representing the Instruction at the index of the Program Counter
@@ -316,10 +325,20 @@ namespace CPUVisNEA
          ReturnToEdit() 
          */
         // function used in CPU constructor to generate initial values with the index at the first byte of RAM 
-        private void SetUp()
+        private void SetUpFresh()
         {
-            //create a default Current State for the CPU to execute first instructions 
+            /* Reset/Set everything to fresh
+             CurrentState
+             History
+             Ram
+             LabelToRam Dictionary*/
+            
             CurrentState = new CPUState();
+            History = new List<CPUState>();
+            ram = new RAM();
+            LabelToRamIndex.Clear();
+            
+
         }
         //todo check if fills Memory
         public bool Compile(string text)
@@ -345,7 +364,7 @@ namespace CPUVisNEA
 
         public CPU()
         {
-            SetUp();
+            SetUpFresh();
         }
         
     }
