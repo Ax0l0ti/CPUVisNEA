@@ -325,8 +325,14 @@ namespace CPUVisNEA
         // basic overridable call statement for all assembly operations to override to deal with individual arguments
         //means CPU can call executeInstruction regardless of Child class to get unique behaviour
         protected internal abstract CPUState executeInstruction(List<Argument> args, CPUState NewState);
-        //NewState.changeLog.Add( $" ");
-        //NewState.DetailedChangeLog.Add( $"XXX instruction - {args[1].name} ... register {args[0].name} ");
+        /*
+        string BasicChangeLog;
+        
+        NewState.changeLog.Add( BasicChangeLog );
+        Trace.WriteLine( BasicChangeLog );
+        NewState.DetailedChangeLog.Add( $"XXX instruction - {args[1].name} ... register {args[0].name} ");
+        */
+        
 
         public string Label
         {
@@ -375,6 +381,7 @@ namespace CPUVisNEA
     //B class acts as all variants, conditional is seperated and stored as a local attribute of the Branch statement to switch case action in execute Instruction
     public abstract class Branch : Instruction
     {
+        protected string BranchFullName; 
         // there are different branch types
         public Branch(CPU.Instructions bType) : base(bType)
         {
@@ -385,12 +392,6 @@ namespace CPUVisNEA
 
         protected internal override CPUState executeInstruction(List<Argument> args, CPUState NewState)
         {
-
-            
-            var jump = 0;
-
-            var label = (Label)args[0];
-            
             return NewState;
         }
     }
@@ -401,11 +402,15 @@ namespace CPUVisNEA
         public B() : base(CPU.Instructions.B)
         {
         }
+
         protected internal override CPUState executeInstruction(List<Argument> args, CPUState NewState)
         {
-            //B<condition>  <Label> Conditionally branch to the instruction at position <Label> in the program if the last comparison met the criteria specified by the <condition>.
-
-            NewState.PC.content = ((Label)args[0]).location ;
+            //B <Label> Branch to the instruction at position <Label> Unconditionally
+            //if Conditional Correctly Met, branch to label's indicated Memory Index 
+            NewState.PC.content = ((Label)args[0]).location;
+            NewState.changeLog.Add($" Branched to {args[0].name} ");
+            Trace.WriteLine($" Branched to {args[0].name} ");
+            NewState.DetailedChangeLog.Add($"{Tag} instruction - Branched to {args[0].name} label at Memory index {NewState.PC.content} ");
             return NewState;
         }
 
@@ -431,21 +436,34 @@ namespace CPUVisNEA
     {
         public Beq() : base(CPU.Instructions.BEQ)
         {
+            BranchFullName = "Equal To";
         }
 
-        //todo create Instruction method to deal w input ( also add description of how operator works, from NEA writeup ) 
-        //B<condition>  <Label> Conditionally branch to the instruction at position <Label> in the program if the last comparison met the criteria specified by the <condition>.
+        //todo create Instruction method to deal w input ( also add description of how operator works, from NEA writeup )
+        //BEQ <Label> Conditionally branch to the instruction at position <Label> in the program if the last comparison met the Equal To criteria
 
         protected internal override CPUState executeInstruction(List<Argument> args, CPUState NewState)
         {
             //check accumulator to find last CMP relationship
+            //Accumulator Stores Last Comparison
             //EQ NE LT GT
             //0     1  2 
 
-            
-            var jump = 0;
-
-            var label = (Label)args[0];
+            //if Conditional Correctly Met, branch to label's indicated Memory Index 
+            string BasicChangeLog;
+            if (NewState.ACC.content == 0)
+            {
+                NewState.PC.content = ((Label)args[0]).location;
+                BasicChangeLog = $"Branched to {args[0].name} ";
+                NewState.changeLog.Add( BasicChangeLog );
+                NewState.DetailedChangeLog.Add( $"{Tag} instruction - {BranchFullName} Branch Condition Met. Branched to {args[0].name} label at Memory index {NewState.PC.content} ");
+            }
+            else {
+                BasicChangeLog = $"{BranchFullName} Condition not met. ";
+                NewState.changeLog.Add( BasicChangeLog );
+                NewState.DetailedChangeLog.Add( $"{Tag} instruction - {BranchFullName} Branch Condition was not met By Compare Statement. "); 
+            }
+            Trace.WriteLine(BasicChangeLog);
             return NewState;
         }
 
@@ -469,23 +487,36 @@ namespace CPUVisNEA
     {
         public Bne() : base(CPU.Instructions.BNE)
         {
+            BranchFullName = "Not Equal To";
         }
 
         //todo create Instruction method to deal w input ( also add description of how operator works, from NEA writeup ) 
-        //Bne<condition>  <Label> Conditionally branch to the instruction at position <Label> in the program if the last comparison met the criteria specified by the <condition>.
+        //BNE <Label> Conditionally branch to the instruction at position <Label> in the program if the last comparison met the Not Equal To criteria
 
         protected internal override CPUState executeInstruction(List<Argument> args, CPUState NewState)
         {
             //check accumulator to find last CMP relationship
+            //Accumulator Stores Last Comparison
             //EQ NE LT GT
             //0     1  2 
 
-            
-            var jump = 0;
-
-            var label = (Label)args[0];
+            //if Conditional Correctly Met, branch to label's indicated Memory Index 
+            // If Content != Equal, Infer Not Equal / [ Less Than or Greater Than ]
+            string BasicChangeLog;
+            if (NewState.ACC.content != 0)
+            {
+                NewState.PC.content = ((Label)args[0]).location;
+                BasicChangeLog = $"Branched to {args[0].name} ";
+                NewState.changeLog.Add( BasicChangeLog );
+                NewState.DetailedChangeLog.Add( $"{Tag} instruction - {BranchFullName} Branch Condition Met. Branched to {args[0].name} label at Memory index {NewState.PC.content} ");
+            }
+            else {
+                BasicChangeLog = $"{BranchFullName} Condition not met. ";
+                NewState.changeLog.Add( BasicChangeLog );
+                NewState.DetailedChangeLog.Add( $"{Tag} instruction - {BranchFullName} Branch Condition was not met By Compare Statement. "); 
+            }
+            Trace.WriteLine(BasicChangeLog);
             return NewState;
-            
         }
 
         /*held locally in class but never used by class. Is used by CPU to instantiate instance
@@ -508,21 +539,34 @@ namespace CPUVisNEA
     {
         public Blt() : base(CPU.Instructions.BLT)
         {
+            BranchFullName = "Less Than";
         }
 
         //todo create Instruction method to deal w input ( also add description of how operator works, from NEA writeup ) 
-        //B<condition>  <Label> Conditionally branch to the instruction at position <Label> in the program if the last comparison met the criteria specified by the <condition>.
+        //BLT <Label> Conditionally branch to the instruction at position <Label> in the program if the last comparison met the Less Than criteria
 
         protected internal override CPUState executeInstruction(List<Argument> args, CPUState NewState)
         {
             //check accumulator to find last CMP relationship
+            //Accumulator Stores Last Comparison
             //EQ NE LT GT
             //0     1  2
 
-            
-            var jump = 0;
-
-            var label = (Label)args[0];
+            //if Conditional Correctly Met, branch to label's indicated Memory Index 
+            string BasicChangeLog;
+            if (NewState.ACC.content == 1)
+            {
+                NewState.PC.content = ((Label)args[0]).location;
+                BasicChangeLog = $"Branched to {args[0].name} ";
+                NewState.changeLog.Add( BasicChangeLog );
+                NewState.DetailedChangeLog.Add( $"{Tag} instruction - {BranchFullName} Branch Condition Met. Branched to {args[0].name} label at Memory index {NewState.PC.content} ");
+            }
+            else {
+                BasicChangeLog = $"{BranchFullName} Condition not met. ";
+                NewState.changeLog.Add( BasicChangeLog );
+                NewState.DetailedChangeLog.Add( $"{Tag} instruction - {BranchFullName} Branch Condition was not met By Compare Statement. "); 
+            }
+            Trace.WriteLine(BasicChangeLog);
             return NewState;
         }
 
@@ -545,21 +589,33 @@ namespace CPUVisNEA
     {
         public Bgt() : base(CPU.Instructions.BGT)
         {
+            BranchFullName = "Greater Than";
         }
 
         //todo create Instruction method to deal w input ( also add description of how operator works, from NEA writeup ) 
-        //B<condition>  <Label> Conditionally branch to the instruction at position <Label> in the program if the last comparison met the criteria specified by the <condition>.
-
+        //BGT <Label> Conditionally branch to the instruction at position <Label> in the program if the last comparison met the Greater Than criteria
         protected internal override CPUState executeInstruction(List<Argument> args, CPUState NewState)
         {
             //check accumulator to find last CMP relationship
+            //Accumulator Stores Last Comparison
             //EQ NE LT GT
             //0     1  2 
-
             
-            var jump = 0;
-
-            var label = (Label)args[0];
+            //if Conditional Correctly Met, branch to label's indicated Memory Index 
+            string BasicChangeLog;
+            if (NewState.ACC.content == 2)
+            {
+                NewState.PC.content = ((Label)args[0]).location;
+                BasicChangeLog = $"Branched to {args[0].name} ";
+                NewState.changeLog.Add( BasicChangeLog );
+                NewState.DetailedChangeLog.Add( $"{Tag} instruction - {BranchFullName} Branch Condition Met. Branched to {args[0].name} label at Memory index {NewState.PC.content} ");
+            }
+            else {
+                BasicChangeLog = $"{BranchFullName} Condition not met. ";
+                NewState.changeLog.Add( BasicChangeLog );
+                NewState.DetailedChangeLog.Add( $"{Tag} instruction - {BranchFullName} Branch Condition was not met By Compare Statement. "); 
+            }
+            Trace.WriteLine(BasicChangeLog);
             return NewState;
         }
 
@@ -595,11 +651,13 @@ namespace CPUVisNEA
             //MOV Rd, <operand2> Copy the value specified by <operand2> into register d.
 
             //Register content indicated by args[0] = value indicated by operand
-            NewState.Basic[((RegisterArg)args[0]).RetInt()].content  =  ( (IntegerArg)args[1] ).RetInt() ;  
-            NewState.changeLog.Add( $" {args[0].name} assigned {args[1].name} value ");
+            NewState.Basic[((RegisterArg)args[0]).RetInt()].content  =  ( (IntegerArg)args[1] ).RetInt() ;
+            string BasicChangeLog = $" {args[0].name} assigned {args[1].name} value ";
+            NewState.changeLog.Add( BasicChangeLog );
+            Trace.WriteLine(BasicChangeLog);
             // Trace Line to test code 
-            Trace.WriteLine($" {args[0].name} assigned {args[1].name} value ");
-            NewState.DetailedChangeLog.Add( $"Mov instruction executed - copies over the value of {args[1].name} into register {args[0].name} ");
+            
+            NewState.DetailedChangeLog.Add( $" {Tag} instruction - copies over the value of {args[1].name} into register {args[0].name} ");
             
             return NewState;
         }
@@ -635,18 +693,25 @@ namespace CPUVisNEA
             //CMP Rn, <operand2> Compare the value stored in register n with the value specified by <operand2>. 
             //stores resultant relation in accumulator for next instruction 
 
+            //Accumulator Stores Last Comparison
             //EQ NE LT GT
             //0     1  2 
             //if equal to 
+            string BasicChangeLog = $"{args[0].name} and  {args[1].name} compared";
+        
+            NewState.changeLog.Add( BasicChangeLog );
+            Trace.WriteLine( BasicChangeLog );
+            NewState.DetailedChangeLog.Add( $"{Tag} instruction - Compared value in {args[0].name} with {args[1].name} ");
+            // Equal To
             if (NewState.Basic[((RegisterArg)args[0]).index].content == ((IntegerArg)args[1]).value)
             {
                 NewState.ACC.content = 0;
             } else 
-                //else if less than
+                //else if Less Than
             if (NewState.Basic[((RegisterArg)args[0]).index].content <= ((IntegerArg)args[1]).value)
             {
                 NewState.ACC.content = 1;
-            } else //else if Greater than
+            } else //else if Greater Than
             {
                 NewState.ACC.content = 2;
             }
@@ -747,6 +812,7 @@ namespace CPUVisNEA
         protected internal override CPUState executeInstruction(List<Argument> args, CPUState NewState)
         {
             //STR Rd, <memory ref> Store the value that is in register d into the memory location specified by <memory ref>.
+            
             return NewState;
         }
 
@@ -876,6 +942,12 @@ namespace CPUVisNEA
         protected internal override CPUState executeInstruction(List<Argument> args, CPUState NewState)
         {
             //LSL Rd, Rn, <operand2> Logically shift left the value stored in register n by the number of bits specified by <operand2> and store the result in register d.
+            //Basic Register at Rd assigned Rn value x 2 ^ <operand2>, aka binary shift left
+            NewState.Basic[args[0].RetInt()].content = NewState.Basic[args[1].RetInt()].content * 2 ^ args[2].RetInt();
+            string BasicChangeLog = $"{args[1].RetInt()} binary shifted by {args[2].name}. Assigned to {args[0].name}";
+            NewState.changeLog.Add( BasicChangeLog );
+            Trace.WriteLine( BasicChangeLog );
+            NewState.DetailedChangeLog.Add( $" {Tag} instruction -  {args[1].name} Register's value {args[1].RetInt()} binary shifted Value by {args[2].name} and value assigned to Register {args[0].name}");
             return NewState;
             
         }
@@ -909,6 +981,14 @@ namespace CPUVisNEA
         protected internal override CPUState executeInstruction(List<Argument> args, CPUState NewState)
         {
             //LSR Rd, Rn, <operand2> Logically shift right the value stored in register n by the number of bits specified by <operand2> and store the result in register d.
+            //Basic Register at Rd assigned Rn value / ( 2 ^ <operand2> ) aka binary shift right
+            //todo needs to round 
+            NewState.Basic[args[0].RetInt()].content = ( NewState.Basic[args[1].RetInt()].content / (2 ^ args[2].RetInt() ) )    ;
+            string BasicChangeLog = $"{args[1].RetInt()} binary shifted by {args[2].name}. Assigned to {args[0].name}";
+            NewState.changeLog.Add( BasicChangeLog );
+            Trace.WriteLine( BasicChangeLog );
+            NewState.DetailedChangeLog.Add( $" {Tag} instruction -  {args[1].name} Register's value {args[1].RetInt()} binary shifted Value by {args[2].name} and value assigned to Register {args[0].name}");
+            return NewState;
             return NewState;
         }
 

@@ -266,21 +266,6 @@ namespace CPUVisNEA
             "Light Mode",
             "Colour Blind",
             "Hacker ",
-            "Custom",
-            "Dark Mode",
-            "Light Mode",
-            "Colour Blind",
-            "Hacker ",
-            "Custom",
-            "Dark Mode",
-            "Light Mode",
-            "Colour Blind",
-            "Hacker ",
-            "Custom",
-            "Dark Mode",
-            "Light Mode",
-            "Colour Blind",
-            "Hacker ",
             "Custom"});
             this.DD_Scheme.Location = new System.Drawing.Point(391, 144);
             this.DD_Scheme.Name = "DD_Scheme";
@@ -296,21 +281,6 @@ namespace CPUVisNEA
             this.DD_Speed.Font = new System.Drawing.Font("Microsoft Sans Serif", 16.125F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.DD_Speed.FormattingEnabled = true;
             this.DD_Speed.Items.AddRange(new object[] {
-            "Real time execution",
-            "Fast",
-            "Medium",
-            "Slow",
-            "User Controlled Step",
-            "Real time execution",
-            "Fast",
-            "Medium",
-            "Slow",
-            "User Controlled Step",
-            "Real time execution",
-            "Fast",
-            "Medium",
-            "Slow",
-            "User Controlled Step",
             "Real time execution",
             "Fast",
             "Medium",
@@ -361,15 +331,6 @@ namespace CPUVisNEA
             this.DD_LoadProg.Font = new System.Drawing.Font("Microsoft Sans Serif", 16.125F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.DD_LoadProg.FormattingEnabled = true;
             this.DD_LoadProg.Items.AddRange(new object[] {
-            "Km ",
-            "We vibe ",
-            "NOt again",
-            "Km ",
-            "We vibe ",
-            "NOt again",
-            "Km ",
-            "We vibe ",
-            "NOt again",
             "Km ",
             "We vibe ",
             "NOt again"});

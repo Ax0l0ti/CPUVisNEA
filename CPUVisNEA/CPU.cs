@@ -144,9 +144,10 @@ namespace CPUVisNEA
         }
         
         //As the Form must Compile before executing Run, the Main Entrance of Run doesnt need to Compile the code but simply Fillram
+        // This Run function exists for test use and is copied with added modifications to grab values output them to the form
         /*---------------------------------------- Run ------------------------------------------------
         |  BREAKDOWN
-        |----> SetUp() Sets a default for Current CPU state
+        |----> SetUp() Resets all used variables called by Run() 
         |----> FillRam() Takes Compiled Version of User Program
         
         |----> todo Cycle Halt
@@ -338,7 +339,6 @@ namespace CPUVisNEA
             ram = new RAM();
             LabelToRamIndex.Clear();
             
-
         }
         //todo check if fills Memory
         public bool Compile(string text)

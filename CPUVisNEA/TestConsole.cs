@@ -84,12 +84,6 @@ namespace CPUVisNEA
 
         }
 
-        [Test]
-        public void LabelTesting()
-        {
-            
-        }
-        
 
 
         /* todo list of tests
