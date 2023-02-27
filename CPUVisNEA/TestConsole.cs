@@ -84,6 +84,13 @@ namespace CPUVisNEA
 
         }
 
+        [Test]
+        public void logicGateboolToBitTesting()
+        {
+            //todo 
+        }
+
+
 
 
         /* todo list of tests

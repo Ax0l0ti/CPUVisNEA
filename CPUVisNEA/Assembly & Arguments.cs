@@ -749,7 +749,7 @@ namespace CPUVisNEA
             //MVN Rd, <operand2> Perform a bitwise logical NOT operation on the value specified by <operand2> and store the result in register d.
 
             
-           //NewState.Basic[ ( (RegisterArg)args[0] ).RetInt() ] = args[1]. 
+           
             return NewState;
         }
 
@@ -910,6 +910,21 @@ namespace CPUVisNEA
         protected internal override CPUState executeInstruction(List<Argument> args, CPUState NewState)
         {
             //EOR Rd, Rn, <operand2> Perform a bitwise logical exclusive or (XOR) operation between the value in register n and the value specified by <operand2> and store the result in register d.
+            // by returning odd or even, the rightmost bit can easily be determined of a byte
+            // bool is a 2 base data type, hence it can be used as a bit representation
+            // true == 1
+            //  false == 0 
+            
+            
+            // todo BitConverter.bit? or bool 
+            // int endValue = 
+            // NewState.Basic[args[0].RetInt()].content = endValue;
+       
+            string BasicChangeLog = $"{args[1].ToByte()}  {args[2].name}. Assigned to {args[0].name}";
+            NewState.changeLog.Add( BasicChangeLog );
+            Trace.WriteLine( BasicChangeLog );
+            NewState.DetailedChangeLog.Add( $" {Tag} instruction - logic gate only interacts with the rightmost bit of the byte value of {args[1].name} and {args[2].name}.\n " + 
+                                            $" Exclusive OR with input ");
             return NewState;
         }
 
@@ -943,11 +958,12 @@ namespace CPUVisNEA
         {
             //LSL Rd, Rn, <operand2> Logically shift left the value stored in register n by the number of bits specified by <operand2> and store the result in register d.
             //Basic Register at Rd assigned Rn value x 2 ^ <operand2>, aka binary shift left
-            NewState.Basic[args[0].RetInt()].content = NewState.Basic[args[1].RetInt()].content * 2 ^ args[2].RetInt();
+            int endValue = NewState.Basic[args[1].RetInt()].content * 2 ^ args[2].RetInt();
+            NewState.Basic[args[0].RetInt()].content = endValue;
             string BasicChangeLog = $"{args[1].RetInt()} binary shifted by {args[2].name}. Assigned to {args[0].name}";
             NewState.changeLog.Add( BasicChangeLog );
             Trace.WriteLine( BasicChangeLog );
-            NewState.DetailedChangeLog.Add( $" {Tag} instruction -  {args[1].name} Register's value {args[1].RetInt()} binary shifted Value by {args[2].name} and value assigned to Register {args[0].name}");
+            NewState.DetailedChangeLog.Add( $" {Tag} instruction -  {args[1].name} Register's value {args[1].RetInt()} binary shifted Value by {args[2].name}. Resultant value of {endValue} assigned to Register {args[0].name}");
             return NewState;
             
         }
@@ -982,13 +998,13 @@ namespace CPUVisNEA
         {
             //LSR Rd, Rn, <operand2> Logically shift right the value stored in register n by the number of bits specified by <operand2> and store the result in register d.
             //Basic Register at Rd assigned Rn value / ( 2 ^ <operand2> ) aka binary shift right
-            //todo needs to round 
-            NewState.Basic[args[0].RetInt()].content = ( NewState.Basic[args[1].RetInt()].content / (2 ^ args[2].RetInt() ) )    ;
+            //
+            int endValue = (NewState.Basic[args[1].RetInt()].content / (2 ^ args[2].RetInt()));
+            NewState.Basic[args[0].RetInt()].content = endValue;
             string BasicChangeLog = $"{args[1].RetInt()} binary shifted by {args[2].name}. Assigned to {args[0].name}";
             NewState.changeLog.Add( BasicChangeLog );
             Trace.WriteLine( BasicChangeLog );
-            NewState.DetailedChangeLog.Add( $" {Tag} instruction -  {args[1].name} Register's value {args[1].RetInt()} binary shifted Value by {args[2].name} and value assigned to Register {args[0].name}");
-            return NewState;
+            NewState.DetailedChangeLog.Add( $" {Tag} instruction -  {args[1].name} Register's value {args[1].RetInt()} binary shifted Right by {args[2].name}. End value of {endValue} assigned to Register {args[0].name}");
             return NewState;
         }
 
@@ -1015,12 +1031,19 @@ namespace CPUVisNEA
     {
         public Add() : base(CPU.Instructions.ADD)
         {
+            
         }
 
         //todo create Instruction method to deal w input ( also add description of how operator works, from NEA writeup ) 
         protected internal override CPUState executeInstruction(List<Argument> args, CPUState NewState)
         {
             //ADD Rd, Rn, <operand2> Add the value specified in <operand2> to the value in register n and store the result in register d.
+            // Register d = value of Rn + operand
+            NewState.Basic[args[0].RetInt()].content = NewState.Basic[args[1].RetInt()].content + args[2].RetInt();
+            string BasicChangeLog = $" {args[0].name} = {args[1].name} ({args[1].RetInt()}) + {args[2].name}";
+            NewState.changeLog.Add( BasicChangeLog );
+            Trace.WriteLine( BasicChangeLog );
+            NewState.DetailedChangeLog.Add( $" {Tag} instruction -  {args[1].name} Register's value {args[1].RetInt()} added to {args[2].name} and value assigned to Register {args[0].name}");
             return NewState;
             
         }
@@ -1053,6 +1076,12 @@ namespace CPUVisNEA
         protected internal override CPUState executeInstruction(List<Argument> args, CPUState NewState)
         {
             //SUB Rd, Rn, <operand2> Subtract the value specified by <operand2> from the value in register n and store the result in register d.
+            // Register d = value of Rn + operand
+            NewState.Basic[args[0].RetInt()].content = NewState.Basic[args[1].RetInt()].content - args[2].RetInt();
+            string BasicChangeLog = $" {args[0].name} = {args[1].name} ({args[1].RetInt()}) - {args[2].name}";
+            NewState.changeLog.Add( BasicChangeLog );
+            Trace.WriteLine( BasicChangeLog );
+            NewState.DetailedChangeLog.Add( $" {Tag} instruction -  {args[1].name} Register's value {args[1].RetInt()} subtracted to {args[2].name} and value assigned to Register {args[0].name}");
             return NewState;
             
         }
