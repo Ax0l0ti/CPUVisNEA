@@ -6,7 +6,7 @@ namespace CPUVisNEA
 {
     public partial class FileHandlingForm : Form
     {
-        private string path = "";
+        private string path = Environment.GetFolderPath(Environment.SpecialFolder.Personal) + "\\CPU_Edu_UI\\";
         
         public FileHandlingForm()
         {
@@ -15,40 +15,45 @@ namespace CPUVisNEA
 
         private void frmLocalDriveAccess_Load( object sender, EventArgs e )
         {
-            string sAppPath = Environment.GetFolderPath( Environment.SpecialFolder.Personal);
-            path = sAppPath + "\\NEA\\";
+            string sAppPath = Environment.GetFolderPath( Environment.SpecialFolder.Personal) + "\\CPU_Edu_UI\\" ;
+            path = sAppPath ;
         }
-
-        private void button3_Click( object sender, EventArgs e )
+        //Delete File Button
+        private void btn_Delete_Click( object sender, EventArgs e )
         {
-            File.Delete( path );
+            string DeletePath = path + txt_DeleteFileName.Text;
+            File.Delete( DeletePath );
         }
-
+        
+        // Push to File Button
+        // - Creates a new File 
+        // - OverWrites a File
         private void btn_Push_Click( object sender, EventArgs e )
         {
-            path = path + txt_FilePushTo.Text;
-            if ( !File.Exists( path ) )
-            {
+            string PushPath = path + txt_FilePushTo.Text;
+            if ( !File.Exists( PushPath ) )
+            { 
                 // Create a file to write to.
-                using ( StreamWriter sw = File.CreateText( path ) )
+                using ( StreamWriter sw = File.CreateText( PushPath ) )
                 {
                     sw.WriteLine(txt_Program.Text);
                     sw.Close();
                 }
             }
-            using ( StreamWriter sw = new StreamWriter( path ) )
+            using ( StreamWriter sw = new StreamWriter( PushPath ) )
             {
                 sw.WriteLine( txt_Program.Text );
                 sw.Close();
             }
 
         }
-
+        // Retrieve File Content Button
         private void btn_Get_Click( object sender, EventArgs e )
         {
+            string LoadPath = path + txt_FileGetName.Text;
             try
             {
-                using ( StreamReader sr = File.OpenText( path ) )
+                using ( StreamReader sr = File.OpenText( LoadPath ) )
                 {
                     string s = "";
                     while ( (s = sr.ReadLine()) != null )

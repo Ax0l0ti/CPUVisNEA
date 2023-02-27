@@ -44,7 +44,7 @@ namespace CPUVisNEA
             // txt_Program
             // 
             this.txt_Program.Location = new System.Drawing.Point(192, 143);
-            this.txt_Program.Margin = new System.Windows.Forms.Padding(5, 5, 5, 5);
+            this.txt_Program.Margin = new System.Windows.Forms.Padding(5);
             this.txt_Program.Name = "txt_Program";
             this.txt_Program.Size = new System.Drawing.Size(181, 227);
             this.txt_Program.TabIndex = 0;
@@ -53,7 +53,7 @@ namespace CPUVisNEA
             // btn_Push
             // 
             this.btn_Push.Location = new System.Drawing.Point(192, 383);
-            this.btn_Push.Margin = new System.Windows.Forms.Padding(5, 5, 5, 5);
+            this.btn_Push.Margin = new System.Windows.Forms.Padding(5);
             this.btn_Push.Name = "btn_Push";
             this.btn_Push.Size = new System.Drawing.Size(183, 38);
             this.btn_Push.TabIndex = 1;
@@ -64,7 +64,7 @@ namespace CPUVisNEA
             // btn_Get
             // 
             this.btn_Get.Location = new System.Drawing.Point(386, 202);
-            this.btn_Get.Margin = new System.Windows.Forms.Padding(5, 5, 5, 5);
+            this.btn_Get.Margin = new System.Windows.Forms.Padding(5);
             this.btn_Get.Name = "btn_Get";
             this.btn_Get.Size = new System.Drawing.Size(192, 38);
             this.btn_Get.TabIndex = 2;
@@ -75,19 +75,19 @@ namespace CPUVisNEA
             // btn_DeleteFile
             // 
             this.btn_DeleteFile.Location = new System.Drawing.Point(588, 202);
-            this.btn_DeleteFile.Margin = new System.Windows.Forms.Padding(5, 5, 5, 5);
+            this.btn_DeleteFile.Margin = new System.Windows.Forms.Padding(5);
             this.btn_DeleteFile.Name = "btn_DeleteFile";
             this.btn_DeleteFile.Size = new System.Drawing.Size(192, 38);
             this.btn_DeleteFile.TabIndex = 3;
             this.btn_DeleteFile.Text = "Delete File :";
             this.btn_DeleteFile.UseVisualStyleBackColor = true;
-            this.btn_DeleteFile.Click += new System.EventHandler(this.button3_Click);
+            this.btn_DeleteFile.Click += new System.EventHandler(this.btn_Delete_Click);
             // 
             // txt_Get
             // 
             this.txt_Get.BackColor = System.Drawing.SystemColors.Window;
             this.txt_Get.Location = new System.Drawing.Point(386, 250);
-            this.txt_Get.Margin = new System.Windows.Forms.Padding(5, 5, 5, 5);
+            this.txt_Get.Margin = new System.Windows.Forms.Padding(5);
             this.txt_Get.Name = "txt_Get";
             this.txt_Get.Size = new System.Drawing.Size(189, 227);
             this.txt_Get.TabIndex = 4;
@@ -96,7 +96,7 @@ namespace CPUVisNEA
             // txt_FilePushTo
             // 
             this.txt_FilePushTo.Location = new System.Drawing.Point(192, 432);
-            this.txt_FilePushTo.Margin = new System.Windows.Forms.Padding(5, 5, 5, 5);
+            this.txt_FilePushTo.Margin = new System.Windows.Forms.Padding(5);
             this.txt_FilePushTo.Name = "txt_FilePushTo";
             this.txt_FilePushTo.Size = new System.Drawing.Size(181, 46);
             this.txt_FilePushTo.TabIndex = 5;
@@ -105,7 +105,7 @@ namespace CPUVisNEA
             // txt_FileGetName
             // 
             this.txt_FileGetName.Location = new System.Drawing.Point(386, 143);
-            this.txt_FileGetName.Margin = new System.Windows.Forms.Padding(5, 5, 5, 5);
+            this.txt_FileGetName.Margin = new System.Windows.Forms.Padding(5);
             this.txt_FileGetName.Name = "txt_FileGetName";
             this.txt_FileGetName.Size = new System.Drawing.Size(189, 46);
             this.txt_FileGetName.TabIndex = 6;
@@ -114,7 +114,7 @@ namespace CPUVisNEA
             // txt_DeleteFileName
             // 
             this.txt_DeleteFileName.Location = new System.Drawing.Point(588, 143);
-            this.txt_DeleteFileName.Margin = new System.Windows.Forms.Padding(5, 5, 5, 5);
+            this.txt_DeleteFileName.Margin = new System.Windows.Forms.Padding(5);
             this.txt_DeleteFileName.Name = "txt_DeleteFileName";
             this.txt_DeleteFileName.Size = new System.Drawing.Size(189, 46);
             this.txt_DeleteFileName.TabIndex = 7;
@@ -133,7 +133,7 @@ namespace CPUVisNEA
             this.Controls.Add(this.btn_Get);
             this.Controls.Add(this.btn_Push);
             this.Controls.Add(this.txt_Program);
-            this.Margin = new System.Windows.Forms.Padding(5, 5, 5, 5);
+            this.Margin = new System.Windows.Forms.Padding(5);
             this.Name = "FileHandlingForm";
             this.Text = "LocalDriveAccess";
             this.Load += new System.EventHandler(this.frmLocalDriveAccess_Load);
@@ -146,7 +146,7 @@ namespace CPUVisNEA
         private Button btn_Get;
         private Button btn_DeleteFile;
         private RichTextBox txt_Get;
-        private RichTextBox txt_FilePushTo;
+        private System.Windows.Forms.RichTextBox txt_FilePushTo;
         private RichTextBox txt_FileGetName;
         private RichTextBox txt_DeleteFileName;
     }

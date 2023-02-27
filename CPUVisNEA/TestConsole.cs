@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Windows.Forms;
 using NUnit.Framework;
 
 using CPUVisNEA.Properties;
@@ -90,6 +91,13 @@ namespace CPUVisNEA
             //todo 
         }
 
+        [Test]
+        public void FileHandlingStartUp()
+        {
+            var FileHandling = new FileHandlingForm();
+            Application.Run(FileHandling);
+            
+        }
 
 
 
