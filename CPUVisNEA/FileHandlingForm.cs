@@ -18,13 +18,13 @@ namespace CPUVisNEA
             string sAppPath = Environment.GetFolderPath( Environment.SpecialFolder.Personal) + "\\CPU_Edu_UI\\" ;
             path = sAppPath ;
         }
+
         //Delete File Button
         private void btn_Delete_Click( object sender, EventArgs e )
         {
             string DeletePath = path + txt_DeleteFileName.Text;
             File.Delete( DeletePath );
         }
-        
         // Push to File Button
         // - Creates a new File 
         // - OverWrites a File
@@ -47,6 +47,7 @@ namespace CPUVisNEA
             }
 
         }
+
         // Retrieve File Content Button
         private void btn_Get_Click( object sender, EventArgs e )
         {

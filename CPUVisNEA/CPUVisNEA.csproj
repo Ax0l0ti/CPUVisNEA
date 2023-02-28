@@ -58,20 +58,44 @@
       <DependentUpon>CpuUI.cs</DependentUpon>
     </Compile>
     <Compile Include="Assembly &amp; Arguments.cs" />
+    <Compile Include="DeleteFile_Form.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="DeleteFile_Form.Designer.cs">
+      <DependentUpon>DeleteFile_Form.cs</DependentUpon>
+    </Compile>
     <Compile Include="FileHandlingForm.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="FileHandlingForm.Designer.cs">
       <DependentUpon>FileHandlingForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="LoadFile_Form.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="LoadFile_Form.Designer.cs">
+      <DependentUpon>LoadFile_Form.cs</DependentUpon>
+    </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SaveFile_Form.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="SaveFile_Form.Designer.cs">
+      <DependentUpon>SaveFile_Form.cs</DependentUpon>
+    </Compile>
     <Compile Include="TestConsole.cs" />
     <EmbeddedResource Include="CpuUI.resx">
       <DependentUpon>CpuUI.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="DeleteFile_Form.resx">
+      <DependentUpon>DeleteFile_Form.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="FileHandlingForm.resx">
       <DependentUpon>FileHandlingForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="LoadFile_Form.resx">
+      <DependentUpon>LoadFile_Form.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
@@ -83,6 +107,9 @@
       <DependentUpon>Resources.resx</DependentUpon>
       <DesignTime>True</DesignTime>
     </Compile>
+    <EmbeddedResource Include="SaveFile_Form.resx">
+      <DependentUpon>SaveFile_Form.cs</DependentUpon>
+    </EmbeddedResource>
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>

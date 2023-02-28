@@ -7,7 +7,7 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using System.Windows.Forms;
 using NUnit.Framework.Internal;
-
+//todo look at this for design https://www.101computing.net/LMC/# 
 /*
 ____________________________________________________________________________________________________________
 Full method
@@ -23,20 +23,25 @@ Use Compile class
 -------------->  assign RAM with correspondence for user program
 -------------->  enter Running Stage 
 --------->  else  ---->  Edit Stage 
------
+---->  
 Running Stage 
 Use CPU class 
 
----->  Run() ==== while( ! halt ) do ...
+----> SetUpFresh() 
+----> RefreshLogs()
+----> FillRam()
 
---------->  Fetch() Go to RAM class at index
---------->  Decode()
--------------->  Check how many indexes arguements takes
--------------->  Fetch arguements
---------->  Execute()
--------------->  ExecuteInstruction()
--------------->  Add new CPUState to History 
-
+---->  Run() ==== do while( ! halted ) 
+--------->  WaitTillStep()
+--------->  FDECycle()
+------------->  Fetch() Go to RAM class at index
+------------->  Decode()
+------------------>  Check how many indexes arguments takes
+------------------>  Fetch arguments
+------------->  Execute()
+------------------>  ExecuteInstruction()
+------------------>  Add new CPUState to History 
+--------->  Output to FDE Logs
 ___________________________________________________________________________________________________________
 
 */
@@ -55,7 +60,29 @@ namespace CPUVisNEA
                 InitializeComponent();
             }
 
-            private void gb_userInput_Enter(object sender, EventArgs e)
+        private void run()
+        {
+
+            //set up and refresh all variables for new Run Command
+            cpu.SetUpFresh();
+            RefreshLogs();
+            cpu.FillRam();
+            
+            do{
+                // todo wait for step
+                cpu.FDECycle( /* todo step parameter to slow it down */ ); // Complete 1 cycle
+                updateFDELogs(); //todo mabye make whenever updated
+            } while (!cpu.CheckHalted());
+            
+        }
+
+        private void RefreshLogs()
+        {
+            txt_longFDE.Text = "";
+            txt_shortFDE.Text = "";
+        }
+
+        private void gb_userInput_Enter(object sender, EventArgs e)
             {
                 
 
@@ -138,7 +165,47 @@ namespace CPUVisNEA
 
         private void btn_Run_Click( object sender, EventArgs e )
         {
-            cpu.Run();
+            //cpu.Run();
+            run();
+        }
+
+        private void updateFDELogs()
+        {
+            
+            foreach (var change in cpu.CurrentState.changeLog)
+            {
+                txt_shortFDE.Text = txt_shortFDE.Text + change + Environment.NewLine ;
+            }
+            foreach (var change in cpu.CurrentState.DetailedChangeLog)
+            {
+                txt_longFDE.Text = txt_longFDE.Text + change + Environment.NewLine ;
+            }
+
+            
+            
+        }
+        private void btn_SaveFile_Click(object sender, EventArgs e)
+        {
+            //todo validate???
+            var SaveFile = new SaveFile_Form( txt_uProg.Text );
+            SaveFile.Show();
+        }
+
+        private void DD_LoadProg_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        private void btn_DeleteFile_Click(object sender, EventArgs e)
+        {
+            var DeleteFile = new DeleteFile_Form();
+            DeleteFile.Show();
+        }
+
+        private void btn_LoadFile_Click(object sender, EventArgs e)
+        {
+            var LoadFile = new LoadFile_Form();
+            LoadFile.Show();
         }
     }
      

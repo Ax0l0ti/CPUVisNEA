@@ -34,10 +34,11 @@ namespace CPUVisNEA
 
         private int PCNonBranchIncriment = 0;
         
-        // todo explain why line below is bs, how to 
-        //private Tuple<Register[], Register[], int>[] CPUHistory = new Tuple<Register[], Register[], int>[] {};
-        private List<CPUState> History = new List<CPUState>();
-        private CPUState CurrentState;
+       
+        // public for CPU User Interface to have access to Current State and History
+        // this allows it to output to the simple and detailed FDE Log
+        public List<CPUState> History = new List<CPUState>();
+        public CPUState CurrentState;
 
         private RAM ram = new RAM();
         // used to compile User string to Cleaned Instruction[]. This confirms the program is valid before trying to compile the code in technically correct CPU assembly translation 
@@ -170,12 +171,10 @@ namespace CPUVisNEA
             //set up and refresh all variables for new Run Command
             SetUpFresh();
             FillRam();
-            var halted = false;
-            while (!halted)
-            {
-                FDECycle(); // Complete 1 cycle
-                halted = CheckHalted(); // stop execution if Halt is called
-            }
+            
+            // stop execution if Halt is called
+            do{ FDECycle(); // Complete 1 cycle
+            } while (!CheckHalted());
         }
 
         public void FDECycle()
@@ -200,7 +199,7 @@ namespace CPUVisNEA
 
         }
 
-        private bool CheckHalted()
+        public bool CheckHalted()
         {
             return (CurrentState.PC.content < 0)  ;
         }
@@ -325,8 +324,10 @@ namespace CPUVisNEA
          DisplayLongFDE()
          ReturnToEdit() 
          */
+        
         // function used in CPU constructor to generate initial values with the index at the first byte of RAM 
-        private void SetUpFresh()
+        // set public to help with Nunit tests ans CPU User Interface access
+        public void SetUpFresh()
         {
             /* Reset/Set everything to fresh
              CurrentState
