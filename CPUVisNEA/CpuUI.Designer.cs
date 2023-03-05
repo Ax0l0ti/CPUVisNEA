@@ -53,7 +53,6 @@ namespace CPUVisNEA
             this.gb_UAssControls = new System.Windows.Forms.GroupBox();
             this.btn_LoadFile = new System.Windows.Forms.Button();
             this.btn_DeleteFile = new System.Windows.Forms.Button();
-            this.DD_LoadProg = new System.Windows.Forms.ComboBox();
             this.btn_SaveFile = new System.Windows.Forms.Button();
             this.gb_userInput = new System.Windows.Forms.GroupBox();
             this.gb_outputs.SuspendLayout();
@@ -331,14 +330,13 @@ namespace CPUVisNEA
             this.gb_UAssControls.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(62)))), ((int)(((byte)(84)))), ((int)(((byte)(151)))));
             this.gb_UAssControls.Controls.Add(this.btn_LoadFile);
             this.gb_UAssControls.Controls.Add(this.btn_DeleteFile);
-            this.gb_UAssControls.Controls.Add(this.DD_LoadProg);
             this.gb_UAssControls.Controls.Add(this.btn_SaveFile);
             this.gb_UAssControls.ForeColor = System.Drawing.Color.White;
-            this.gb_UAssControls.Location = new System.Drawing.Point(20, 36);
+            this.gb_UAssControls.Location = new System.Drawing.Point(12, 36);
             this.gb_UAssControls.Margin = new System.Windows.Forms.Padding(6);
             this.gb_UAssControls.Name = "gb_UAssControls";
             this.gb_UAssControls.Padding = new System.Windows.Forms.Padding(6);
-            this.gb_UAssControls.Size = new System.Drawing.Size(755, 135);
+            this.gb_UAssControls.Size = new System.Drawing.Size(766, 139);
             this.gb_UAssControls.TabIndex = 4;
             this.gb_UAssControls.TabStop = false;
             this.gb_UAssControls.Text = "File & Assembely Controls";
@@ -347,9 +345,9 @@ namespace CPUVisNEA
             // 
             this.btn_LoadFile.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(90)))), ((int)(((byte)(90)))), ((int)(((byte)(90)))));
             this.btn_LoadFile.ForeColor = System.Drawing.Color.White;
-            this.btn_LoadFile.Location = new System.Drawing.Point(328, 33);
+            this.btn_LoadFile.Location = new System.Drawing.Point(268, 36);
             this.btn_LoadFile.Name = "btn_LoadFile";
-            this.btn_LoadFile.Size = new System.Drawing.Size(186, 69);
+            this.btn_LoadFile.Size = new System.Drawing.Size(230, 70);
             this.btn_LoadFile.TabIndex = 12;
             this.btn_LoadFile.Text = "Load Program ";
             this.btn_LoadFile.UseVisualStyleBackColor = false;
@@ -359,36 +357,21 @@ namespace CPUVisNEA
             // 
             this.btn_DeleteFile.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(90)))), ((int)(((byte)(90)))), ((int)(((byte)(90)))));
             this.btn_DeleteFile.ForeColor = System.Drawing.Color.White;
-            this.btn_DeleteFile.Location = new System.Drawing.Point(544, 33);
+            this.btn_DeleteFile.Location = new System.Drawing.Point(527, 36);
             this.btn_DeleteFile.Name = "btn_DeleteFile";
-            this.btn_DeleteFile.Size = new System.Drawing.Size(202, 69);
+            this.btn_DeleteFile.Size = new System.Drawing.Size(230, 70);
             this.btn_DeleteFile.TabIndex = 11;
-            this.btn_DeleteFile.Text = "Delete Saved Program";
+            this.btn_DeleteFile.Text = "Delete Existing Program";
             this.btn_DeleteFile.UseVisualStyleBackColor = false;
             this.btn_DeleteFile.Click += new System.EventHandler(this.btn_DeleteFile_Click);
-            // 
-            // DD_LoadProg
-            // 
-            this.DD_LoadProg.AccessibleRole = System.Windows.Forms.AccessibleRole.ButtonDropDown;
-            this.DD_LoadProg.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.ListItems;
-            this.DD_LoadProg.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.DD_LoadProg.Font = new System.Drawing.Font("Microsoft Sans Serif", 16.125F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.DD_LoadProg.FormattingEnabled = true;
-            this.DD_LoadProg.Items.AddRange(new object[] { "Km ", "We vibe ", "NOt again" });
-            this.DD_LoadProg.Location = new System.Drawing.Point(12, 43);
-            this.DD_LoadProg.Name = "DD_LoadProg";
-            this.DD_LoadProg.Size = new System.Drawing.Size(97, 59);
-            this.DD_LoadProg.TabIndex = 10;
-            this.DD_LoadProg.Tag = "";
-            this.DD_LoadProg.SelectedIndexChanged += new System.EventHandler(this.DD_LoadProg_SelectedIndexChanged);
             // 
             // btn_SaveFile
             // 
             this.btn_SaveFile.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(90)))), ((int)(((byte)(90)))), ((int)(((byte)(90)))));
             this.btn_SaveFile.ForeColor = System.Drawing.Color.White;
-            this.btn_SaveFile.Location = new System.Drawing.Point(124, 33);
+            this.btn_SaveFile.Location = new System.Drawing.Point(12, 36);
             this.btn_SaveFile.Name = "btn_SaveFile";
-            this.btn_SaveFile.Size = new System.Drawing.Size(182, 69);
+            this.btn_SaveFile.Size = new System.Drawing.Size(230, 70);
             this.btn_SaveFile.TabIndex = 8;
             this.btn_SaveFile.Text = "Save Program";
             this.btn_SaveFile.UseVisualStyleBackColor = false;
@@ -431,6 +414,7 @@ namespace CPUVisNEA
             this.MaximumSize = new System.Drawing.Size(2450, 1400);
             this.Name = "UI";
             this.Padding = new System.Windows.Forms.Padding(20, 5, 5, 5);
+            this.Load += new System.EventHandler(this.UI_Load);
             this.gb_outputs.ResumeLayout(false);
             this.gb_outputs.PerformLayout();
             this.gb_registers.ResumeLayout(false);
@@ -469,7 +453,6 @@ namespace CPUVisNEA
         public System.Windows.Forms.ComboBox DD_Speed;
         private System.Windows.Forms.Button btn_Compile;
         private System.Windows.Forms.GroupBox gb_UAssControls;
-        public System.Windows.Forms.ComboBox DD_LoadProg;
         private System.Windows.Forms.Button btn_SaveFile;
         private System.Windows.Forms.GroupBox gb_userInput;
         private System.Windows.Forms.Button btn_ReturnToEdit;

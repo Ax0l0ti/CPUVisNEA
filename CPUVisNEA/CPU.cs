@@ -656,20 +656,4 @@ namespace CPUVisNEA
         }
     }
 
-    //--------------------------------------Assembely Program classes - files -----------------------------------------------
-//assembly program
-//need to test access 
-    public class AssProg
-    {
-        private string fileLocation; //what to search when accessing file directory
-        private string displayName; //name shown in list (end of file ) 
-        private string[] filecontent;
-
-        public AssProg(string fileLocation, string displayName, string[] filecontent)
-        {
-            this.fileLocation = fileLocation;
-            this.displayName = displayName;
-            this.filecontent = filecontent;
-        }
-    } // maybe have a list of AssProgs? Then call append(Compiler.saveProg()) 
 }

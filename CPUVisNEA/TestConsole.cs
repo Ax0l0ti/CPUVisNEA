@@ -82,7 +82,7 @@ namespace CPUVisNEA
             Console.WriteLine($"The initial value stored in {arg1} is {defaultState.Basic[targetIndex].content} ");
             CPUState newCPUState = Test.executeInstruction(Test.args, defaultState);
             Console.WriteLine($"The end value stored in {arg1} after {Test.Tag} instruction is {newCPUState.Basic[targetIndex].content} ");
-
+            //test cross ide
         }
 
         [Test]

@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Windows.Forms;
 
@@ -8,7 +9,9 @@ namespace CPUVisNEA
 
     public partial class DeleteFile_Form : Form
     {
-        public DeleteFile_Form()
+        private List<string> existingFiles = new List<string>();
+        private string path = Environment.GetFolderPath( Environment.SpecialFolder.Personal ) + "\\CPU_Edu_UI\\";
+        public DeleteFile_Form( List<string> existingFiles )
         {
             InitializeComponent();
             
@@ -16,20 +19,29 @@ namespace CPUVisNEA
             // found through searching through files, takes CpuUI.Files<List> as parameter
             // select only user made files
         }
-
-        private string path = Environment.GetFolderPath(Environment.SpecialFolder.Personal) + "\\CPU_Edu_UI\\";
+        private void DeleteFile_Form_Load( object sender, EventArgs e )
+        {
+            DD_DeletableFiles.DataSource = existingFiles;
+        }
         //Delete File Button
         private void btn_DeleteFile_Click( object sender, EventArgs e )
         {
 
-            string DeletePath = path + txt_DeleteFileName.Text;
+            string DeletePath = path + DD_DeletableFiles.Text;
             // if user confirms delete, delete the file and close deleteFile form
-            if (DialogResult.Yes == MessageBox.Show($"Delete file : {txt_DeleteFileName.Text} ?",
+            if (DialogResult.Yes == MessageBox.Show($"Delete file : {DD_DeletableFiles.Text} ?",
                     "This action is permenant", MessageBoxButtons.YesNo))
             {
                 File.Delete( DeletePath );
                 Close();
             }
         }
+
+        private void DD_DeletableFiles_SelectedIndexChanged( object sender, EventArgs e )
+        {
+
+        }
+
+
     }
 }

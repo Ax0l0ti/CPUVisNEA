@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Collections;
 using System.Drawing;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
 using System.Threading;
@@ -50,7 +52,8 @@ namespace CPUVisNEA
     
     public partial class UI : Form
     {
-
+        private string path = Environment.GetFolderPath(Environment.SpecialFolder.Personal) + "\\CPU_Edu_UI\\";
+        private List<string> availableFiles = new List<string>();
         private bool Editstate = true;
         private CPU cpu;
 
@@ -59,6 +62,23 @@ namespace CPUVisNEA
                 this.cpu = cpu;
                 InitializeComponent();
             }
+        //when the form loads, get all available file names from the directory 
+        //this should be both 
+        private void UI_Load(object sender, EventArgs e)
+        {
+            UpdateFileNames();
+        }
+
+        private void UpdateFileNames()
+        {
+            availableFiles.Clear();
+            foreach (var fileName in Directory.GetFiles(path) ) 
+            {
+                availableFiles.Add(fileName);
+            }
+
+            MessageBox.Show($"{availableFiles.Count} Files named : "); //todo 
+        }
 
         private void run()
         {
@@ -104,7 +124,7 @@ namespace CPUVisNEA
                 }
                 catch (Exception ex)
                 {
-                    // TODO: show dialog / write to output pane
+                    MessageBox.Show($"Failed to Compile Program, error message : {ex}");
                 }
                 // if valid, call CPU.ChangeState()
                 // if invalid, output assembly problems
@@ -187,8 +207,10 @@ namespace CPUVisNEA
         private void btn_SaveFile_Click(object sender, EventArgs e)
         {
             //todo validate???
-            var SaveFile = new SaveFile_Form( txt_uProg.Text );
+            //btn_Compile_Click(sender,e);
+            var SaveFile = new SaveFile_Form( txt_uProg.Text, availableFiles );
             SaveFile.Show();
+            UpdateFileNames();
         }
 
         private void DD_LoadProg_SelectedIndexChanged(object sender, EventArgs e)
@@ -198,17 +220,22 @@ namespace CPUVisNEA
 
         private void btn_DeleteFile_Click(object sender, EventArgs e)
         {
-            var DeleteFile = new DeleteFile_Form();
+            var DeleteFile = new DeleteFile_Form( availableFiles );
             DeleteFile.Show();
+            UpdateFileNames();
         }
 
         private void btn_LoadFile_Click(object sender, EventArgs e)
         {
-            var LoadFile = new LoadFile_Form();
+            var LoadFile = new LoadFile_Form( availableFiles );
             LoadFile.Show();
+            if (LoadFile.ReturnedProgram != "")
+            {
+                txt_uProg.Text = LoadFile.ReturnedProgram;
+            }
+            UpdateFileNames();
         }
     }
-     
 }
 /*
 //TODO

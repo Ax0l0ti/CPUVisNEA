@@ -26,7 +26,8 @@ namespace CPUVisNEA
             Trace.WriteLine("Welcome to CPU - Debug window");
 
             // function to check for the file directory used for user premade files ( exists on school servers across computers) 
-            PreMadePrograms_FileCheck();
+            PreMadeFolderCheck();
+            PreMadeFilesCheck();
 
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
@@ -38,7 +39,7 @@ namespace CPUVisNEA
         }
 
 
-        static void PreMadePrograms_FileCheck()
+        static void PreMadeFolderCheck()
         {
             //create a basic folder within file path with guaranteed access by user's program
             string sAppPath = Environment.GetFolderPath( Environment.SpecialFolder.Personal) + "\\CPU_Edu_UI\\" ;
@@ -52,6 +53,11 @@ namespace CPUVisNEA
             {
                 Trace.WriteLine($"Directory [ path : {sAppPath} ] already exists") ;
             }
+        }
+
+        static void PreMadeFilesCheck()
+        {
+            
         }
         
         
