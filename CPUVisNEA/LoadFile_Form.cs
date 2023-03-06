@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.Diagnostics;
 using System.IO;
 using System.Windows.Forms;
 
@@ -10,6 +12,7 @@ namespace CPUVisNEA
         private List<string> existingFiles = new List<string>();
         private string path = Environment.GetFolderPath(Environment.SpecialFolder.Personal) + "\\CPU_Edu_UI\\";
         public string ReturnedProgram = "";
+
         public LoadFile_Form(  List<string> existingFiles  )
         {
             this.existingFiles= existingFiles;
@@ -24,18 +27,16 @@ namespace CPUVisNEA
             
         }
 
-        
         // Retrieve File Content Button
         private void btn_Load_Click( object sender, EventArgs e )
         {
-            string LoadPath = path + txt_FileGetName.Text;
+            string LoadPath = path + DD_files.Text;
             try
             {
                 using ( StreamReader sr = File.OpenText( LoadPath ) )
                 {
-                    string s = "";
                     ReturnedProgram = sr.ReadToEnd();
-                    txt_Get.Text = sr.ReadToEnd();
+                    Trace.WriteLine($"Program taken from file is : \n{ReturnedProgram}");
                 }
             }
             catch
@@ -43,12 +44,12 @@ namespace CPUVisNEA
                 MessageBox.Show( " File Name error " );
             }
             
-            if (DialogResult.Yes == MessageBox.Show($"Do you want to load this program? ",
-                    "This will erase you current Assembly Program", MessageBoxButtons.YesNo))
+            if (DialogResult.Yes == MessageBox.Show("This will erase you current Assembly Program",
+                    $"Load {DD_files.Text} program?" , MessageBoxButtons.YesNo))
             {
+                Close();
             }
         }
-        //https://learn.microsoft.com/en-us/dotnet/api/system.io.file.appendtext?view=net-7.0 
-        
+        //https://learn.microsoft.com/en-us/dotnet/api/system.io.file.appendtext?view=net-7.0
     }
 }

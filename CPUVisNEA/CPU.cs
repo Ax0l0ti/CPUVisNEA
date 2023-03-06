@@ -43,12 +43,14 @@ namespace CPUVisNEA
         private RAM ram = new RAM();
         // used to compile User string to Cleaned Instruction[]. This confirms the program is valid before trying to compile the code in technically correct CPU assembly translation 
         public Compiler Compiler = new Compiler();
-        
+        private List<string> FetchDecodeToAdd;
+        public string FDadd;
+
         public enum Instructions : byte
         {
             //enum number integer can be converted to represent binary value
+            OUT,
             LDR,
-            STR,
             ADD,
             SUB,
             MOV,
@@ -75,6 +77,8 @@ namespace CPUVisNEA
             {
                 case Instructions.HALT:
                     return new Halt();
+                case Instructions.OUT:
+                    return new Out();
                 case Instructions.B:
                     return new B();
                 case Instructions.BEQ:
@@ -93,8 +97,6 @@ namespace CPUVisNEA
                     return new Mvn();
                 case Instructions.LDR:
                     return new Ldr();
-                case Instructions.STR:
-                    return new Str();
                 case Instructions.AND:
                     return new And();
                 case Instructions.ORR:
@@ -123,13 +125,10 @@ namespace CPUVisNEA
             {
                 case "RegisterArg":
                     return new RegisterArg(ByteFormOfContent);
-                    break;
                 case "IntegerArg":
                     return new IntegerArg(ByteFormOfContent);
-                    break;
                 case "Label":
                     return GetNewLabelDetails(ByteFormOfContent);
-                    break;
                 default:
                     throw new Exception($"Invalid Type {ArgType.Name} ");
             }
@@ -179,19 +178,22 @@ namespace CPUVisNEA
 
         public void FDECycle()
         {
+            FDadd = "";
             // Searches from index in RAM for next Instruction
             // calls Display Fetch Log
-
+            
             var FetchedInstruction = Fetch(CurrentState.PC.content);
-                
+            FDadd += ($"\n----------------\n   Fetch\n----------------\n CPU fetches byte {FetchedInstruction} from MDR {CurrentState.PC.content}.\n");
             // Checks How many Parameters Required
             // calls ParameterFetch() to get Parameters
             // Incriments Program Counter 
             // calls Display Decode Log
-                
+
 
             var InstructionToExecute = Decode(FetchedInstruction);
-            Trace.WriteLine($"Executing {InstructionToExecute.Tag} with parameters: {string.Join(", ", InstructionToExecute.args.Select(arg => $"{arg.name}"))}");
+
+            FDadd += ($"\n----------------\n   Execute\n----------------\nExecuting {InstructionToExecute.Tag} with parameters: {string.Join(", ", InstructionToExecute.args.Select(arg => $"{arg.name}"))}") ;
+            Trace.WriteLine(FDadd);
             CurrentState = Execute(InstructionToExecute);
 
             //add to the CPU History
@@ -254,7 +256,7 @@ namespace CPUVisNEA
 
             var TargetInstruction = newInstruction((Instructions)InstructionInt);
             var parameters = GetNumberOfParameters(TargetInstruction);
-            
+
             // start at the index after Instruction RAM index and iterate for all parameters 
             for (var i = 0; i < parameters; i++)
             {
@@ -264,14 +266,18 @@ namespace CPUVisNEA
                 /* TypeAndByteToArg creates a new Argument the Argtype to indicate the subclass of Argument and accesses
                  the ram to retrieve the byte at the index of instruction incrimented by the parameter number dsd representing the Arg's content
                 */
-                var FilledArg = TypeAndByteToArg(ArgType, ram.GetByteAt(CurrentState.PC.content + i + 1 ));
+                var FilledArg = TypeAndByteToArg(ArgType, ram.GetByteAt(CurrentState.PC.content + i + 1));
                 TargetInstruction.addArg(FilledArg);
 
                 //incrementing the Program counter by number of bytes used to store parameters to access the next instruction assuming no branch condition
             }
 
+            FDadd += ($"\n----------------\n   Decode\n----------------\n CPU decodes MDR {BinaryInstruction} as a {TargetInstruction.Tag} Instruction, {parameters} parameters required.");
+            if (parameters > 0)
+            {
+                FDadd += ($" CPU Fetches parameters from Memory Indexes {CurrentState.PC.content + 1} to {CurrentState.PC.content + parameters + 1}");
+            }
             CurrentState.PC.content += parameters + 1;
-
             return TargetInstruction;
         }
 
@@ -298,8 +304,8 @@ namespace CPUVisNEA
             //( Could be partically more efficient with passed args but this allows easy testing
             //with my Unit testing interface for if executeInstruction works)
             
-            var NewState = instr.executeInstruction(instr.args, CurrentState.Copy());
-            
+            var NewState = CurrentState.Copy();
+            NewState = instr.executeInstruction(instr.args, NewState);
             return NewState;
         }
 
@@ -358,7 +364,7 @@ namespace CPUVisNEA
             catch (Exception ex)
             {
                 Trace.WriteLine($"Compile failed: {ex}");
-                MessageBox.Show($"Compile failed {ex} ");
+                MessageBox.Show($"Compile failed : \n {ex} ");
             }
             return valid;
         }
@@ -621,7 +627,9 @@ namespace CPUVisNEA
         public IntReg MBR;
             
         public IntReg[] Basic;
-
+        
+        // potentially used
+        public string Outputs;
         public CPUState()
         {
             PC = new IntReg("PC", 0);
@@ -641,6 +649,7 @@ namespace CPUVisNEA
 
         public CPUState Copy()
         {
+            Trace.WriteLine(Outputs);
             var cpuState = new CPUState();
             cpuState.PC.content = PC.content; 
             cpuState.MAR.content = MAR.content; 

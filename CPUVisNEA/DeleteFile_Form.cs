@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Windows.Forms;
 
@@ -32,6 +33,7 @@ namespace CPUVisNEA
             if (DialogResult.Yes == MessageBox.Show($"Delete file : {DD_DeletableFiles.Text} ?",
                     "This action is permenant", MessageBoxButtons.YesNo))
             {
+                Trace.WriteLine($"Deleted File : {DD_DeletableFiles.Text} ");
                 File.Delete( DeletePath );
                 Close();
             }

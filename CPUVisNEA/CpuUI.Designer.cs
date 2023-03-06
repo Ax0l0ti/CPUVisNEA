@@ -193,7 +193,7 @@ namespace CPUVisNEA
             this.txt_out.Name = "txt_out";
             this.txt_out.ReadOnly = true;
             this.txt_out.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.txt_out.Size = new System.Drawing.Size(665, 200);
+            this.txt_out.Size = new System.Drawing.Size(167, 200);
             this.txt_out.TabIndex = 3;
             // 
             // groupBox4
@@ -231,7 +231,7 @@ namespace CPUVisNEA
             this.txt_uProg.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
             this.txt_uProg.Size = new System.Drawing.Size(678, 766);
             this.txt_uProg.TabIndex = 3;
-            this.txt_uProg.Text = "B Test\r\nMOV R0, #10\r\nTest: MOV R0, #69\r\nHALT";
+            this.txt_uProg.Text = "B Test\r\nMOV R0, #10\r\nOUT R0\r\nTest: MOV R0, #69\r\nOUT R0\r\nHALT";
             this.txt_uProg.TextChanged += new System.EventHandler(this.txt_uProg_TextChanged);
             // 
             // gb_Execute
@@ -309,6 +309,7 @@ namespace CPUVisNEA
             this.DD_Speed.Size = new System.Drawing.Size(346, 59);
             this.DD_Speed.TabIndex = 6;
             this.DD_Speed.Tag = "";
+            this.DD_Speed.SelectedIndexChanged += new System.EventHandler(this.DD_Speed_SelectedIndexChanged);
             // 
             // btn_Compile
             // 

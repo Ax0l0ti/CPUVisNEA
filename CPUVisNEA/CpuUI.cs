@@ -56,7 +56,7 @@ namespace CPUVisNEA
         private List<string> availableFiles = new List<string>();
         private bool Editstate = true;
         private CPU cpu;
-
+        
         public UI(CPU cpu)
             {
                 this.cpu = cpu;
@@ -67,17 +67,19 @@ namespace CPUVisNEA
         private void UI_Load(object sender, EventArgs e)
         {
             UpdateFileNames();
+            
         }
 
         private void UpdateFileNames()
         {
             availableFiles.Clear();
-            foreach (var fileName in Directory.GetFiles(path) ) 
+            foreach (var filePath in Directory.GetFiles(path) )
             {
+                var fileName = filePath.Replace(path, "");
                 availableFiles.Add(fileName);
             }
-
-            MessageBox.Show($"{availableFiles.Count} Files named : "); //todo 
+            Trace.WriteLine($"{availableFiles.Count} Files named : {string.Join(", ", availableFiles)}");
+             //todo 
         }
 
         private void run()
@@ -90,8 +92,10 @@ namespace CPUVisNEA
             
             do{
                 // todo wait for step
+                wait(1000);
                 cpu.FDECycle( /* todo step parameter to slow it down */ ); // Complete 1 cycle
                 updateFDELogs(); //todo mabye make whenever updated
+                
             } while (!cpu.CheckHalted());
             
         }
@@ -139,7 +143,7 @@ namespace CPUVisNEA
                 btn_Compile.Visible = edit;
                 btn_ReturnToEdit.Visible = !edit;
                 btn_Run.Visible = !edit;
-        }
+            }
             
 
             private void txt_uProg_TextChanged(object sender, EventArgs e)
@@ -174,11 +178,7 @@ namespace CPUVisNEA
                 
             }
 
-            private void txt_Labels_TextChanged(object sender, EventArgs e)
-            {
-            }
-
-        private void btn_ReturnToEdit_Click(object sender, EventArgs e)
+            private void btn_ReturnToEdit_Click(object sender, EventArgs e)
         {
             setEditState(true);
         }
@@ -194,46 +194,67 @@ namespace CPUVisNEA
             
             foreach (var change in cpu.CurrentState.changeLog)
             {
-                txt_shortFDE.Text = txt_shortFDE.Text + change + Environment.NewLine ;
+                txt_shortFDE.Text += change + Environment.NewLine  ;
             }
             foreach (var change in cpu.CurrentState.DetailedChangeLog)
             {
                 txt_longFDE.Text = txt_longFDE.Text + change + Environment.NewLine ;
             }
 
-            
-            
         }
         private void btn_SaveFile_Click(object sender, EventArgs e)
         {
             //todo validate???
             //btn_Compile_Click(sender,e);
             var SaveFile = new SaveFile_Form( txt_uProg.Text, availableFiles );
-            SaveFile.Show();
+            SaveFile.ShowDialog();
             UpdateFileNames();
-        }
-
-        private void DD_LoadProg_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            throw new System.NotImplementedException();
         }
 
         private void btn_DeleteFile_Click(object sender, EventArgs e)
         {
             var DeleteFile = new DeleteFile_Form( availableFiles );
-            DeleteFile.Show();
+            DeleteFile.ShowDialog();
             UpdateFileNames();
         }
 
         private void btn_LoadFile_Click(object sender, EventArgs e)
         {
             var LoadFile = new LoadFile_Form( availableFiles );
-            LoadFile.Show();
+            //whilst the Load isnt dealt with, carry on showing it
+            LoadFile.ShowDialog();
             if (LoadFile.ReturnedProgram != "")
             {
                 txt_uProg.Text = LoadFile.ReturnedProgram;
             }
-            UpdateFileNames();
+        }
+        //declared inside UI class to allow interaction and register when a click event on the form is taken
+        private void wait(int ms)
+        {
+            var timer = new System.Windows.Forms.Timer();
+            if (ms == 0 || ms < 0) return;
+
+            // Console.WriteLine("start wait timer");
+            timer.Interval = ms;
+            timer.Enabled  = true;
+            timer.Start();
+
+            timer.Tick += (s, e) =>
+            {
+                timer.Enabled = false;
+                timer.Stop();
+                // Console.WriteLine("stop wait timer");
+            };
+
+            while (timer.Enabled)
+            {
+                Application.DoEvents();
+            }
+        }
+
+        private void DD_Speed_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            throw new System.NotImplementedException();
         }
     }
 }

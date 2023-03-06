@@ -46,11 +46,13 @@ namespace CPUVisNEA
                     if (DialogResult.Yes == MessageBox.Show($"overwrite contents of file : {txt_FileName.Text} ?",
                             "This action is permenant", MessageBoxButtons.YesNo))
                     {
-                        using ( StreamWriter sw = new StreamWriter( PushPath ) )
+                        
+                        File.Delete(PushPath);
+                        using (StreamWriter sw = File.CreateText( PushPath ) )
                         {
-                            File.Delete(PushPath);
                             sw.WriteLine(ProgramToSave);
                             sw.Close();
+
                         }
                         Close();
                     }
