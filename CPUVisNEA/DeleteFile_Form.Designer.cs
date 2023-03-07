@@ -42,7 +42,7 @@ namespace CPUVisNEA
             this.btn_Delete.Location = new System.Drawing.Point(25, 28);
             this.btn_Delete.Margin = new System.Windows.Forms.Padding(5);
             this.btn_Delete.Name = "btn_Delete";
-            this.btn_Delete.Size = new System.Drawing.Size(192, 49);
+            this.btn_Delete.Size = new System.Drawing.Size(224, 49);
             this.btn_Delete.TabIndex = 8;
             this.btn_Delete.Text = "Delete File :";
             this.btn_Delete.UseVisualStyleBackColor = true;
@@ -52,27 +52,28 @@ namespace CPUVisNEA
             // 
             this.DD_DeletableFiles.Font = new System.Drawing.Font("Microsoft YaHei UI", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.DD_DeletableFiles.FormattingEnabled = true;
-            this.DD_DeletableFiles.Location = new System.Drawing.Point(226, 28);
+            this.DD_DeletableFiles.Location = new System.Drawing.Point(269, 28);
             this.DD_DeletableFiles.Name = "DD_DeletableFiles";
-            this.DD_DeletableFiles.Size = new System.Drawing.Size(402, 49);
+            this.DD_DeletableFiles.Size = new System.Drawing.Size(350, 49);
             this.DD_DeletableFiles.TabIndex = 9;
             this.DD_DeletableFiles.SelectedIndexChanged += new System.EventHandler(this.DD_DeletableFiles_SelectedIndexChanged);
             // 
             // textBox1
             // 
-            this.textBox1.Location = new System.Drawing.Point(25, 85);
+            this.textBox1.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.125F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.textBox1.Location = new System.Drawing.Point(25, 99);
             this.textBox1.Multiline = true;
             this.textBox1.Name = "textBox1";
-            this.textBox1.Size = new System.Drawing.Size(382, 110);
+            this.textBox1.Size = new System.Drawing.Size(594, 110);
             this.textBox1.TabIndex = 10;
-            this.textBox1.Text = "Note : \r\nDefault Files cannot be deleted, only user created files can be deleted";
+            this.textBox1.Text = "Note : \r\nDefault Files cannot be deleted\r\nOnly user created files can be deleted";
             // 
             // DeleteFile_Form
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(12F, 25F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.Navy;
-            this.ClientSize = new System.Drawing.Size(658, 293);
+            this.ClientSize = new System.Drawing.Size(658, 242);
             this.Controls.Add(this.textBox1);
             this.Controls.Add(this.DD_DeletableFiles);
             this.Controls.Add(this.btn_Delete);

@@ -15,16 +15,16 @@ namespace CPUVisNEA
         public DeleteFile_Form( List<string> existingFiles )
         {
             InitializeComponent();
-            
+            this.existingFiles = existingFiles;
+            DD_DeletableFiles.DataSource = existingFiles;
             //todo make this a select list box of possible closable files
             // found through searching through files, takes CpuUI.Files<List> as parameter
             // select only user made files
         }
         private void DeleteFile_Form_Load( object sender, EventArgs e )
         {
-            DD_DeletableFiles.DataSource = existingFiles;
+            //Delete File Button
         }
-        //Delete File Button
         private void btn_DeleteFile_Click( object sender, EventArgs e )
         {
 

@@ -9,6 +9,8 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using System.Windows.Forms;
 using NUnit.Framework.Internal;
+using static System.Net.Mime.MediaTypeNames;
+using Application = System.Windows.Forms.Application;
 //todo look at this for design https://www.101computing.net/LMC/# 
 /*
 ____________________________________________________________________________________________________________
@@ -67,7 +69,7 @@ namespace CPUVisNEA
         private void UI_Load(object sender, EventArgs e)
         {
             UpdateFileNames();
-            
+            RunSpeed.SetRange( 0, 5000 );
         }
 
         private void UpdateFileNames()
@@ -89,17 +91,53 @@ namespace CPUVisNEA
             cpu.SetUpFresh();
             RefreshLogs();
             cpu.FillRam();
+            //fist index is always 0
             
-            do{
+            //VisualMemoryCreate(0);
+
+            do
+            {
                 // todo wait for step
-                wait(1000);
+                wait(RunSpeed.Value);
                 cpu.FDECycle( /* todo step parameter to slow it down */ ); // Complete 1 cycle
+                
+                //VisualMemoryUpdate( cpu.CurrentState.PC.content );
+                
                 updateFDELogs(); //todo mabye make whenever updated
                 
             } while (!cpu.CheckHalted());
             
         }
+        private void VisualMemoryCreate( int current  )
+        {
 
+            for ( int row = 0; row < 10; row++ )
+            {
+                for ( int col = 0; col < 10; col++ )
+                {
+                    int index = row * 10 + col;
+                    
+                    string text = $"{index}\n{cpu.ram.Memory[index]}";
+
+                    // Create a new Label control with the text and add it to the TableLayoutPanel
+                    
+                    Label label = new Label();
+                    if ( index == current )
+                    {
+                        label.BackColor = Color.Aqua;
+                    }
+                    label.Text = text;
+                    label.Dock = DockStyle.Fill;
+                    label.TextAlign = ContentAlignment.MiddleCenter;
+                    MemoryTable.Controls.Add( label, col, row );
+                }
+            }
+        }
+        private void VisualMemoryUpdate( int current )
+        {
+            MemoryTable.Controls.Clear();
+            VisualMemoryCreate(current);
+        }
         private void RefreshLogs()
         {
             txt_longFDE.Text = "";
@@ -256,6 +294,22 @@ namespace CPUVisNEA
         {
             throw new System.NotImplementedException();
         }
+
+        private void MemoryTable_Paint( object sender, PaintEventArgs e )
+        {
+
+        }
+
+        private void txt_shortFDE_TextChanged( object sender, EventArgs e )
+        {
+            txt_shortFDE.ScrollToCaret();
+        }
+
+        private void txt_longFDE_TextChanged( object sender, EventArgs e )
+        {
+            txt_longFDE.ScrollToCaret();
+        }
+
     }
 }
 /*

@@ -37,7 +37,7 @@ namespace CPUVisNEA
             // 
             // btn_Load
             // 
-            this.btn_Load.BackColor = System.Drawing.SystemColors.ScrollBar;
+            this.btn_Load.BackColor = System.Drawing.SystemColors.Menu;
             this.btn_Load.Font = new System.Drawing.Font("Microsoft YaHei UI", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.btn_Load.ForeColor = System.Drawing.SystemColors.ActiveCaptionText;
             this.btn_Load.Location = new System.Drawing.Point(39, 29);
@@ -72,6 +72,7 @@ namespace CPUVisNEA
             this.Text = "LoadFile_Form";
             this.Load += new System.EventHandler(this.LoadFile_Form_Load);
             this.ResumeLayout(false);
+
         }
 
         private System.Windows.Forms.Button btn_Load;

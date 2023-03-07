@@ -157,11 +157,11 @@ namespace CPUVisNEA
         }
     }
 
-    public class Label : Argument //todo maybe create linked class between Label argument and destination location
+    public class LineLabel : Argument //todo maybe create linked class between Label argument and destination location
     {
         public int location; // destination
 
-        public Label(string name)
+        public LineLabel(string name)
         {
             this.name = name;
         }
@@ -244,7 +244,7 @@ namespace CPUVisNEA
                         CPU.Instructions.B, CPU.Instructions.BEQ, CPU.Instructions.BLT, CPU.Instructions.BNE,
                         CPU.Instructions.BGT
                     },
-                    new[] { typeof(Label) }
+                    new[] { typeof(LineLabel) }
                 }
             };
 
@@ -293,7 +293,7 @@ namespace CPUVisNEA
                     return new IntegerArg(s);
                 // Label argument - 1 or more word characters
                 case var s when Regex.IsMatch(s, "^(\\w)*$"):
-                    return new Label(s);
+                    return new LineLabel(s);
 
                 default:
                     throw new Exception("Input does not match any of the specified regexes for arguments");
@@ -430,7 +430,7 @@ namespace CPUVisNEA
         {
             //B <Label> Branch to the instruction at position <Label> Unconditionally
             //if Conditional Correctly Met, branch to label's indicated Memory Index 
-            NewState.PC.content = ((Label)args[0]).location;
+            NewState.PC.content = ((LineLabel)args[0]).location;
             NewState.changeLog.Add($" Branched to {args[0].name} ");
             Trace.WriteLine($" Branched to {args[0].name} ");
             NewState.DetailedChangeLog.Add(
@@ -477,7 +477,7 @@ namespace CPUVisNEA
             string BasicChangeLog;
             if (NewState.ACC.content == 0)
             {
-                NewState.PC.content = ((Label)args[0]).location;
+                NewState.PC.content = ((LineLabel)args[0]).location;
                 BasicChangeLog = $"Branched to {args[0].name} ";
                 NewState.changeLog.Add(BasicChangeLog);
                 NewState.DetailedChangeLog.Add(
@@ -533,7 +533,7 @@ namespace CPUVisNEA
             string BasicChangeLog;
             if (NewState.ACC.content != 0)
             {
-                NewState.PC.content = ((Label)args[0]).location;
+                NewState.PC.content = ((LineLabel)args[0]).location;
                 BasicChangeLog = $"Branched to {args[0].name} ";
                 NewState.changeLog.Add(BasicChangeLog);
                 NewState.DetailedChangeLog.Add(
@@ -588,7 +588,7 @@ namespace CPUVisNEA
             string BasicChangeLog;
             if (NewState.ACC.content == 1)
             {
-                NewState.PC.content = ((Label)args[0]).location;
+                NewState.PC.content = ((LineLabel)args[0]).location;
                 BasicChangeLog = $"Branched to {args[0].name} ";
                 NewState.changeLog.Add(BasicChangeLog);
                 NewState.DetailedChangeLog.Add(
@@ -641,7 +641,7 @@ namespace CPUVisNEA
             string BasicChangeLog;
             if (NewState.ACC.content == 2)
             {
-                NewState.PC.content = ((Label)args[0]).location;
+                NewState.PC.content = ((LineLabel)args[0]).location;
                 BasicChangeLog = $"Branched to {args[0].name} ";
                 NewState.changeLog.Add(BasicChangeLog);
                 NewState.DetailedChangeLog.Add(

@@ -10,6 +10,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Forms; 
 using CPUVisNEA.Properties; // access to scope 
+using System.IO;
 
 namespace CPUVisNEA
 {
@@ -57,7 +58,22 @@ namespace CPUVisNEA
 
         static void PreMadeFilesCheck()
         {
-            
+            string[,] premadeFiles = new string[,] { 
+                {"Labeltest", "B Test\r\nMOV R0, #10\r\nOUT R0\r\nTest: MOV R0, #69\r\nOUT R0\r\nHALT"} ,
+                { "for10", "MOV R0, #1\r\nMOV R1, #10\r\nstartloop: OUT R0\r\nADD R0, R0, #1\r\nCMP R0, #10\r\nBNE  startloop\r\nendloop: HALT\r\n " } 
+            };
+        for(int i = 0; i < premadeFiles.GetLength(0); i++ )
+            {
+                string PushPath = Environment.GetFolderPath( Environment.SpecialFolder.Personal ) + "\\CPU_Edu_UI\\" + premadeFiles[i,0];
+
+                File.Delete( PushPath );
+                using ( StreamWriter sw = File.CreateText( PushPath ) )
+                {
+                    sw.WriteLine( premadeFiles[i, 1] );
+                    sw.Close();
+
+                }
+            }
         }
         
         

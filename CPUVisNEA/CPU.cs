@@ -40,7 +40,7 @@ namespace CPUVisNEA
         public List<CPUState> History = new List<CPUState>();
         public CPUState CurrentState;
 
-        private RAM ram = new RAM();
+        public RAM ram = new RAM();
         // used to compile User string to Cleaned Instruction[]. This confirms the program is valid before trying to compile the code in technically correct CPU assembly translation 
         public Compiler Compiler = new Compiler();
         private List<string> FetchDecodeToAdd;
@@ -127,18 +127,18 @@ namespace CPUVisNEA
                     return new RegisterArg(ByteFormOfContent);
                 case "IntegerArg":
                     return new IntegerArg(ByteFormOfContent);
-                case "Label":
+                case "LineLabel":
                     return GetNewLabelDetails(ByteFormOfContent);
                 default:
                     throw new Exception($"Invalid Type {ArgType.Name} ");
             }
         }
-        private Label GetNewLabelDetails( int TargetLocation )
+        private LineLabel GetNewLabelDetails( int TargetLocation )
         {
             //whilst this looping method has Time Complexity O( n ), labelsDictionary has a very limited size and hence will be efficient enough to search through
             string labelTag = LabelToRamIndex.FirstOrDefault(x => x.Value == TargetLocation).Key;
             if (labelTag == null) { MessageBox.Show("Ram to Instruction Execute - Branch label not found"); }
-            Label LabelToAdd = new Label(labelTag);
+            LineLabel LabelToAdd = new LineLabel(labelTag);
             LabelToAdd.location = TargetLocation;
             return LabelToAdd;
         }
@@ -203,7 +203,7 @@ namespace CPUVisNEA
 
         public bool CheckHalted()
         {
-            return (CurrentState.PC.content < 0)  ;
+            return (CurrentState.PC.content < 0);
         }
 
         //use compiled version of assembly program to correctly store all values of program into RAM 
@@ -231,11 +231,11 @@ namespace CPUVisNEA
                 if (instruction.GetType().IsSubclassOf(typeof(Branch)))
                 {
                     var firstArg = instruction.args[0];
-                    var label = (Label)firstArg;
+                    var label = (LineLabel)firstArg;
                         var jumpTarget = Compiler.LabelledInstructions[label.name];
                         var jumpLocation = ram.InstructionLocations[jumpTarget];
                         LabelToRamIndex.Add(label.name, jumpLocation);
-                        ((Label)instruction.args[0]).location = jumpLocation;
+                        ((LineLabel)instruction.args[0]).location = jumpLocation;
                         ram.Memory[ram.InstructionLocations[instruction] + 1] = instruction.args[0].ToByte(); 
                 }
             }
@@ -453,7 +453,7 @@ namespace CPUVisNEA
                 if (maybeBranch.GetType().IsInstanceOfType(typeof(Branch)))
                 {
                     // branch instructions need to know where their label points to
-                    Label target = (Label)maybeBranch.args[0];
+                    LineLabel target = (LineLabel)maybeBranch.args[0];
                     if (!LabelledInstructions.ContainsKey(target.name))
                     {
                         throw new Exception($"Label: {target.name} not defined");

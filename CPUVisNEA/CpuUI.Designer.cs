@@ -1,4 +1,6 @@
 ﻿
+using System.Windows.Forms;
+
 namespace CPUVisNEA
 {
     partial class UI
@@ -39,22 +41,26 @@ namespace CPUVisNEA
             this.gb_registers = new System.Windows.Forms.GroupBox();
             this.txt_TEMPORARY = new System.Windows.Forms.TextBox();
             this.gb_Display = new System.Windows.Forms.GroupBox();
+            this.lbl_MemoryTest = new System.Windows.Forms.Label();
+            this.MemoryTable = new System.Windows.Forms.TableLayoutPanel();
             this.gb_InpOut = new System.Windows.Forms.GroupBox();
             this.txt_out = new System.Windows.Forms.TextBox();
             this.groupBox4 = new System.Windows.Forms.GroupBox();
             this.pnl_uCodeManip = new System.Windows.Forms.Panel();
             this.txt_uProg = new System.Windows.Forms.TextBox();
             this.gb_Execute = new System.Windows.Forms.GroupBox();
+            this.btb_PlayOrPause = new System.Windows.Forms.Button();
             this.btn_ReturnToEdit = new System.Windows.Forms.Button();
             this.btn_Run = new System.Windows.Forms.Button();
             this.DD_Scheme = new System.Windows.Forms.ComboBox();
-            this.DD_Speed = new System.Windows.Forms.ComboBox();
             this.btn_Compile = new System.Windows.Forms.Button();
             this.gb_UAssControls = new System.Windows.Forms.GroupBox();
             this.btn_LoadFile = new System.Windows.Forms.Button();
             this.btn_DeleteFile = new System.Windows.Forms.Button();
             this.btn_SaveFile = new System.Windows.Forms.Button();
             this.gb_userInput = new System.Windows.Forms.GroupBox();
+            this.txt_CurrentFDE = new System.Windows.Forms.TextBox();
+            this.RunSpeed = new System.Windows.Forms.TrackBar();
             this.gb_outputs.SuspendLayout();
             this.gb_registers.SuspendLayout();
             this.gb_Display.SuspendLayout();
@@ -62,11 +68,13 @@ namespace CPUVisNEA
             this.gb_Execute.SuspendLayout();
             this.gb_UAssControls.SuspendLayout();
             this.gb_userInput.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.RunSpeed)).BeginInit();
             this.SuspendLayout();
             // 
             // gb_outputs
             // 
             this.gb_outputs.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(70)))), ((int)(((byte)(70)))), ((int)(((byte)(70)))));
+            this.gb_outputs.Controls.Add(this.txt_CurrentFDE);
             this.gb_outputs.Controls.Add(this.txt_longFDE);
             this.gb_outputs.Controls.Add(this.txt_shortFDE);
             this.gb_outputs.Controls.Add(this.groupBox3);
@@ -84,10 +92,9 @@ namespace CPUVisNEA
             // 
             this.txt_longFDE.AllowDrop = true;
             this.txt_longFDE.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(90)))), ((int)(((byte)(90)))), ((int)(((byte)(90)))));
-            this.txt_longFDE.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.txt_longFDE.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.txt_longFDE.ForeColor = System.Drawing.Color.White;
-            this.txt_longFDE.Location = new System.Drawing.Point(20, 767);
+            this.txt_longFDE.Location = new System.Drawing.Point(23, 892);
             this.txt_longFDE.Margin = new System.Windows.Forms.Padding(6);
             this.txt_longFDE.Multiline = true;
             this.txt_longFDE.Name = "txt_longFDE";
@@ -95,15 +102,15 @@ namespace CPUVisNEA
             this.txt_longFDE.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
             this.txt_longFDE.Size = new System.Drawing.Size(756, 381);
             this.txt_longFDE.TabIndex = 3;
+            this.txt_longFDE.TextChanged += new System.EventHandler(this.txt_longFDE_TextChanged);
             // 
             // txt_shortFDE
             // 
             this.txt_shortFDE.AllowDrop = true;
             this.txt_shortFDE.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(90)))), ((int)(((byte)(90)))), ((int)(((byte)(90)))));
-            this.txt_shortFDE.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.txt_shortFDE.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.txt_shortFDE.ForeColor = System.Drawing.Color.White;
-            this.txt_shortFDE.Location = new System.Drawing.Point(20, 192);
+            this.txt_shortFDE.Location = new System.Drawing.Point(23, 499);
             this.txt_shortFDE.Margin = new System.Windows.Forms.Padding(6);
             this.txt_shortFDE.Multiline = true;
             this.txt_shortFDE.Name = "txt_shortFDE";
@@ -111,6 +118,7 @@ namespace CPUVisNEA
             this.txt_shortFDE.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
             this.txt_shortFDE.Size = new System.Drawing.Size(756, 381);
             this.txt_shortFDE.TabIndex = 2;
+            this.txt_shortFDE.TextChanged += new System.EventHandler(this.txt_shortFDE_TextChanged);
             // 
             // groupBox3
             // 
@@ -155,6 +163,8 @@ namespace CPUVisNEA
             // gb_Display
             // 
             this.gb_Display.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(70)))), ((int)(((byte)(70)))), ((int)(((byte)(70)))));
+            this.gb_Display.Controls.Add(this.lbl_MemoryTest);
+            this.gb_Display.Controls.Add(this.MemoryTable);
             this.gb_Display.Controls.Add(this.gb_InpOut);
             this.gb_Display.Controls.Add(this.gb_registers);
             this.gb_Display.ForeColor = System.Drawing.Color.White;
@@ -166,6 +176,47 @@ namespace CPUVisNEA
             this.gb_Display.TabIndex = 1;
             this.gb_Display.TabStop = false;
             this.gb_Display.Text = "CPU stuff";
+            // 
+            // lbl_MemoryTest
+            // 
+            this.lbl_MemoryTest.AutoSize = true;
+            this.lbl_MemoryTest.Location = new System.Drawing.Point(106, 300);
+            this.lbl_MemoryTest.Name = "lbl_MemoryTest";
+            this.lbl_MemoryTest.Size = new System.Drawing.Size(89, 25);
+            this.lbl_MemoryTest.TabIndex = 5;
+            this.lbl_MemoryTest.Text = "Memory";
+            // 
+            // MemoryTable
+            // 
+            this.MemoryTable.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(65)))), ((int)(((byte)(65)))), ((int)(((byte)(65)))));
+            this.MemoryTable.ColumnCount = 10;
+            this.MemoryTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 10F));
+            this.MemoryTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 10F));
+            this.MemoryTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 10F));
+            this.MemoryTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 10F));
+            this.MemoryTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 10F));
+            this.MemoryTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 10F));
+            this.MemoryTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 10F));
+            this.MemoryTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 10F));
+            this.MemoryTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 10F));
+            this.MemoryTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 10F));
+            this.MemoryTable.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.875F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.MemoryTable.Location = new System.Drawing.Point(26, 328);
+            this.MemoryTable.Name = "MemoryTable";
+            this.MemoryTable.RowCount = 10;
+            this.MemoryTable.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 10F));
+            this.MemoryTable.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 10F));
+            this.MemoryTable.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 10F));
+            this.MemoryTable.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 10F));
+            this.MemoryTable.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 10F));
+            this.MemoryTable.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 10F));
+            this.MemoryTable.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 10F));
+            this.MemoryTable.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 10F));
+            this.MemoryTable.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 10F));
+            this.MemoryTable.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 10F));
+            this.MemoryTable.Size = new System.Drawing.Size(732, 671);
+            this.MemoryTable.TabIndex = 4;
+            this.MemoryTable.Paint += new System.Windows.Forms.PaintEventHandler(this.MemoryTable_Paint);
             // 
             // gb_InpOut
             // 
@@ -239,20 +290,33 @@ namespace CPUVisNEA
             this.gb_Execute.AutoSize = true;
             this.gb_Execute.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
             this.gb_Execute.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(62)))), ((int)(((byte)(84)))), ((int)(((byte)(151)))));
+            this.gb_Execute.Controls.Add(this.RunSpeed);
+            this.gb_Execute.Controls.Add(this.btb_PlayOrPause);
             this.gb_Execute.Controls.Add(this.btn_ReturnToEdit);
             this.gb_Execute.Controls.Add(this.btn_Run);
             this.gb_Execute.Controls.Add(this.DD_Scheme);
-            this.gb_Execute.Controls.Add(this.DD_Speed);
             this.gb_Execute.Controls.Add(this.btn_Compile);
             this.gb_Execute.ForeColor = System.Drawing.Color.White;
             this.gb_Execute.Location = new System.Drawing.Point(20, 1054);
             this.gb_Execute.Margin = new System.Windows.Forms.Padding(6);
             this.gb_Execute.Name = "gb_Execute";
             this.gb_Execute.Padding = new System.Windows.Forms.Padding(6);
-            this.gb_Execute.Size = new System.Drawing.Size(746, 239);
+            this.gb_Execute.Size = new System.Drawing.Size(746, 244);
             this.gb_Execute.TabIndex = 3;
             this.gb_Execute.TabStop = false;
             this.gb_Execute.Text = "Execution Buttons";
+            // 
+            // btb_PlayOrPause
+            // 
+            this.btb_PlayOrPause.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(90)))), ((int)(((byte)(90)))), ((int)(((byte)(90)))));
+            this.btb_PlayOrPause.ForeColor = System.Drawing.Color.White;
+            this.btb_PlayOrPause.Location = new System.Drawing.Point(318, 32);
+            this.btb_PlayOrPause.Margin = new System.Windows.Forms.Padding(6);
+            this.btb_PlayOrPause.Name = "btb_PlayOrPause";
+            this.btb_PlayOrPause.Size = new System.Drawing.Size(52, 59);
+            this.btb_PlayOrPause.TabIndex = 10;
+            this.btb_PlayOrPause.UseVisualStyleBackColor = false;
+            this.btb_PlayOrPause.Visible = false;
             // 
             // btn_ReturnToEdit
             // 
@@ -289,27 +353,17 @@ namespace CPUVisNEA
             this.DD_Scheme.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.DD_Scheme.Font = new System.Drawing.Font("Microsoft Sans Serif", 16.125F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.DD_Scheme.FormattingEnabled = true;
-            this.DD_Scheme.Items.AddRange(new object[] { "Dark Mode", "Light Mode", "Colour Blind", "Hacker ", "Custom" });
-            this.DD_Scheme.Location = new System.Drawing.Point(391, 144);
+            this.DD_Scheme.Items.AddRange(new object[] {
+            "Dark Mode",
+            "Light Mode",
+            "Colour Blind",
+            "Hacker ",
+            "Custom"});
+            this.DD_Scheme.Location = new System.Drawing.Point(391, 23);
             this.DD_Scheme.Name = "DD_Scheme";
             this.DD_Scheme.Size = new System.Drawing.Size(346, 59);
             this.DD_Scheme.TabIndex = 7;
             this.DD_Scheme.Tag = "";
-            // 
-            // DD_Speed
-            // 
-            this.DD_Speed.AccessibleRole = System.Windows.Forms.AccessibleRole.ButtonDropDown;
-            this.DD_Speed.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.ListItems;
-            this.DD_Speed.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.DD_Speed.Font = new System.Drawing.Font("Microsoft Sans Serif", 16.125F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.DD_Speed.FormattingEnabled = true;
-            this.DD_Speed.Items.AddRange(new object[] { "Real time execution", "Fast", "Medium", "Slow", "User Controlled Step" });
-            this.DD_Speed.Location = new System.Drawing.Point(390, 32);
-            this.DD_Speed.Name = "DD_Speed";
-            this.DD_Speed.Size = new System.Drawing.Size(346, 59);
-            this.DD_Speed.TabIndex = 6;
-            this.DD_Speed.Tag = "";
-            this.DD_Speed.SelectedIndexChanged += new System.EventHandler(this.DD_Speed_SelectedIndexChanged);
             // 
             // btn_Compile
             // 
@@ -397,6 +451,28 @@ namespace CPUVisNEA
             this.gb_userInput.Text = "User Input";
             this.gb_userInput.Enter += new System.EventHandler(this.gb_userInput_Enter);
             // 
+            // txt_CurrentFDE
+            // 
+            this.txt_CurrentFDE.AllowDrop = true;
+            this.txt_CurrentFDE.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(90)))), ((int)(((byte)(90)))), ((int)(((byte)(90)))));
+            this.txt_CurrentFDE.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.txt_CurrentFDE.ForeColor = System.Drawing.Color.White;
+            this.txt_CurrentFDE.Location = new System.Drawing.Point(23, 167);
+            this.txt_CurrentFDE.Margin = new System.Windows.Forms.Padding(6);
+            this.txt_CurrentFDE.Multiline = true;
+            this.txt_CurrentFDE.Name = "txt_CurrentFDE";
+            this.txt_CurrentFDE.ReadOnly = true;
+            this.txt_CurrentFDE.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
+            this.txt_CurrentFDE.Size = new System.Drawing.Size(756, 320);
+            this.txt_CurrentFDE.TabIndex = 4;
+            // 
+            // RunSpeed
+            // 
+            this.RunSpeed.Location = new System.Drawing.Point(318, 121);
+            this.RunSpeed.Name = "RunSpeed";
+            this.RunSpeed.Size = new System.Drawing.Size(419, 90);
+            this.RunSpeed.TabIndex = 11;
+            // 
             // UI
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(12F, 25F);
@@ -421,13 +497,17 @@ namespace CPUVisNEA
             this.gb_registers.ResumeLayout(false);
             this.gb_registers.PerformLayout();
             this.gb_Display.ResumeLayout(false);
+            this.gb_Display.PerformLayout();
             this.gb_InpOut.ResumeLayout(false);
             this.gb_InpOut.PerformLayout();
             this.gb_Execute.ResumeLayout(false);
+            this.gb_Execute.PerformLayout();
             this.gb_UAssControls.ResumeLayout(false);
             this.gb_userInput.ResumeLayout(false);
             this.gb_userInput.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.RunSpeed)).EndInit();
             this.ResumeLayout(false);
+
         }
 
         private System.Windows.Forms.Button btn_LoadFile;
@@ -451,13 +531,17 @@ namespace CPUVisNEA
         private System.Windows.Forms.TextBox txt_uProg;
         private System.Windows.Forms.GroupBox gb_Execute;
         public System.Windows.Forms.ComboBox DD_Scheme;
-        public System.Windows.Forms.ComboBox DD_Speed;
         private System.Windows.Forms.Button btn_Compile;
         private System.Windows.Forms.GroupBox gb_UAssControls;
         private System.Windows.Forms.Button btn_SaveFile;
         private System.Windows.Forms.GroupBox gb_userInput;
         private System.Windows.Forms.Button btn_ReturnToEdit;
         private System.Windows.Forms.Button btn_Run;
+        private System.Windows.Forms.Button btb_PlayOrPause;
+        private System.Windows.Forms.TableLayoutPanel MemoryTable;
+        private System.Windows.Forms.Label lbl_MemoryTest;
+        private TextBox txt_CurrentFDE;
+        private TrackBar RunSpeed;
     }
     
     
