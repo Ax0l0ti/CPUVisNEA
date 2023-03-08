@@ -215,13 +215,13 @@ namespace CPUVisNEA
             {
                 // for every instruction in the compiled program, fill RAM index with instruction signiture 
                 //todo appemnds??? or byte List
-                ram.Memory[index] = (byte)instruction.Tag;
+                ram.Memory.Add((byte)instruction.Tag);
                 ram.InstructionLocations[instruction] = index;
                 //increment and for each argument of instruction store operand and increment again
                 index++;
                 foreach (var argument in instruction.args)
                 {
-                    ram.Memory[index] = argument.ToByte();
+                    ram.Memory.Add(argument.ToByte());
                     index++;
                 }
             }
@@ -379,7 +379,7 @@ namespace CPUVisNEA
 
     public class RAM
     {
-        public byte[] Memory = new byte[256] ;
+        public List<byte> Memory = new List<byte>() ;
         private Instruction[] AssembelyProgram = { };
         public Dictionary<Instruction, int> InstructionLocations = new Dictionary<Instruction, int>() ;
         private bool binaryMode;

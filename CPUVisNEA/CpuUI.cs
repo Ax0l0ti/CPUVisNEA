@@ -58,6 +58,7 @@ namespace CPUVisNEA
         private List<string> availableFiles = new List<string>();
         private bool Editstate = true;
         private CPU cpu;
+        private bool BytesVHuman = false;
         
         public UI(CPU cpu)
             {
@@ -70,6 +71,8 @@ namespace CPUVisNEA
         {
             UpdateFileNames();
             RunSpeed.SetRange( 0, 5000 );
+            //always load program in edit state
+            setEditState(true);
         }
 
         private void UpdateFileNames()
@@ -83,7 +86,6 @@ namespace CPUVisNEA
             Trace.WriteLine($"{availableFiles.Count} Files named : {string.Join(", ", availableFiles)}");
              //todo 
         }
-
         private void run()
         {
 
@@ -93,51 +95,144 @@ namespace CPUVisNEA
             cpu.FillRam();
             //fist index is always 0
             
-            //VisualMemoryCreate(0);
-
+            VisualMemoryCreate();
+            VisualMemoryUpdate( 0 );
             do
             {
                 // todo wait for step
                 wait(RunSpeed.Value);
+                VisualMemoryUpdate( cpu.CurrentState.PC.content );
                 cpu.FDECycle( /* todo step parameter to slow it down */ ); // Complete 1 cycle
-                
-                //VisualMemoryUpdate( cpu.CurrentState.PC.content );
-                
                 updateFDELogs(); //todo mabye make whenever updated
                 
             } while (!cpu.CheckHalted());
             
         }
-        private void VisualMemoryCreate( int current  )
+        /* todo create new class
+         * make a list of new classes containing 2 labels
+         * ----> one label holding index that fills top with bold text
+         * ----> one label holding Memory value at index 
+         */
+        private void VisualMemoryCreate()
         {
-
-            for ( int row = 0; row < 10; row++ )
+            int max = ReqNumOfMemoryIndexes();
+            
+            MemoryTable.Controls.Clear();
+            // for '(max / 10) + 1' columns means that required num of row always rounds upwards to accommodate
+            for ( int row = 0; row < ((max / 10) + 1)  ; row++ )
             {
+                
                 for ( int col = 0; col < 10; col++ )
                 {
                     int index = row * 10 + col;
                     
-                    string text = $"{index}\n{cpu.ram.Memory[index]}";
-
-                    // Create a new Label control with the text and add it to the TableLayoutPanel
                     
-                    Label label = new Label();
-                    if ( index == current )
+                    Cell cell = new Cell(index.ToString());
+                    if( max <= index )
                     {
-                        label.BackColor = Color.Aqua;
+                        string text = "0";
+                        cell.content.Text = text;
                     }
-                    label.Text = text;
-                    label.Dock = DockStyle.Fill;
+                    else
+                    {
+                        string text = $"{cpu.ram.Memory[index]}";
+                        cell.content.Text = text;
+                    }
+
+                    /*
+                     label.Dock = DockStyle.Fill;
                     label.TextAlign = ContentAlignment.MiddleCenter;
                     MemoryTable.Controls.Add( label, col, row );
+                    */
+                    MemoryTable.Controls.Add( cell, col,row);
                 }
             }
         }
+
+        private int ReqNumOfMemoryIndexes()
+        {
+            return cpu.ram.Memory.Count;
+        }
+        
+
         private void VisualMemoryUpdate( int current )
         {
-            MemoryTable.Controls.Clear();
-            VisualMemoryCreate(current);
+            int max = ReqNumOfMemoryIndexes();
+            for ( int row = 0; row < ((max / 10) + 1) ; row++ )
+            {
+                for ( int col = 0; col < 10; col++ )
+                {
+                    int index = row * 10 + col;
+                    string text = "";
+                    if( cpu.ram.Memory.Count <= index )
+                    {
+                         text = "0";
+                    }
+                    else
+                    {
+                        text = $"{cpu.ram.Memory[index]}";
+                    }
+                    
+
+                    // Create a new Label control with the text and add it to the TableLayoutPanel
+                    if ( index == current )
+                    {
+                        MemoryTable.Controls[index].BackColor = Color.DeepSkyBlue;
+                    } else
+                    {
+                        MemoryTable.Controls[index].BackColor = Color.DarkSlateGray;
+                    }
+                     
+                    ( (Cell)MemoryTable.Controls[index] ).content.Text = text;
+                }
+            }
         }
+        public class Cell : Panel 
+        {
+            private Label name;
+            public Label content;
+
+            public Cell(string name)
+            {
+                // Initialize the name label
+                this.name = new Label();
+                this.name.Text = name;
+                this.name.AutoSize = false;
+                this.name.TextAlign = ContentAlignment.MiddleCenter;
+                this.name.Dock = DockStyle.Top;
+                // name in boldened font
+                this.name.Font = new Font(this.name.Font, FontStyle.Bold);
+
+
+                    // Initialize the content label
+                content = new Label();
+                content.Text = "";
+                content.AutoSize = false;
+                content.TextAlign = ContentAlignment.MiddleCenter;
+                content.Dock = DockStyle.Bottom;
+
+                // Add the name and content labels to the cell
+                /* Panel panel = new Panel();
+                panel.BackColor = Color.White;
+                panel.Controls.Add(content);
+                panel.Controls.Add(this.name);
+                panel.Dock = DockStyle.Fill;
+
+                // Set the cell's controls and initial background color
+                Controls.Add(panel); */
+                BackColor = Color.LightSlateGray;
+                Controls.Add(this.name);
+                Controls.Add(content);
+            }
+
+            public Color BackColor
+            {
+                set { content.BackColor = value; }
+            }
+
+            // Other properties and methods as needed
+        }
+
         private void RefreshLogs()
         {
             txt_longFDE.Text = "";
@@ -181,6 +276,9 @@ namespace CPUVisNEA
                 btn_Compile.Visible = edit;
                 btn_ReturnToEdit.Visible = !edit;
                 btn_Run.Visible = !edit;
+                btn_play.Visible = !edit;
+                btn_pause.Visible = !edit;
+                RunSpeed.Visible = !edit;
             }
             
 
@@ -239,6 +337,10 @@ namespace CPUVisNEA
                 txt_longFDE.Text = txt_longFDE.Text + change + Environment.NewLine ;
             }
 
+            if (cpu.CurrentState.Outputs != null)
+            {
+                txt_out.Text += '\n' + cpu.CurrentState.Outputs  ;
+            }
         }
         private void btn_SaveFile_Click(object sender, EventArgs e)
         {
