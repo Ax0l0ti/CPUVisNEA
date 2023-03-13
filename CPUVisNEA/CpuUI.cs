@@ -11,6 +11,7 @@ using System.Windows.Forms;
 using NUnit.Framework.Internal;
 using static System.Net.Mime.MediaTypeNames;
 using Application = System.Windows.Forms.Application;
+
 //todo look at this for design https://www.101computing.net/LMC/# 
 /*
 ____________________________________________________________________________________________________________
@@ -51,7 +52,6 @@ ________________________________________________________________________________
 */
 namespace CPUVisNEA
 {
-    
     public partial class UI : Form
     {
         private string path = Environment.GetFolderPath(Environment.SpecialFolder.Personal) + "\\CPU_Edu_UI\\";
@@ -59,18 +59,19 @@ namespace CPUVisNEA
         private bool Editstate = true;
         private CPU cpu;
         private bool BytesVHuman = false;
-        
+
         public UI(CPU cpu)
-            {
-                this.cpu = cpu;
-                InitializeComponent();
-            }
+        {
+            this.cpu = cpu;
+            InitializeComponent();
+        }
+
         //when the form loads, get all available file names from the directory 
         //this should be both 
         private void UI_Load(object sender, EventArgs e)
         {
             UpdateFileNames();
-            RunSpeed.SetRange( 0, 5000 );
+            RunSpeed.SetRange(0, 5000);
             //always load program in edit state
             setEditState(true);
         }
@@ -78,36 +79,37 @@ namespace CPUVisNEA
         private void UpdateFileNames()
         {
             availableFiles.Clear();
-            foreach (var filePath in Directory.GetFiles(path) )
+            foreach (var filePath in Directory.GetFiles(path))
             {
                 var fileName = filePath.Replace(path, "");
                 availableFiles.Add(fileName);
             }
+
             Trace.WriteLine($"{availableFiles.Count} Files named : {string.Join(", ", availableFiles)}");
-             //todo 
+            //todo 
         }
+
         private void run()
         {
-
             //set up and refresh all variables for new Run Command
             cpu.SetUpFresh();
             RefreshLogs();
             cpu.FillRam();
             //fist index is always 0
-            
+
             VisualMemoryCreate();
-            VisualMemoryUpdate( 0 );
+            VisualMemoryUpdate(0);
+            SPRCreate();
             do
             {
                 // todo wait for step
                 wait(RunSpeed.Value);
-                VisualMemoryUpdate( cpu.CurrentState.PC.content );
-                cpu.FDECycle( /* todo step parameter to slow it down */ ); // Complete 1 cycle
+                VisualMemoryUpdate(cpu.CurrentState.PC.content);
+                cpu.FDECycle( /* todo step parameter to slow it down */); // Complete 1 cycle
                 updateFDELogs(); //todo mabye make whenever updated
-                
             } while (!cpu.CheckHalted());
-            
         }
+
         /* todo create new class
          * make a list of new classes containing 2 labels
          * ----> one label holding index that fills top with bold text
@@ -115,79 +117,115 @@ namespace CPUVisNEA
          */
         private void VisualMemoryCreate()
         {
-            int max = ReqNumOfMemoryIndexes();
-            
+            var max = ReqNumOfMemoryIndexes();
+
             MemoryTable.Controls.Clear();
             // for '(max / 10) + 1' columns means that required num of row always rounds upwards to accommodate
-            for ( int row = 0; row < ((max / 10) + 1)  ; row++ )
+            for (var row = 0; row < max / 10 + 1; row++)
+            for (var col = 0; col < 10; col++)
             {
-                
-                for ( int col = 0; col < 10; col++ )
-                {
-                    int index = row * 10 + col;
-                    
-                    
-                    Cell cell = new Cell(index.ToString());
-                    if( max <= index )
-                    {
-                        string text = "0";
-                        cell.content.Text = text;
-                    }
-                    else
-                    {
-                        string text = $"{cpu.ram.Memory[index]}";
-                        cell.content.Text = text;
-                    }
+                var index = row * 10 + col;
 
-                    /*
+
+                var cell = new Cell(index.ToString());
+                if (max <= index)
+                {
+                    var text = "0";
+                    cell.content.Text = text;
+                }
+                else
+                {
+                    var text = $"{cpu.ram.Memory[index]}";
+                    cell.content.Text = text;
+                }
+
+                /*
                      label.Dock = DockStyle.Fill;
                     label.TextAlign = ContentAlignment.MiddleCenter;
                     MemoryTable.Controls.Add( label, col, row );
                     */
-                    MemoryTable.Controls.Add( cell, col,row);
-                }
+                MemoryTable.Controls.Add(cell, col, row);
             }
+        }
+
+        private void SPRCreate()
+        {
+            int index = 0;
+            var SPRs = new List<string> { "PC", "MAR", "MDR", "ACC", "CIR", "MBR" };
+            var pc = new Cell("PC");
+            pc.content.Text = cpu.CurrentState.PC.content.ToString();
+            SPRTable.Controls.Add(pc,index,0);
+            index++;
+            
+            var mar = new Cell("MAR");
+            mar.content.Text = cpu.CurrentState.MAR.content;
+            SPRTable.Controls.Add(mar,index,0);
+            index++;
+
+            var mdr = new Cell("MDR");
+            mdr.content.Text = cpu.CurrentState.MDR.content.ToString();
+            SPRTable.Controls.Add(mdr,index,0);
+            index++;
+
+            var acc = new Cell("ACC");
+            acc.content.Text = cpu.CurrentState.ACC.content.ToString();
+            SPRTable.Controls.Add(acc,index,0);
+            index++;
+
+            var cir = new Cell("CIR");
+            cir.content.Text = cpu.CurrentState.CIR.content;
+            SPRTable.Controls.Add(cir,index,0);
+            index++;
+
+            var mbr = new Cell("MBR");
+            mbr.content.Text = cpu.CurrentState.MBR.content.ToString();
+            SPRTable.Controls.Add(mbr,index,0);
+            index++;
+
+            for (var i = 0; i < cpu.CurrentState.Basic.Length; i++)
+            {
+                var Registeri = new Cell($"R{i}");
+                Registeri.content.Text = cpu.CurrentState.Basic[i].content.ToString();
+                BasicRegTable.Controls.Add(Registeri,i,0);
+            }
+        }
+
+        private void SPRupdate()
+        {
+            //todo copy memory 
         }
 
         private int ReqNumOfMemoryIndexes()
         {
             return cpu.ram.Memory.Count;
         }
-        
 
-        private void VisualMemoryUpdate( int current )
+
+        private void VisualMemoryUpdate(int current)
         {
-            int max = ReqNumOfMemoryIndexes();
-            for ( int row = 0; row < ((max / 10) + 1) ; row++ )
+            var max = ReqNumOfMemoryIndexes();
+            for (var row = 0; row < max / 10 + 1; row++)
+            for (var col = 0; col < 10; col++)
             {
-                for ( int col = 0; col < 10; col++ )
-                {
-                    int index = row * 10 + col;
-                    string text = "";
-                    if( cpu.ram.Memory.Count <= index )
-                    {
-                         text = "0";
-                    }
-                    else
-                    {
-                        text = $"{cpu.ram.Memory[index]}";
-                    }
-                    
+                var index = row * 10 + col;
+                var text = "";
+                if (cpu.ram.Memory.Count <= index)
+                    text = "0";
+                else
+                    text = $"{cpu.ram.Memory[index]}";
 
-                    // Create a new Label control with the text and add it to the TableLayoutPanel
-                    if ( index == current )
-                    {
-                        MemoryTable.Controls[index].BackColor = Color.DeepSkyBlue;
-                    } else
-                    {
-                        MemoryTable.Controls[index].BackColor = Color.DarkSlateGray;
-                    }
-                     
-                    ( (Cell)MemoryTable.Controls[index] ).content.Text = text;
-                }
+
+                // Create a new Label control with the text and add it to the TableLayoutPanel
+                if (index == current)
+                    MemoryTable.Controls[index].BackColor = Color.DeepSkyBlue;
+                else
+                    MemoryTable.Controls[index].BackColor = Color.DarkSlateGray;
+
+                ((Cell)MemoryTable.Controls[index]).content.Text = text;
             }
         }
-        public class Cell : Panel 
+
+        public class Cell : Panel
         {
             private Label name;
             public Label content;
@@ -204,7 +242,7 @@ namespace CPUVisNEA
                 this.name.Font = new Font(this.name.Font, FontStyle.Bold);
 
 
-                    // Initialize the content label
+                // Initialize the content label
                 content = new Label();
                 content.Text = "";
                 content.AutoSize = false;
@@ -227,7 +265,7 @@ namespace CPUVisNEA
 
             public Color BackColor
             {
-                set { content.BackColor = value; }
+                set => content.BackColor = value;
             }
 
             // Other properties and methods as needed
@@ -240,86 +278,85 @@ namespace CPUVisNEA
         }
 
         private void gb_userInput_Enter(object sender, EventArgs e)
-            {
-                
+        {
+        }
 
+        private void pnl_uCodeManip_Paint(object sender, PaintEventArgs e)
+        {
+        }
+
+        private void btn_Compile_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                cpu.Compiler = new Compiler();
+                var valid = cpu.Compile(txt_uProg.Text);
+                Trace.WriteLine($"compiled: \n {txt_uProg.Text}");
+                setEditState(false);
             }
-
-            private void pnl_uCodeManip_Paint(object sender, PaintEventArgs e)
+            catch (Exception ex)
             {
-
+                MessageBox.Show($"Failed to Compile Program, error message : {ex}");
             }
+            // if valid, call CPU.ChangeState()
+            // if invalid, output assembly problems
+        }
 
-            private void btn_Compile_Click(object sender, EventArgs e)
+        private void setEditState(bool edit)
+        {
+            Trace.WriteLine($"Switched to Edit Mode to {edit} \n");
+            Editstate = edit;
+            txt_uProg.Enabled = edit;
+            btn_Compile.Visible = edit;
+            btn_ReturnToEdit.Visible = !edit;
+            btn_Run.Visible = !edit;
+            btn_play.Visible = !edit;
+            btn_pause.Visible = !edit;
+            RunSpeed.Visible = !edit;
+        }
+
+
+        private void txt_uProg_TextChanged(object sender, EventArgs e)
+        {
+            //current method is inefficient as it iterates round every line when updating
+            var i = 0;
+            var validLine = true;
+            //while there is still a line with text on it
+            while (validLine)
             {
+                /*as there is no built in function for converting
+                 a text box from a string to array of lines, I cant use a foreach loop or for loop */
+                //try to assign to-be compiled string the string value in the form's textbox
                 try
                 {
-                    cpu.Compiler = new Compiler();
-                    var valid = cpu.Compile(txt_uProg.Text);
-                    Trace.WriteLine($"compiled: \n {txt_uProg.Text}");
-                    setEditState(false);
+                    if (txt_uProg.Lines != null) cpu.Compiler.StringProgram[i] = txt_uProg.Lines[i];
                 }
-                catch (Exception ex)
+                catch (Exception exception)
                 {
-                    MessageBox.Show($"Failed to Compile Program, error message : {ex}");
-                }
-                // if valid, call CPU.ChangeState()
-                // if invalid, output assembly problems
-
-            }
-
-            private void setEditState(bool edit)
-            {
-                Trace.WriteLine($"Switched to Edit Mode to {edit} \n");
-                Editstate = edit;
-                txt_uProg.Enabled = edit;
-                btn_Compile.Visible = edit;
-                btn_ReturnToEdit.Visible = !edit;
-                btn_Run.Visible = !edit;
-                btn_play.Visible = !edit;
-                btn_pause.Visible = !edit;
-                RunSpeed.Visible = !edit;
-            }
-            
-
-            private void txt_uProg_TextChanged(object sender, EventArgs e)
-            {
-                //current method is inefficient as it iterates round every line when updating
-                int i = 0;
-                bool validLine = true; 
-                //while there is still a line with text on it
-                while (validLine)
-                {
-                    /*as there is no built in function for converting
-                     a text box from a string to array of lines, I cant use a foreach loop or for loop */
-                    //try to assign to-be compiled string the string value in the form's textbox
-                    try { if (txt_uProg.Lines != null) { cpu.Compiler.StringProgram[i] = txt_uProg.Lines[i]; } }
-                    catch(Exception exception)
-                    {
-                        //if error stop compiling as this is either end of textbook string or incorrect syntax
-                        Console.WriteLine(exception);
-                        validLine = false;
-                    }
-                    i++;
+                    //if error stop compiling as this is either end of textbook string or incorrect syntax
+                    Console.WriteLine(exception);
+                    validLine = false;
                 }
 
-                //need to create function to update Compiler class local variable of contents
-                //
-                // int len = this.txt_uProg.Lines.Length;
-                // for(int line = 0, line<len;lin)
-                // {
-                //     
-                // }
-                //
-                
+                i++;
             }
 
-            private void btn_ReturnToEdit_Click(object sender, EventArgs e)
+            //need to create function to update Compiler class local variable of contents
+            //
+            // int len = this.txt_uProg.Lines.Length;
+            // for(int line = 0, line<len;lin)
+            // {
+            //     
+            // }
+            //
+        }
+
+        private void btn_ReturnToEdit_Click(object sender, EventArgs e)
         {
             setEditState(true);
         }
 
-        private void btn_Run_Click( object sender, EventArgs e )
+        private void btn_Run_Click(object sender, EventArgs e)
         {
             //cpu.Run();
             run();
@@ -327,47 +364,37 @@ namespace CPUVisNEA
 
         private void updateFDELogs()
         {
-            
-            foreach (var change in cpu.CurrentState.changeLog)
-            {
-                txt_shortFDE.Text += change + Environment.NewLine  ;
-            }
+            foreach (var change in cpu.CurrentState.changeLog) txt_shortFDE.Text += change + Environment.NewLine;
             foreach (var change in cpu.CurrentState.DetailedChangeLog)
-            {
-                txt_longFDE.Text = txt_longFDE.Text + change + Environment.NewLine ;
-            }
+                txt_longFDE.Text = txt_longFDE.Text + change + Environment.NewLine;
 
-            if (cpu.CurrentState.Outputs != null)
-            {
-                txt_out.Text += '\n' + cpu.CurrentState.Outputs  ;
-            }
+            if (cpu.CurrentState.Outputs != null) txt_out.Text += '\n' + cpu.CurrentState.Outputs;
         }
+
         private void btn_SaveFile_Click(object sender, EventArgs e)
         {
             //todo validate???
             //btn_Compile_Click(sender,e);
-            var SaveFile = new SaveFile_Form( txt_uProg.Text, availableFiles );
+            var SaveFile = new SaveFile_Form(txt_uProg.Text, availableFiles);
             SaveFile.ShowDialog();
             UpdateFileNames();
         }
 
         private void btn_DeleteFile_Click(object sender, EventArgs e)
         {
-            var DeleteFile = new DeleteFile_Form( availableFiles );
+            var DeleteFile = new DeleteFile_Form(availableFiles);
             DeleteFile.ShowDialog();
             UpdateFileNames();
         }
 
         private void btn_LoadFile_Click(object sender, EventArgs e)
         {
-            var LoadFile = new LoadFile_Form( availableFiles );
+            var LoadFile = new LoadFile_Form(availableFiles);
             //whilst the Load isnt dealt with, carry on showing it
             LoadFile.ShowDialog();
-            if (LoadFile.ReturnedProgram != "")
-            {
-                txt_uProg.Text = LoadFile.ReturnedProgram;
-            }
+            if (LoadFile.ReturnedProgram != "") txt_uProg.Text = LoadFile.ReturnedProgram;
         }
+
         //declared inside UI class to allow interaction and register when a click event on the form is taken
         private void wait(int ms)
         {
@@ -376,7 +403,7 @@ namespace CPUVisNEA
 
             // Console.WriteLine("start wait timer");
             timer.Interval = ms;
-            timer.Enabled  = true;
+            timer.Enabled = true;
             timer.Start();
 
             timer.Tick += (s, e) =>
@@ -386,32 +413,27 @@ namespace CPUVisNEA
                 // Console.WriteLine("stop wait timer");
             };
 
-            while (timer.Enabled)
-            {
-                Application.DoEvents();
-            }
+            while (timer.Enabled) Application.DoEvents();
         }
 
         private void DD_Speed_SelectedIndexChanged(object sender, EventArgs e)
         {
-            throw new System.NotImplementedException();
+            throw new NotImplementedException();
         }
 
-        private void MemoryTable_Paint( object sender, PaintEventArgs e )
+        private void MemoryTable_Paint(object sender, PaintEventArgs e)
         {
-
         }
 
-        private void txt_shortFDE_TextChanged( object sender, EventArgs e )
+        private void txt_shortFDE_TextChanged(object sender, EventArgs e)
         {
             txt_shortFDE.ScrollToCaret();
         }
 
-        private void txt_longFDE_TextChanged( object sender, EventArgs e )
+        private void txt_longFDE_TextChanged(object sender, EventArgs e)
         {
             txt_longFDE.ScrollToCaret();
         }
-
     }
 }
 /*

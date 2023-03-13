@@ -42,7 +42,8 @@ namespace CPUVisNEA
             this.groupBox3 = new System.Windows.Forms.GroupBox();
             this.backgroundWorker2 = new System.ComponentModel.BackgroundWorker();
             this.gb_registers = new System.Windows.Forms.GroupBox();
-            this.txt_TEMPORARY = new System.Windows.Forms.TextBox();
+            this.BasicRegTable = new System.Windows.Forms.TableLayoutPanel();
+            this.SPRTable = new System.Windows.Forms.TableLayoutPanel();
             this.gb_Display = new System.Windows.Forms.GroupBox();
             this.btn_MachineHuman = new System.Windows.Forms.Button();
             this.lbl_MemoryTest = new System.Windows.Forms.Label();
@@ -62,6 +63,7 @@ namespace CPUVisNEA
             this.btn_DeleteFile = new System.Windows.Forms.Button();
             this.btn_SaveFile = new System.Windows.Forms.Button();
             this.gb_userInput = new System.Windows.Forms.GroupBox();
+            this.tableLayoutPanel2 = new System.Windows.Forms.TableLayoutPanel();
             this.gb_outputs.SuspendLayout();
             this.gb_InpOut.SuspendLayout();
             this.gb_registers.SuspendLayout();
@@ -173,7 +175,8 @@ namespace CPUVisNEA
             // gb_registers
             // 
             this.gb_registers.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(62)))), ((int)(((byte)(84)))), ((int)(((byte)(151)))));
-            this.gb_registers.Controls.Add(this.txt_TEMPORARY);
+            this.gb_registers.Controls.Add(this.BasicRegTable);
+            this.gb_registers.Controls.Add(this.SPRTable);
             this.gb_registers.ForeColor = System.Drawing.Color.White;
             this.gb_registers.Location = new System.Drawing.Point(12, 1008);
             this.gb_registers.Margin = new System.Windows.Forms.Padding(6);
@@ -184,21 +187,63 @@ namespace CPUVisNEA
             this.gb_registers.TabStop = false;
             this.gb_registers.Text = "Registers";
             // 
-            // txt_TEMPORARY
+            // BasicRegTable
             // 
-            this.txt_TEMPORARY.AllowDrop = true;
-            this.txt_TEMPORARY.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(90)))), ((int)(((byte)(90)))), ((int)(((byte)(90)))));
-            this.txt_TEMPORARY.BorderStyle = System.Windows.Forms.BorderStyle.None;
-            this.txt_TEMPORARY.ForeColor = System.Drawing.Color.White;
-            this.txt_TEMPORARY.Location = new System.Drawing.Point(31, 58);
-            this.txt_TEMPORARY.Margin = new System.Windows.Forms.Padding(6);
-            this.txt_TEMPORARY.Multiline = true;
-            this.txt_TEMPORARY.Name = "txt_TEMPORARY";
-            this.txt_TEMPORARY.ReadOnly = true;
-            this.txt_TEMPORARY.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.txt_TEMPORARY.Size = new System.Drawing.Size(682, 165);
-            this.txt_TEMPORARY.TabIndex = 4;
-            this.txt_TEMPORARY.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            this.BasicRegTable.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(65)))), ((int)(((byte)(65)))), ((int)(((byte)(65)))));
+            this.BasicRegTable.ColumnCount = 10;
+            this.BasicRegTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 10F));
+            this.BasicRegTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 10F));
+            this.BasicRegTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 10F));
+            this.BasicRegTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 10F));
+            this.BasicRegTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 10F));
+            this.BasicRegTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 10F));
+            this.BasicRegTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 10F));
+            this.BasicRegTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 10F));
+            this.BasicRegTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 10F));
+            this.BasicRegTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 10F));
+            this.BasicRegTable.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.875F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.BasicRegTable.Location = new System.Drawing.Point(11, 149);
+            this.BasicRegTable.Name = "BasicRegTable";
+            this.BasicRegTable.RowCount = 1;
+            this.BasicRegTable.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 10F));
+            this.BasicRegTable.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 10F));
+            this.BasicRegTable.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 10F));
+            this.BasicRegTable.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 10F));
+            this.BasicRegTable.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 10F));
+            this.BasicRegTable.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 10F));
+            this.BasicRegTable.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 10F));
+            this.BasicRegTable.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 10F));
+            this.BasicRegTable.Size = new System.Drawing.Size(863, 90);
+            this.BasicRegTable.TabIndex = 6;
+            // 
+            // SPRTable
+            // 
+            this.SPRTable.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(65)))), ((int)(((byte)(65)))), ((int)(((byte)(65)))));
+            this.SPRTable.ColumnCount = 6;
+            this.SPRTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 10F));
+            this.SPRTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 10F));
+            this.SPRTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 10F));
+            this.SPRTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 10F));
+            this.SPRTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 10F));
+            this.SPRTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 10F));
+            this.SPRTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 10F));
+            this.SPRTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 10F));
+            this.SPRTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 10F));
+            this.SPRTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 10F));
+            this.SPRTable.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.875F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.SPRTable.Location = new System.Drawing.Point(9, 36);
+            this.SPRTable.Name = "SPRTable";
+            this.SPRTable.RowCount = 1;
+            this.SPRTable.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 10F));
+            this.SPRTable.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 10F));
+            this.SPRTable.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 10F));
+            this.SPRTable.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 10F));
+            this.SPRTable.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 10F));
+            this.SPRTable.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 10F));
+            this.SPRTable.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 10F));
+            this.SPRTable.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 10F));
+            this.SPRTable.Size = new System.Drawing.Size(863, 100);
+            this.SPRTable.TabIndex = 5;
             // 
             // gb_Display
             // 
@@ -234,7 +279,7 @@ namespace CPUVisNEA
             // 
             this.lbl_MemoryTest.AutoSize = true;
             this.lbl_MemoryTest.Font = new System.Drawing.Font("Microsoft YaHei UI", 13.875F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lbl_MemoryTest.Location = new System.Drawing.Point(26, 93);
+            this.lbl_MemoryTest.Location = new System.Drawing.Point(21, 72);
             this.lbl_MemoryTest.Name = "lbl_MemoryTest";
             this.lbl_MemoryTest.Size = new System.Drawing.Size(170, 48);
             this.lbl_MemoryTest.TabIndex = 5;
@@ -255,7 +300,7 @@ namespace CPUVisNEA
             this.MemoryTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 10F));
             this.MemoryTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 10F));
             this.MemoryTable.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.875F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.MemoryTable.Location = new System.Drawing.Point(26, 144);
+            this.MemoryTable.Location = new System.Drawing.Point(21, 148);
             this.MemoryTable.Name = "MemoryTable";
             this.MemoryTable.RowCount = 8;
             this.MemoryTable.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 10F));
@@ -266,7 +311,7 @@ namespace CPUVisNEA
             this.MemoryTable.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 10F));
             this.MemoryTable.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 10F));
             this.MemoryTable.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 10F));
-            this.MemoryTable.Size = new System.Drawing.Size(863, 855);
+            this.MemoryTable.Size = new System.Drawing.Size(863, 784);
             this.MemoryTable.TabIndex = 4;
             this.MemoryTable.Paint += new System.Windows.Forms.PaintEventHandler(this.MemoryTable_Paint);
             // 
@@ -479,6 +524,35 @@ namespace CPUVisNEA
             this.gb_userInput.Text = "User Input";
             this.gb_userInput.Enter += new System.EventHandler(this.gb_userInput_Enter);
             // 
+            // tableLayoutPanel2
+            // 
+            this.tableLayoutPanel2.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(65)))), ((int)(((byte)(65)))), ((int)(((byte)(65)))));
+            this.tableLayoutPanel2.ColumnCount = 10;
+            this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 10F));
+            this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 10F));
+            this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 10F));
+            this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 10F));
+            this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 10F));
+            this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 10F));
+            this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 10F));
+            this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 10F));
+            this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 10F));
+            this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 20F));
+            this.tableLayoutPanel2.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.875F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.tableLayoutPanel2.Location = new System.Drawing.Point(0, 0);
+            this.tableLayoutPanel2.Name = "tableLayoutPanel2";
+            this.tableLayoutPanel2.RowCount = 8;
+            this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
+            this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
+            this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
+            this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
+            this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
+            this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
+            this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
+            this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
+            this.tableLayoutPanel2.Size = new System.Drawing.Size(200, 100);
+            this.tableLayoutPanel2.TabIndex = 0;
+            // 
             // UI
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(12F, 25F);
@@ -503,7 +577,6 @@ namespace CPUVisNEA
             this.gb_InpOut.ResumeLayout(false);
             this.gb_InpOut.PerformLayout();
             this.gb_registers.ResumeLayout(false);
-            this.gb_registers.PerformLayout();
             this.gb_Display.ResumeLayout(false);
             this.gb_Display.PerformLayout();
             this.gb_Execute.ResumeLayout(false);
@@ -514,6 +587,11 @@ namespace CPUVisNEA
             this.gb_userInput.PerformLayout();
             this.ResumeLayout(false);
         }
+
+        private System.Windows.Forms.TableLayoutPanel BasicRegTable;
+
+        private System.Windows.Forms.TableLayoutPanel SPRTable;
+        private System.Windows.Forms.TableLayoutPanel tableLayoutPanel2;
 
         private System.Windows.Forms.Button btn_MachineHuman;
 
@@ -533,7 +611,6 @@ namespace CPUVisNEA
         private System.Windows.Forms.TextBox txt_longFDE;
         private System.Windows.Forms.TextBox txt_shortFDE;
         private System.Windows.Forms.GroupBox gb_registers;
-        private System.Windows.Forms.TextBox txt_TEMPORARY;
         private System.Windows.Forms.GroupBox gb_Display;
         private System.Windows.Forms.GroupBox gb_InpOut;
         private System.Windows.Forms.TextBox txt_out;
