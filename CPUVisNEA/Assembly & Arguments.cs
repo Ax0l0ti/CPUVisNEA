@@ -80,12 +80,13 @@ namespace CPUVisNEA
     public abstract class Argument
     {
         protected internal string name;
+        protected int value;
 
         //protected int byteLength ;
         // todo decide IntegerArg byteLength = ( value % 255 ) + 1; 1 for others 
         protected internal virtual byte ToByte()
         {
-            return 0;
+            return (byte)value;
         }
 
         //all arguements have a 
@@ -200,6 +201,8 @@ namespace CPUVisNEA
         {
             Tag = tag;
         }
+        
+        
 
 
         protected internal static Dictionary<CPU.Instructions[], Type[]> dictionaryOfValidParams =
@@ -262,12 +265,13 @@ namespace CPUVisNEA
 
         protected internal void addArg(Argument arg)
         {
+            
             if (validArgType(arg))
                 //if its a valid argument, add it to the objects Arguments list
                 args.Add(arg);
             //else output error saying the argument type cant be used as the nth parameter ( +1 to counter 0 first index) 
             else
-                throw new Exception($"arg {args.Count + 1} can't be {arg.GetType()} for {Tag} Instruction");
+                throw new Exception($"Argument {arg.name} : arg {args.Count + 1} can't be {arg.GetType()} for {Tag} Instruction ");
         }
 
         /*
@@ -296,7 +300,7 @@ namespace CPUVisNEA
                     return new LineLabel(s);
 
                 default:
-                    throw new Exception("Input does not match any of the specified regexes for arguments");
+                    throw new Exception($"{argumentStringForm} does not match any of the specified regexes for arguments");
             }
         }
 
@@ -348,8 +352,9 @@ namespace CPUVisNEA
         //means CPU can call executeInstruction regardless of Child class to get unique behaviour
         protected internal abstract CPUState executeInstruction(List<Argument> args, CPUState NewState);
         /*
+        GENERALISED STRUCTURE 
+        M
         string BasicChangeLog;
-        
         NewState.changeLog.Add( BasicChangeLog );
         Trace.WriteLine( BasicChangeLog );
         NewState.DetailedChangeLog.Add( $"XXX instruction - {args[1].name} ... register {args[0].name} ");
@@ -378,6 +383,7 @@ namespace CPUVisNEA
             //HALT Stop the execution of the program.
 
             NewState.PC.content = -1;
+            NewState.Outputs = "Program Halted";
             return NewState;
         }
 

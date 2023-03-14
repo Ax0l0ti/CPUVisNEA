@@ -136,6 +136,7 @@ namespace CPUVisNEA
             this.gb_InpOut.Size = new System.Drawing.Size(721, 257);
             this.gb_InpOut.TabIndex = 3;
             this.gb_InpOut.TabStop = false;
+            this.gb_InpOut.Text = "Outputs";
             // 
             // txt_out
             // 
@@ -149,7 +150,7 @@ namespace CPUVisNEA
             this.txt_out.Name = "txt_out";
             this.txt_out.ReadOnly = true;
             this.txt_out.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.txt_out.Size = new System.Drawing.Size(167, 200);
+            this.txt_out.Size = new System.Drawing.Size(612, 200);
             this.txt_out.TabIndex = 3;
             // 
             // groupBox4
@@ -219,7 +220,7 @@ namespace CPUVisNEA
             // SPRTable
             // 
             this.SPRTable.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(65)))), ((int)(((byte)(65)))), ((int)(((byte)(65)))));
-            this.SPRTable.ColumnCount = 6;
+            this.SPRTable.ColumnCount = 5;
             this.SPRTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 10F));
             this.SPRTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 10F));
             this.SPRTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 10F));

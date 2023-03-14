@@ -181,7 +181,7 @@ namespace CPUVisNEA
             FDadd = "";
             // Searches from index in RAM for next Instruction
             // calls Display Fetch Log
-            
+            //todo combine into EXECUTE funxtion as currently deals w CPUState registers handling
             var FetchedInstruction = Fetch(CurrentState.PC.content);
             FDadd += ($"\n----------------\n   Fetch\n----------------\n CPU fetches byte {FetchedInstruction} from MDR {CurrentState.PC.content}.\n");
             // Checks How many Parameters Required
@@ -194,7 +194,16 @@ namespace CPUVisNEA
 
             FDadd += ($"\n----------------\n   Execute\n----------------\nExecuting {InstructionToExecute.Tag} with parameters: {string.Join(", ", InstructionToExecute.args.Select(arg => $"{arg.name}"))}") ;
             Trace.WriteLine(FDadd);
-            CurrentState = Execute(InstructionToExecute);
+            try
+            {
+                CurrentState = Execute(InstructionToExecute);
+            }
+            catch( Exception ex)
+            {
+                throw new Exception($" Failed to execute {InstructionToExecute} \n error : {ex}");
+            }
+            
+            
 
             //add to the CPU History
             History.Add(CurrentState);
@@ -305,14 +314,25 @@ namespace CPUVisNEA
             //with my Unit testing interface for if executeInstruction works)
             
             var NewState = CurrentState.Copy();
+            NewState.MAR = NewState.PC;
+            try
+            {
+                if (NewState.MAR.content < ram.Memory.Count )
+                {
+                    //todo error here 
+                    NewState.MDR.content = $"{ram.Memory[NewState.MAR.content]}";
+                }
+            }
+            catch( Exception ex)
+            {
+                throw new Exception(
+                    $" index {NewState.MAR.content} of Ram Memory count {ram.Memory.Count} caused error : {ex}");
+            }
+            
+
+            NewState.CIR.content = $"{instr.Tag}";
             NewState = instr.executeInstruction(instr.args, NewState);
             return NewState;
-        }
-
-
-        private void UpdateRunSpeed(int selection)
-        {
-            // 
         }
 
         /* TODO add 
@@ -392,7 +412,14 @@ namespace CPUVisNEA
 
         internal byte GetByteAt(int index)
         {
-            return Memory[index];
+            if(index > -1 ){
+                return Memory[index];
+            }
+            else
+            {
+                throw new Exception($"Index {index} invalid memory index");
+            }
+            
         }
         
         private List<string> FormRamDisplay_Convert()
@@ -559,7 +586,7 @@ namespace CPUVisNEA
         }
 
         //function to extract value of Register's assAllowed value due to local scope
-        protected object RetContent()
+        protected virtual object RetContent()
         {
             return content;
         }
@@ -586,7 +613,7 @@ namespace CPUVisNEA
     //class for Assembly opcode only registers that hold opcode values
     public class CodeReg : Register
     {
-        internal string content;
+        internal string  content;
 
         public CodeReg(string name, string content) : base(name, content)
         {
@@ -606,16 +633,16 @@ namespace CPUVisNEA
         // the SpecialPurpose Register array contains all required data for immediate execution and testing of any instruction
         // needs to be public so any index in arrays can be quickly accessed for both Instruction classes and Test Console
         public List<string> changeLog = new List<string>();
-
+        
         public List<string> DetailedChangeLog = new List<string>();
         // Program Counter
         public IntReg PC;
 
         // Memory Address Register
-        public CodeReg MAR;
+        public IntReg MAR;
 
         // Memory Data Register
-        public IntReg MDR;
+        public CodeReg MDR;
 
         //Accumulator
         public IntReg ACC;
@@ -623,9 +650,6 @@ namespace CPUVisNEA
         //Current Instruction Register
         public CodeReg CIR;
 
-        // Memory Buffer Register 
-        public IntReg MBR;
-            
         public IntReg[] Basic;
         
         // potentially used
@@ -633,12 +657,11 @@ namespace CPUVisNEA
         public CPUState()
         {
             PC = new IntReg("PC", 0);
-            MAR = new CodeReg("MAR", "");
-            MDR = new IntReg("MDR", 0);
+            MAR = new IntReg("MAR", 0);
+            MDR = new CodeReg("MDR", "");
             ACC = new IntReg("ACC", 0);
             CIR = new CodeReg("CIR", "");
-            MBR = new IntReg("MBR", 0);
-            Basic = new IntReg[6];
+            Basic = new IntReg[10];
             for (int i = 0; i < Basic.Length; i++)
             {
                 Basic[i] = new IntReg($"R{i}", 0);
@@ -655,8 +678,7 @@ namespace CPUVisNEA
             cpuState.MAR.content = MAR.content; 
             cpuState.MDR.content = MDR.content; 
             cpuState.ACC.content = ACC.content; 
-            cpuState.CIR.content = CIR.content; 
-            cpuState.MBR.content = MBR.content;
+            cpuState.CIR.content = CIR.content;
             for (int i = 0; i < Basic.Length; i++)
             {
                 cpuState.Basic[i].content = Basic[i].content;

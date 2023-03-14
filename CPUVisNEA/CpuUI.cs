@@ -98,7 +98,6 @@ namespace CPUVisNEA
             //fist index is always 0
 
             VisualMemoryCreate();
-            VisualMemoryUpdate(0);
             SPRCreate();
             do
             {
@@ -107,14 +106,11 @@ namespace CPUVisNEA
                 VisualMemoryUpdate(cpu.CurrentState.PC.content);
                 cpu.FDECycle( /* todo step parameter to slow it down */); // Complete 1 cycle
                 updateFDELogs(); //todo mabye make whenever updated
+                SPRupdate();
             } while (!cpu.CheckHalted());
         }
 
-        /* todo create new class
-         * make a list of new classes containing 2 labels
-         * ----> one label holding index that fills top with bold text
-         * ----> one label holding Memory value at index 
-         */
+
         private void VisualMemoryCreate()
         {
             var max = ReqNumOfMemoryIndexes();
@@ -158,7 +154,7 @@ namespace CPUVisNEA
             index++;
             
             var mar = new Cell("MAR");
-            mar.content.Text = cpu.CurrentState.MAR.content;
+            mar.content.Text = cpu.CurrentState.MAR.content.ToString();
             SPRTable.Controls.Add(mar,index,0);
             index++;
 
@@ -177,11 +173,6 @@ namespace CPUVisNEA
             SPRTable.Controls.Add(cir,index,0);
             index++;
 
-            var mbr = new Cell("MBR");
-            mbr.content.Text = cpu.CurrentState.MBR.content.ToString();
-            SPRTable.Controls.Add(mbr,index,0);
-            index++;
-
             for (var i = 0; i < cpu.CurrentState.Basic.Length; i++)
             {
                 var Registeri = new Cell($"R{i}");
@@ -193,6 +184,28 @@ namespace CPUVisNEA
         private void SPRupdate()
         {
             //todo copy memory 
+            int index = 0;
+            
+            ((Cell)SPRTable.Controls[index]).content.Text = cpu.CurrentState.PC.content.ToString();
+            index++;
+            
+            ((Cell)SPRTable.Controls[index]).content.Text = cpu.CurrentState.MAR.content.ToString();
+            index++;
+
+            ((Cell)SPRTable.Controls[index]).content.Text = cpu.CurrentState.MDR.content;
+            index++;
+
+            ((Cell)SPRTable.Controls[index]).content.Text = cpu.CurrentState.ACC.content.ToString();
+            index++;
+
+            ((Cell)SPRTable.Controls[index]).content.Text = cpu.CurrentState.CIR.content;
+            index++;
+
+            //((Cell)MemoryTable.Controls[index]).content.Text = text;
+            for (var i = 0; i < cpu.CurrentState.Basic.Length; i++)
+            {
+                ((Cell)BasicRegTable.Controls[i]).content.Text = cpu.CurrentState.Basic[i].content.ToString();
+            }
         }
 
         private int ReqNumOfMemoryIndexes()
@@ -208,7 +221,7 @@ namespace CPUVisNEA
             for (var col = 0; col < 10; col++)
             {
                 var index = row * 10 + col;
-                var text = "";
+                string text = "";
                 if (cpu.ram.Memory.Count <= index)
                     text = "0";
                 else
@@ -224,7 +237,10 @@ namespace CPUVisNEA
                 ((Cell)MemoryTable.Controls[index]).content.Text = text;
             }
         }
-
+        // Cell is a child class that inherits from the default class used in forms of panels
+        // this form contains 2 Labels
+        // -> private Cell title as it doesnt need to be written to
+        // -> public content title needs to be colour edited and content potentially changed with each FDE cycle 
         public class Cell : Panel
         {
             private Label name;
@@ -275,6 +291,9 @@ namespace CPUVisNEA
         {
             txt_longFDE.Text = "";
             txt_shortFDE.Text = "";
+            MemoryTable.Controls.Clear();
+            SPRTable.Controls.Clear();
+            BasicRegTable.Controls.Clear();
         }
 
         private void gb_userInput_Enter(object sender, EventArgs e)
@@ -296,7 +315,7 @@ namespace CPUVisNEA
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Failed to Compile Program, error message : {ex}");
+                MessageBox.Show($"Failed to Compile Program, error message : {ex} on line ");
             }
             // if valid, call CPU.ChangeState()
             // if invalid, output assembly problems
@@ -305,9 +324,13 @@ namespace CPUVisNEA
         private void setEditState(bool edit)
         {
             Trace.WriteLine($"Switched to Edit Mode to {edit} \n");
+            // edit mode
             Editstate = edit;
             txt_uProg.Enabled = edit;
             btn_Compile.Visible = edit;
+            btn_LoadFile.Visible = edit;
+            
+            // run mode
             btn_ReturnToEdit.Visible = !edit;
             btn_Run.Visible = !edit;
             btn_play.Visible = !edit;
@@ -368,7 +391,7 @@ namespace CPUVisNEA
             foreach (var change in cpu.CurrentState.DetailedChangeLog)
                 txt_longFDE.Text = txt_longFDE.Text + change + Environment.NewLine;
 
-            if (cpu.CurrentState.Outputs != null) txt_out.Text += '\n' + cpu.CurrentState.Outputs;
+            if (cpu.CurrentState.Outputs != null) txt_out.Text += " " + cpu.CurrentState.Outputs;
         }
 
         private void btn_SaveFile_Click(object sender, EventArgs e)

@@ -60,7 +60,7 @@ namespace CPUVisNEA
         {
             string[,] premadeFiles = new string[,] { 
                 {"Labeltest", "B Test\r\nMOV R0, #10\r\nOUT R0\r\nTest: MOV R0, #69\r\nOUT R0\r\nHALT"} ,
-                { "for10", "MOV R0, #1\r\nMOV R1, #10\r\nstartloop: OUT R0\r\nADD R0, R0, #1\r\nCMP R0, #10\r\nBNE  startloop\r\nendloop: HALT\r\n " } 
+                { "for100", "MOV R0, #1\r\nstartloop: OUT R0\r\nADD R0, R0, #1\r\nCMP R0, #100\r\nBNE  startloop\r\nendloop: HALT\r\n " } 
             };
         for(int i = 0; i < premadeFiles.GetLength(0); i++ )
             {
