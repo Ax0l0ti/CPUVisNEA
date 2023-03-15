@@ -88,6 +88,16 @@ namespace CPUVisNEA
         [Test]
         public void logicGateboolToBitTesting()
         {
+            byte b1 = 7;
+            byte b2 = 13;
+            
+            byte AND = (byte) (b1 & b2);
+            Console.WriteLine($"vars | {b1}={Int32.Parse(Convert.ToString(b1, 2)).ToString("0000")} {b2}j={Int32.Parse(Convert.ToString(b2, 2)).ToString("0000")} ");
+            Console.WriteLine($"and  | {b1} & {b2} = {AND} {Int32.Parse(Convert.ToString(AND, 2)).ToString("0000")}");
+            byte OR = (byte) (b1 | b2);
+            Console.WriteLine($"or   | {b1} | {b2} = {OR} {Int32.Parse(Convert.ToString(OR, 2)).ToString("0000")}");
+            byte XOR = (byte) (b1 ^ b2);
+            Console.WriteLine($"XOR  | {b1} ^ {b2} = {XOR} {Int32.Parse(Convert.ToString(XOR, 2)).ToString("0000")}");
             //todo 
         }
 

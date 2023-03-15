@@ -61,6 +61,36 @@ namespace CPUVisNEA
             string[,] premadeFiles = new string[,] { 
                 {"Labeltest", "B Test\r\nMOV R0, #10\r\nOUT R0\r\nTest: MOV R0, #69\r\nOUT R0\r\nHALT"} ,
                 { "for100", "MOV R0, #1\r\nstartloop: OUT R0\r\nADD R0, R0, #1\r\nCMP R0, #100\r\nBNE  startloop\r\nendloop: HALT\r\n " } 
+                //{ "EveryTest", ""}
+                /* MOV R9, #244
+                MOV R8, #1
+                MOV R0, #10
+                LDR R1, R0
+                MOV R2, #5
+                OUT R1
+                ADD R1, R1, R8
+                OUT R1
+                SUB R1, R1, R8
+                OUT R1
+                CMP R9, #244
+                BEQ pass
+                OUT R9
+                pass: CMP R2, #10
+                BGT greater
+                OUT R1
+                greater: OUT R2
+                AND R2, R2, R8
+                OUT R2
+                ORR R2, R2, R7
+                OUT R2
+                EOR R2, R2, R7
+                OUT R2
+                OUT R0
+                LSL R0, R0, #2
+                OUT R0
+                LSR R0, R0, #1
+                OUT R0
+                HALT */
             };
         for(int i = 0; i < premadeFiles.GetLength(0); i++ )
             {

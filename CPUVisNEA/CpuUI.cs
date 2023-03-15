@@ -291,6 +291,7 @@ namespace CPUVisNEA
         {
             txt_longFDE.Text = "";
             txt_shortFDE.Text = "";
+            txt_out.Text = "";
             MemoryTable.Controls.Clear();
             SPRTable.Controls.Clear();
             BasicRegTable.Controls.Clear();
