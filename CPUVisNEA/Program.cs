@@ -58,50 +58,42 @@ namespace CPUVisNEA
 
         static void PreMadeFilesCheck()
         {
-            string[,] premadeFiles = new string[,] { 
+            string[,] premadeFiles = { 
+                // initial testing of premade files being used across network, kept for fun
+                // used to test if labels worked correctly 
                 {"Labeltest", "B Test\r\nMOV R0, #10\r\nOUT R0\r\nTest: MOV R0, #69\r\nOUT R0\r\nHALT"} ,
-                { "for100", "MOV R0, #1\r\nstartloop: OUT R0\r\nADD R0, R0, #1\r\nCMP R0, #100\r\nBNE  startloop\r\nendloop: HALT\r\n " } 
-                //{ "EveryTest", ""}
-                /* MOV R9, #244
-                MOV R8, #1
-                MOV R0, #10
-                LDR R1, R0
-                MOV R2, #5
-                OUT R1
-                ADD R1, R1, R8
-                OUT R1
-                SUB R1, R1, R8
-                OUT R1
-                CMP R9, #244
-                BEQ pass
-                OUT R9
-                pass: CMP R2, #10
-                BGT greater
-                OUT R1
-                greater: OUT R2
-                AND R2, R2, R8
-                OUT R2
-                ORR R2, R2, R7
-                OUT R2
-                EOR R2, R2, R7
-                OUT R2
-                OUT R0
-                LSL R0, R0, #2
-                OUT R0
-                LSR R0, R0, #1
-                OUT R0
-                HALT */
+                
+                // creates for loop that iterates through outputs 1 to 100 
+                { "for100", "MOV R0, #1\r\nstartloop: OUT R0\r\nADD R0, R0, #1\r\nCMP R0, #101\r\nBNE  startloop\r\nendloop: HALT\r\n " } ,
+                
+                // EveryTest - Test Vast Majority of all potential aspects
+                // designed to test if ALL Instructions compiled and functioned.
+                // Also used to test visual memory block with boundary size & storing extreme values
+                { "EveryTest",
+                    //test of moving/storing/copying registers
+                    "MOV R9, #244\r\nMOV R8, #1\r\nMOV R0, #10\r\nLDR R1, R0\r\nMOV R2, #5\r\nOUT R1\r\n" +
+                    //test of add, sub and incidentally out 
+                    "ADD R1, R1, R8\r\nOUT R1\r\nSUB R1, R1, R8\r\nOUT R1\r\n" +
+                    //  tests branches, if EQ works, B and NE works. Test greater, hence lesser works 
+                    "CMP R9, #244\r\nBEQ pass\r\nOUT R9\r\npass: CMP R2, #10\r\nBGT greater\r\nOUT R1\r\ngreater: OUT R2\r\n" +
+                    // logic gate tests AND OR XOR
+                    // using blank register 7 to test 
+                    "AND R2, R2, R8\r\nOUT R2\r\nORR R2, R2, R7\r\nOUT R2\r\nEOR R2, R2, R7\r\nOUT R2\r\nOUT R0\r\n" +
+                    //Binary shifts
+                    "LSL R0, R0, #2\r\nOUT R0\r\nLSR R0, R0, #1\r\nOUT R0\r\nHALT"
+                }
+                
             };
+            //used get length of 1st dimension in case New file manually appended later
         for(int i = 0; i < premadeFiles.GetLength(0); i++ )
             {
                 string PushPath = Environment.GetFolderPath( Environment.SpecialFolder.Personal ) + "\\CPU_Edu_UI\\" + premadeFiles[i,0];
-
+                //stop user maliciously modifiying the default files via folder 
                 File.Delete( PushPath );
                 using ( StreamWriter sw = File.CreateText( PushPath ) )
                 {
                     sw.WriteLine( premadeFiles[i, 1] );
                     sw.Close();
-
                 }
             }
         }

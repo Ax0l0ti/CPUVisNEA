@@ -32,6 +32,7 @@ namespace CPUVisNEA
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(UI));
             this.backgroundWorker1 = new System.ComponentModel.BackgroundWorker();
             this.gb_outputs = new System.Windows.Forms.GroupBox();
             this.txt_longFDE = new System.Windows.Forms.TextBox();
@@ -341,7 +342,7 @@ namespace CPUVisNEA
             this.txt_uProg.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
             this.txt_uProg.Size = new System.Drawing.Size(536, 766);
             this.txt_uProg.TabIndex = 3;
-            this.txt_uProg.Text = "B Test\r\nMOV R0, #10\r\nOUT R0\r\nTest: MOV R0, #69\r\nOUT R0\r\nHALT";
+            this.txt_uProg.Text = resources.GetString("txt_uProg.Text");
             this.txt_uProg.TextChanged += new System.EventHandler(this.txt_uProg_TextChanged);
             // 
             // gb_Execute

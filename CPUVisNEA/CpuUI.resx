@@ -123,6 +123,38 @@
   <metadata name="backgroundWorker2.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
     <value>181, 17</value>
   </metadata>
+  <data name="txt_uProg.Text" xml:space="preserve">
+    <value>MOV R9, #244
+MOV R8, #1
+MOV R0, #10
+LDR R1, R0
+MOV R2, #5
+OUT R1
+ADD R1, R1, R8
+OUT R1
+SUB R1, R1, R8
+OUT R1
+CMP R9, #244
+BEQ pass
+OUT R9
+pass: CMP R2, #10
+BGT greater
+OUT R1
+greater: OUT R2
+AND R2, R2, R8
+OUT R2
+ORR R2, R2, R7
+OUT R2
+EOR R2, R2, R7
+OUT R2
+OUT R0
+LSL R0, R0, #2
+OUT R0
+LSR R0, R0, #1
+OUT R0
+HALT
+</value>
+  </data>
   <metadata name="$this.TrayHeight" type="System.Int32, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>25</value>
   </metadata>
