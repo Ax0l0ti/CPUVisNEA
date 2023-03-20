@@ -92,7 +92,7 @@ namespace CPUVisNEA
         //all arguements have a 
         protected internal virtual int RetInt()
         {
-            return 0;
+            throw new Exception("Argument not cast");
         }
     }
 
@@ -108,6 +108,7 @@ namespace CPUVisNEA
             // from is R(index) or r(index) to allow for user Mistakes. Hence Memory Index is string minus first index of string 
             index = int.Parse(StringArg.Remove(0, 1));
             name = $"R{index}";
+            value = index;
         }
 
         //second constructor for FDE Cycle retrieving from RAM 
@@ -116,7 +117,6 @@ namespace CPUVisNEA
             index = Convert.ToInt32(ByteForm);
             name = $"R{index}";
         }
-
         protected internal override byte ToByte()
         {
             return (byte)index;
@@ -131,7 +131,6 @@ namespace CPUVisNEA
     public class IntegerArg : Argument
     {
         public int value;
-
         //user may need to deal with integers above 255, therefore the required value representable value must be represented by variable bytes 
 
         public IntegerArg(string StringArg)
@@ -165,6 +164,7 @@ namespace CPUVisNEA
         public LineLabel(string name)
         {
             this.name = name;
+             
         }
 
         public int Location
@@ -193,7 +193,7 @@ namespace CPUVisNEA
         //protected so all inherited classes have args attributes 
         // internal so TestConsole can access Instruction child class' args
         protected internal List<Argument> args = new List<Argument>(); //list of instruction arguments
-
+        protected string label;
         public CPU.Instructions Tag { get; } //use enum to get Tag ( instruction name ) 
 
         //sets instruction tag automatically to new instance of an Instruction class or child classes
@@ -202,9 +202,12 @@ namespace CPUVisNEA
             Tag = tag;
         }
         
-        
-
-
+        public string Label
+        {
+            get => label;
+            set => label = value;
+        }
+        //contains set of CPU.Instructions that correspond to an appropriate layout of Parameters 
         protected internal static Dictionary<CPU.Instructions[], Type[]> dictionaryOfValidParams =
             new Dictionary<CPU.Instructions[], Type[]>
             {
@@ -266,7 +269,7 @@ namespace CPUVisNEA
                 }
             };
 
-        protected string label;
+
 
 
         //add Parsed Argument takes takes the instruction its a
@@ -376,11 +379,7 @@ namespace CPUVisNEA
         */
 
 
-        public string Label
-        {
-            get => label;
-            set => label = value;
-        }
+
     }
 
 
@@ -392,7 +391,7 @@ namespace CPUVisNEA
         {
         }
 
-        //todo create Instruction method to deal w input ( also add description of how operator works, from NEA writeup ) 
+
         protected internal override CPUState executeInstruction(List<Argument> args, CPUState NewState)
         {
             //HALT Stop the execution of the program.
@@ -400,20 +399,6 @@ namespace CPUVisNEA
             NewState.PC.content = -1;
             NewState.Outputs = "Program Halted";
             return NewState;
-        }
-
-        /*held locally in class but never used by class. Is used by CPU to instantiate instance
-         of Instruction type and pass arguments held by local CPU compiling function  */
-        public static Halt parseArgs(List<string> args)
-        {
-            //creates new local instance of a blank object correspondent to class
-            var halt = new Halt();
-            /*passes string version of arguments given by parameter to use
-             Inherited addParsedArgs method to clean args and append to the 
-             protected Instructions local attribute args */
-            addParsedArgs(halt, args);
-            // return modified and filled Instruction
-            return halt;
         }
     }
 
@@ -431,7 +416,7 @@ namespace CPUVisNEA
         {
         }
 
-        //todo create Instruction method to deal w input ( also add description of how operator works, from NEA writeup ) 
+
         //B<condition>  <Label> Conditionally branch to the instruction at position <Label> in the program if the last comparison met the criteria specified by the <condition>.
 
         protected internal override CPUState executeInstruction(List<Argument> args, CPUState NewState)
@@ -451,29 +436,15 @@ namespace CPUVisNEA
         {
             //B <Label> Branch to the instruction at position <Label> Unconditionally
             //if Conditional Correctly Met, branch to label's indicated Memory Index 
-            NewState.PC.content = ((LineLabel)args[0]).location;
+            
+            //Accumulator assigned temporary value of operation value
+            NewState.ACC.content = ((LineLabel)args[0]).location;
+            NewState.PC.content = NewState.ACC.content;
             NewState.changeLog.Add($" Branched to {args[0].name} ");
             Trace.WriteLine($" Branched to {args[0].name} ");
             NewState.DetailedChangeLog.Add(
                 $"{Tag} instruction - Branched to {args[0].name} label at Memory index {NewState.PC.content} ");
             return NewState;
-        }
-
-        //todo create Instruction method to deal w input ( also add description of how operator works, from NEA writeup ) 
-
-
-        /*held locally in class but never used by class. Is used by CPU to instantiate instance
- of Instruction type and pass arguments held by local CPU compiling function  */
-        public static B parseArgs(List<string> args)
-        {
-            //creates new local instance of a blank object correspondent to class
-            var b = new B();
-            /*passes string version of arguments given by parameter to use
-             Inherited addParsedArgs method to clean args and append to the 
-             protected Instructions local attribute args */
-            addParsedArgs(b, args);
-            // return modified and filled Instruction
-            return b;
         }
     }
 
@@ -515,20 +486,6 @@ namespace CPUVisNEA
             Trace.WriteLine(BasicChangeLog);
             return NewState;
         }
-
-        /*held locally in class but never used by class. Is used by CPU to instantiate instance
-         of Instruction type and pass arguments held by local CPU compiling function  */
-        public static Beq parseArgs(List<string> args, string condition)
-        {
-            //creates new local instance of a blank object correspondent to class
-            var beq = new Beq();
-            /*passes string version of arguments given by parameter to use
-             Inherited addParsedArgs method to clean args and append to the 
-             protected Instructions local attribute args */
-            addParsedArgs(beq, args);
-            // return modified and filled Instruction
-            return beq;
-        }
     }
 
     // Branch if Not Equal to 
@@ -539,7 +496,7 @@ namespace CPUVisNEA
             BranchFullName = "'Not Equal To'";
         }
 
-        //todo create Instruction method to deal w input ( also add description of how operator works, from NEA writeup ) 
+
         //BNE <Label> Conditionally branch to the instruction at position <Label> in the program if the last comparison met the Not Equal To criteria
 
         protected internal override CPUState executeInstruction(List<Argument> args, CPUState NewState)
@@ -571,20 +528,6 @@ namespace CPUVisNEA
             Trace.WriteLine(BasicChangeLog);
             return NewState;
         }
-
-        /*held locally in class but never used by class. Is used by CPU to instantiate instance
-         of Instruction type and pass arguments held by local CPU compiling function  */
-        public static Bne parseArgs(List<string> args, string condition)
-        {
-            //creates new local instance of a blank object correspondent to class
-            var bne = new Bne();
-            /*passes string version of arguments given by parameter to use
-             Inherited addParsedArgs method to clean args and append to the 
-             protected Instructions local attribute args */
-            addParsedArgs(bne, args);
-            // return modified and filled Instruction
-            return bne;
-        }
     }
 
     // Branch if Less Than
@@ -595,7 +538,7 @@ namespace CPUVisNEA
             BranchFullName = "'Less Than'";
         }
 
-        //todo create Instruction method to deal w input ( also add description of how operator works, from NEA writeup ) 
+
         //BLT <Label> Conditionally branch to the instruction at position <Label> in the program if the last comparison met the Less Than criteria
 
         protected internal override CPUState executeInstruction(List<Argument> args, CPUState NewState)
@@ -626,20 +569,6 @@ namespace CPUVisNEA
             Trace.WriteLine(BasicChangeLog);
             return NewState;
         }
-
-        /*held locally in class but never used by class. Is used by CPU to instantiate instance
-         of Instruction type and pass arguments held by local CPU compiling function  */
-        public static Blt parseArgs(List<string> args, string condition)
-        {
-            //creates new local instance of a blank object correspondent to class
-            var blt = new Blt();
-            /*passes string version of arguments given by parameter to use
-             Inherited addParsedArgs method to clean args and append to the 
-             protected Instructions local attribute args */
-            addParsedArgs(blt, args);
-            // return modified and filled Instruction
-            return blt;
-        }
     }
 
     public class Bgt : Branch
@@ -649,7 +578,7 @@ namespace CPUVisNEA
             BranchFullName = "Greater Than";
         }
 
-        //todo create Instruction method to deal w input ( also add description of how operator works, from NEA writeup ) 
+
         //BGT <Label> Conditionally branch to the instruction at position <Label> in the program if the last comparison met the Greater Than criteria
         protected internal override CPUState executeInstruction(List<Argument> args, CPUState NewState)
         {
@@ -679,20 +608,6 @@ namespace CPUVisNEA
             Trace.WriteLine(BasicChangeLog);
             return NewState;
         }
-
-        /*held locally in class but never used by class. Is used by CPU to instantiate instance
-         of Instruction type and pass arguments held by local CPU compiling function  */
-        public static Bgt parseArgs(List<string> args, string condition)
-        {
-            //creates new local instance of a blank object correspondent to class
-            var bgt = new Bgt();
-            /*passes string version of arguments given by parameter to use
-             Inherited addParsedArgs method to clean args and append to the 
-             protected Instructions local attribute args */
-            addParsedArgs(bgt, args);
-            // return modified and filled Instruction
-            return bgt;
-        }
     }
 
 
@@ -706,12 +621,12 @@ namespace CPUVisNEA
         {
         }
 
-        //todo create Instruction method to deal w input ( also add description of how operator works, from NEA writeup ) 
+
         protected internal override CPUState executeInstruction(List<Argument> args, CPUState NewState)
         {
             //MOV Rd, <operand2> Copy the value specified by <operand2> into register d.
 
-            //Register content indicated by args[0] = value indicated by operand
+            //Register content indicated by args[0] = value indicated by operand 
             NewState.Basic[((RegisterArg)args[0]).RetInt()].content = ((IntegerArg)args[1]).RetInt();
             var BasicChangeLog = $" {args[0].name} assigned {args[1].name} value ";
             NewState.changeLog.Add(BasicChangeLog);
@@ -722,20 +637,6 @@ namespace CPUVisNEA
                 $" {Tag} instruction - copies over the value of {args[1].name} into register {args[0].name} ");
 
             return NewState;
-        }
-
-        /*held locally in class but never used by class. Is used by CPU to instantiate instance
-         of Instruction type and pass arguments held by local CPU compiling function  */
-        public static Mov parseArgs(List<string> args)
-        {
-            //creates new local instance of a blank object correspondent to class
-            var mov = new Mov();
-            /*passes string version of arguments given by parameter to use
-             Inherited addParsedArgs method to clean args and append to the 
-             protected Instructions local attribute args */
-            addParsedArgs(mov, args);
-            // return modified and filled Instruction
-            return mov;
         }
     }
 
@@ -748,7 +649,7 @@ namespace CPUVisNEA
         {
         }
 
-        //todo create Instruction method to deal w input ( also add description of how operator works, from NEA writeup ) 
+
         protected internal override CPUState executeInstruction(List<Argument> args, CPUState NewState)
         {
             //CMP Rn, <operand2> Compare the value stored in register n with the value specified by <operand2>. 
@@ -776,54 +677,6 @@ namespace CPUVisNEA
 
             return NewState;
         }
-
-        /*held locally in class but never used by class. Is used by CPU to instantiate instance
-         of Instruction type and pass arguments held by local CPU compiling function  */
-        public static Cmp parseArgs(List<string> args)
-        {
-            //creates new local instance of a blank object correspondent to class
-            var cmp = new Cmp();
-            /*passes string version of arguments given by parameter to use
-             Inherited addParsedArgs method to clean args and append to the 
-             protected Instructions local attribute args */
-            addParsedArgs(cmp, args);
-            // return modified and filled Instruction
-            return cmp;
-        }
-    }
-
-    //---------------------------------------     MVN      Instruction ------------------------------------------------
-    //MVN RegisterArg, IntegerArg
-
-    public class Mvn : Instruction
-    {
-        public Mvn() : base(CPU.Instructions.MVN)
-        {
-        }
-
-        //todo create Instruction method to deal w input ( also add description of how operator works, from NEA writeup ) 
-        protected internal override CPUState executeInstruction(List<Argument> args, CPUState NewState)
-        {
-            //MVN Rd, <operand2> Perform a bitwise logical NOT operation on the value specified by <operand2> and store the result in register d.
-
-
-            return NewState;
-        }
-
-        //todo move all comments to all valid loc - create, passes string... ,return modified
-        /*held locally in class but never used by class. Is used by CPU to instantiate instance
-         of Instruction type and pass arguments held by local CPU compiling function  */
-        public static Mvn parseArgs(List<string> args)
-        {
-            //creates new local instance of a blank object correspondent to class
-            var mvn = new Mvn();
-            /*passes string version of arguments given by parameter to use
-             Inherited addParsedArgs method to clean args and append to the 
-             protected Instructions local attribute args */
-            addParsedArgs(mvn, args);
-            // return modified and filled Instruction
-            return mvn;
-        }
     }
 
     //---------------------------------------     OUT      Instruction ------------------------------------------------
@@ -834,7 +687,7 @@ namespace CPUVisNEA
         {
         }
 
-        //todo create Instruction method to deal w input ( also add description of how operator works, from NEA writeup ) 
+
         protected internal override CPUState executeInstruction(List<Argument> args, CPUState NewState)
         {
             //OUT Rd, <memory ref> Load the value stored in the memory location specified by <memory ref> into register d. 
@@ -844,20 +697,6 @@ namespace CPUVisNEA
             NewState.changeLog.Add($"Output : {NewState.Outputs}");
             NewState.DetailedChangeLog.Add($"{Tag} used to output {NewState.Outputs} from register {((RegisterArg)args[0]).name} ");
             return NewState;
-        }
-
-        /*held locally in class but never used by class. Is used by CPU to instantiate instance
-         of Instruction type and pass arguments held by local CPU compiling function  */
-        public static Out parseArgs(List<string> args)
-        {
-            //creates new local instance of a blank object correspondent to class
-            var Out = new Out();
-            /*passes string version of arguments given by parameter to use
-             Inherited addParsedArgs method to clean args and append to the 
-             protected Instructions local attribute args */
-            addParsedArgs(Out, args);
-            // return modified and filled Instruction
-            return Out;
         }
     }
 
@@ -870,7 +709,7 @@ namespace CPUVisNEA
         {
         }
 
-        //todo create Instruction method to deal w input ( also add description of how operator works, from NEA writeup ) 
+
         protected internal override CPUState executeInstruction(List<Argument> args, CPUState NewState)
         {
             //LDR Rd, Rn Store the value that is in register d into register n.
@@ -887,21 +726,39 @@ namespace CPUVisNEA
 
             return NewState;
         }
-
-        /*held locally in class but never used by class. Is used by CPU to instantiate instance
-         of Instruction type and pass arguments held by local CPU compiling function  */
-        public static Ldr parseArgs(List<string> args)
-        {
-            //creates new local instance of a blank object correspondent to class
-            var ldr = new Ldr();
-            /*passes string version of arguments given by parameter to use
-             Inherited addParsedArgs method to clean args and append to the 
-             protected Instructions local attribute args */
-            addParsedArgs(ldr, args);
-            // return modified and filled Instruction
-            return ldr;
-        }
     }
+    
+    //---------------------------------------     MVN      Instruction ------------------------------------------------
+    //MVN RegisterArg, IntegerArg
+
+    public class Mvn : Instruction
+    {
+        public Mvn() : base(CPU.Instructions.MVN)
+        {
+        }
+
+
+        protected internal override CPUState executeInstruction(List<Argument> args, CPUState NewState)
+        {
+            //MVN Rd, <operand2> Perform a bitwise logical NOT operation on the value specified by <operand2> and store the result in register d.
+            byte b1 = (byte)(NewState.Basic[args[1].RetInt()].content);
+            //not b1
+            byte result = (byte) ~b1;
+            NewState.ACC.content = result;
+            NewState.Basic[args[0].RetInt()].content = result;
+            var BasicChangeLog = $"{args[0].name} assigned {Int32.Parse(Convert.ToString(result, 2)):0000 0000} from NOT {args[1].name}";
+            NewState.changeLog.Add(BasicChangeLog);
+            Trace.WriteLine(BasicChangeLog);
+            NewState.DetailedChangeLog.Add(
+                $" {Tag} instruction - preformed bitwise NOT on {args[1].name} value {b1} ({Int32.Parse(Convert.ToString(b1, 2)).ToString("0000")}). Result ({Int32.Parse(Convert.ToString(result, 2)):0000 0000} = {result}) stored in {args[0].name}");
+            return NewState; 
+
+            return NewState;
+        }
+
+        //todo move all comments to all valid loc - create, passes string... ,return modifie
+    }
+    
     //---------------------------------------     AND      Instruction ------------------------------------------------
     //AND RegisterArg, RegisterArg, IntegerArg
     //will have multiple acceptable types in second addArg index
@@ -912,13 +769,14 @@ namespace CPUVisNEA
         {
         }
 
-        //todo create Instruction method to deal w input ( also add description of how operator works, from NEA writeup ) 
+
         protected internal override CPUState executeInstruction(List<Argument> args, CPUState NewState)
         {
             //AND Rd, Rn, <operand2> Perform a bitwise logical AND operation between the value in register n and the value specified by <operand2> and store the result in register d.
             byte b1 = (byte)(NewState.Basic[args[1].RetInt()].content);
             byte b2 = (byte)(NewState.Basic[args[2].RetInt()].content);
             byte result = (byte) (b1 & b2);
+            NewState.ACC.content = result;
             NewState.Basic[args[0].RetInt()].content = result;
             var BasicChangeLog = $"{args[0].name} assigned {Int32.Parse(Convert.ToString(result, 2)):0000 0000} from AND {args[1].name},{args[2].name} ";
             NewState.changeLog.Add(BasicChangeLog);
@@ -926,20 +784,6 @@ namespace CPUVisNEA
             NewState.DetailedChangeLog.Add(
                 $" {Tag} instruction - {args[1].name} value {b1} ({Int32.Parse(Convert.ToString(b1, 2)).ToString("0000")}) and {args[2].name} value {b2} ({Int32.Parse(Convert.ToString(b2, 2)).ToString("0000")}) AND result ({Int32.Parse(Convert.ToString(result, 2)):0000 0000} = {result}) stored in {args[0].name}");
             return NewState;        }
-
-        /*held locally in class but never used by class. Is used by CPU to instantiate instance
-         of Instruction type and pass arguments held by local CPU compiling function  */
-        public static And parseArgs(List<string> args)
-        {
-            //creates new local instance of a blank object correspondent to class
-            var and = new And();
-            /*passes string version of arguments given by parameter to use
-             Inherited addParsedArgs method to clean args and append to the 
-             protected Instructions local attribute args */
-            addParsedArgs(and, args);
-            // return modified and filled Instruction
-            return and;
-        }
     }
 
     //---------------------------------------     ORR      Instruction ------------------------------------------------
@@ -952,13 +796,14 @@ namespace CPUVisNEA
         {
         }
 
-        //todo create Instruction method to deal w input ( also add description of how operator works, from NEA writeup ) 
+
         protected internal override CPUState executeInstruction(List<Argument> args, CPUState NewState)
         {
             //ORR Rd, Rn, <operand2> Perform a bitwise logical OR operation between the value in register n and the value specified by <operand2> and store the result in register d.
             byte b1 = (byte)(NewState.Basic[args[1].RetInt()].content);
             byte b2 = (byte)(NewState.Basic[args[2].RetInt()].content);
             byte result = (byte) (b1 | b2);
+            NewState.ACC.content = result;
             NewState.Basic[args[0].RetInt()].content = result;
             var BasicChangeLog = $"{args[0].name} assigned {Int32.Parse(Convert.ToString(result, 2)):0000 0000} from OR {args[1].name},{args[2].name} ";
             NewState.changeLog.Add(BasicChangeLog);
@@ -966,20 +811,6 @@ namespace CPUVisNEA
             NewState.DetailedChangeLog.Add(
                 $" {Tag} instruction - {args[1].name} value {b1} ({Int32.Parse(Convert.ToString(b1, 2)).ToString("0000")}) and {args[2].name} value {b2} ({Int32.Parse(Convert.ToString(b2, 2)).ToString("0000")}) OR result ({Int32.Parse(Convert.ToString(result, 2)):0000 0000} = {result}) stored in {args[0].name}");
             return NewState;
-        }
-
-        /*held locally in class but never used by class. Is used by CPU to instantiate instance
-         of Instruction type and pass arguments held by local CPU compiling function  */
-        public static Orr parseArgs(List<string> args)
-        {
-            //creates new local instance of a blank object correspondent to class
-            var orr = new Orr();
-            /*passes string version of arguments given by parameter to use
-             Inherited addParsedArgs method to clean args and append to the 
-             protected Instructions local attribute args */
-            addParsedArgs(orr, args);
-            // return modified and filled Instruction
-            return orr;
         }
     }
 
@@ -993,13 +824,14 @@ namespace CPUVisNEA
         {
         }
 
-        //todo create Instruction method to deal w input ( also add description of how operator works, from NEA writeup ) 
+
         protected internal override CPUState executeInstruction(List<Argument> args, CPUState NewState)
         {
             //EOR Rd, Rn, <operand2> Perform a bitwise logical exclusive or (XOR) operation between the value in register n and the value specified by <operand2> and store the result in register d.
             byte b1 = (byte)(NewState.Basic[args[1].RetInt()].content);
             byte b2 = (byte)(NewState.Basic[args[2].RetInt()].content);
             byte result = (byte) (b1 ^ b2);
+            NewState.ACC.content = result;
             NewState.Basic[args[0].RetInt()].content = result;
             var BasicChangeLog = $"{args[0].name} assigned {Int32.Parse(Convert.ToString(result, 2)):0000 0000} from EOR {args[1].name},{args[2].name} ";
             NewState.changeLog.Add(BasicChangeLog);
@@ -1007,20 +839,6 @@ namespace CPUVisNEA
             NewState.DetailedChangeLog.Add(
                 $" {Tag} instruction - {args[1].name} value {b1} ({Int32.Parse(Convert.ToString(b1, 2)).ToString("0000")}) and {args[2].name} value {b2} ({Int32.Parse(Convert.ToString(b2, 2)).ToString("0000")}) Exclusive OR result ({Int32.Parse(Convert.ToString(result, 2)):0000 0000} = {result}) stored in {args[0].name}");
             return NewState;
-        }
-
-        /*held locally in class but never used by class. Is used by CPU to instantiate instance
-         of Instruction type and pass arguments held by local CPU compiling function  */
-        public static Eor parseArgs(List<string> args)
-        {
-            //creates new local instance of a blank object correspondent to class
-            var eor = new Eor();
-            /*passes string version of arguments given by parameter to use
-             Inherited addParsedArgs method to clean args and append to the 
-             protected Instructions local attribute args */
-            addParsedArgs(eor, args);
-            // return modified and filled Instruction
-            return eor;
         }
     }
 
@@ -1034,34 +852,22 @@ namespace CPUVisNEA
         {
         }
 
-        //todo create Instruction method to deal w input ( also add description of how operator works, from NEA writeup ) 
+
         protected internal override CPUState executeInstruction(List<Argument> args, CPUState NewState)
         {
             //LSL Rd, Rn, <operand2> Logically shift left the value stored in register n by the number of bits specified by <operand2> and store the result in register d.
             //Basic Register at Rd assigned Rn value x 2 ^ <operand2>, aka binary shift left
-            var orig = NewState.Basic[args[1].RetInt()].content;
-            var endValue = orig * (2 ^ args[2].RetInt());
-            NewState.Basic[args[0].RetInt()].content = endValue;
+            var orig = NewState.Basic[((RegisterArg)args[1]).RetInt()].content;
+            var retInt = ((IntegerArg)args[2]).RetInt();
+            var endValue = ((byte)orig) << retInt;
+            NewState.ACC.content = endValue;
+            NewState.Basic[args[0].RetInt()].content = NewState.ACC.content;
             var BasicChangeLog = $"{args[1].name} binary shifted left by {args[2].name}. Assigned to {args[0].name}";
             NewState.changeLog.Add(BasicChangeLog);
             Trace.WriteLine(BasicChangeLog);
             NewState.DetailedChangeLog.Add(
                 $" {Tag} instruction -  {args[1].name} Register's value {orig} binary shifted Left by {args[2].name}. End value of {endValue} assigned to Register {args[0].name}");
             return NewState;
-        }
-
-        /*held locally in class but never used by class. Is used by CPU to instantiate instance
-         of Instruction type and pass arguments held by local CPU compiling function  */
-        public static Lsl parseArgs(List<string> args)
-        {
-            //creates new local instance of a blank object correspondent to class
-            var lsl = new Lsl();
-            /*passes string version of arguments given by parameter to use
-             Inherited addParsedArgs method to clean args and append to the 
-             protected Instructions local attribute args */
-            addParsedArgs(lsl, args);
-            // return modified and filled Instruction
-            return lsl;
         }
     }
 
@@ -1075,35 +881,22 @@ namespace CPUVisNEA
         {
         }
 
-        //todo create Instruction method to deal w input ( also add description of how operator works, from NEA writeup ) 
+
         protected internal override CPUState executeInstruction(List<Argument> args, CPUState NewState)
         {
             //LSR Rd, Rn, <operand2> Logically shift right the value stored in register n by the number of bits specified by <operand2> and store the result in register d.
             //Basic Register at Rd assigned Rn value / ( 2 ^ <operand2> ) aka binary shift right
             //
-            var orig = NewState.Basic[args[1].RetInt()].content;
-            var endValue = orig / (2 ^ args[2].RetInt());
-            NewState.Basic[args[0].RetInt()].content = endValue;
+            var orig = NewState.Basic[((RegisterArg)args[1]).RetInt()].content;
+            var endValue = orig >> ((IntegerArg)args[2]).RetInt();
+            NewState.ACC.content = endValue;
+            NewState.Basic[args[0].RetInt()].content = NewState.ACC.content;
             var BasicChangeLog = $"{args[1].name} binary shifted right by {args[2].name}. Assigned to {args[0].name}";
             NewState.changeLog.Add(BasicChangeLog);
             Trace.WriteLine(BasicChangeLog);
             NewState.DetailedChangeLog.Add(
                 $" {Tag} instruction -  {args[1].name} Register's value {orig} binary shifted Right by {args[2].name}. End value of {endValue} assigned to Register {args[0].name}");
             return NewState;
-        }
-
-        /*held locally in class but never used by class. Is used by CPU to instantiate instance
-         of Instruction type and pass arguments held by local CPU compiling function  */
-        public static Lsr parseArgs(List<string> args)
-        {
-            //creates new local instance of a blank object correspondent to class
-            var lsr = new Lsr();
-            /*passes string version of arguments given by parameter to use
-             Inherited addParsedArgs method to clean args and append to the 
-             protected Instructions local attribute args */
-            addParsedArgs(lsr, args);
-            // return modified and filled Instruction
-            return lsr;
         }
     }
 
@@ -1117,7 +910,7 @@ namespace CPUVisNEA
         {
         }
 
-        //todo create Instruction method to deal w input ( also add description of how operator works, from NEA writeup ) 
+
         protected internal override CPUState executeInstruction(List<Argument> args, CPUState NewState)
         {
             //ADD Rd, Rn, <operand2> Add the value specified in n2 to the value in register n1 and store the result in register d.
@@ -1125,27 +918,13 @@ namespace CPUVisNEA
             var param1 = NewState.Basic[args[1].RetInt()].content;
             var param2 = NewState.Basic[args[2].RetInt()].content;
             var BasicChangeLog = $" {args[0].name} = {args[1].name} ({param1}) + {args[2].name} ({param2})";
-            
-            NewState.Basic[args[0].RetInt()].content = param1 + param2;
+            NewState.ACC.content = param1 + param2;
+            NewState.Basic[args[0].RetInt()].content = NewState.ACC.content;
             NewState.changeLog.Add(BasicChangeLog);
             Trace.WriteLine(BasicChangeLog);
             NewState.DetailedChangeLog.Add(
-                $"{Tag} instruction -  {args[1].name} value {param1} added to {args[2].name} {param2} and value assigned to Register {args[0].name}");
+                $"{Tag} instruction -  {args[1].name} value {param1} added to {args[2].name} {param2} and value {NewState.ACC.content} assigned to Register {args[0].name}");
             return NewState;
-        }
-
-        /*held locally in class but never used by class. Is used by CPU to instantiate instance
-         of Instruction type and pass arguments held by local CPU compiling function  */
-        public static Add parseArgs(List<string> args)
-        {
-            //creates new local instance of a blank object correspondent to class
-            var add = new Add();
-            /*passes string version of arguments given by parameter to use
-             Inherited addParsedArgs method to clean args and append to the 
-             protected Instructions local attribute args */
-            addParsedArgs(add, args);
-            // return modified and filled Instruction
-            return add;
         }
     }
 
@@ -1158,34 +937,22 @@ namespace CPUVisNEA
         {
         }
 
-        //todo create Instruction method to deal w input ( also add description of how operator works, from NEA writeup ) 
+
         protected internal override CPUState executeInstruction(List<Argument> args, CPUState NewState)
         {
             //SUB Rd, Rn, <operand2> Subtract the value specified by <operand2> from the value in register n and store the result in register d.
             // Register d = value of Rn + operand
             var param1 = NewState.Basic[args[1].RetInt()].content;
             var param2 = NewState.Basic[args[2].RetInt()].content;
-            NewState.Basic[args[0].RetInt()].content = param1 - param2;
+            
+            NewState.ACC.content = param1 - param2;
+            NewState.Basic[args[0].RetInt()].content = NewState.ACC.content;
             var BasicChangeLog = $" {args[0].name} = {args[1].name} ({args[1].RetInt()}) - {args[2].name} ({((RegisterArg)args[2]).RetInt()}) ";
             NewState.changeLog.Add(BasicChangeLog);
             Trace.WriteLine(BasicChangeLog);
             NewState.DetailedChangeLog.Add(
-                $" {Tag} instruction -  {args[1].name} Register's value {NewState.Basic[args[1].RetInt()].content} subtracted by {args[2].name} {NewState.Basic[args[2].RetInt()].content} value assigned to Register {args[0].name}");
+                $" {Tag} instruction -  {args[1].name} Register's value {NewState.Basic[args[1].RetInt()].content} subtracted by {args[2].name} {NewState.Basic[args[2].RetInt()].content} value {NewState.ACC.content} assigned to Register {args[0].name}");
             return NewState;
-        }
-
-        /*held locally in class but never used by class. Is used by CPU to instantiate instance
-         of Instruction type and pass arguments held by local CPU compiling function  */
-        public static Sub parseArgs(List<string> args)
-        {
-            //creates new local instance of a blank object correspondent to class
-            var sub = new Sub();
-            /*passes string version of arguments given by parameter to use
-             Inherited addParsedArgs method to clean args and append to the 
-             protected Instructions local attribute args */
-            addParsedArgs(sub, args);
-            // return modified and filled Instruction
-            return sub;
         }
     }
 }

@@ -75,7 +75,9 @@ namespace CPUVisNEA
             
             var args = new List<string>() { arg1, arg2 };
             //CHANGE THIS LINE TO EDIT INSTRUCTION TESTED
-            Mov Test = Mov.parseArgs(args);
+
+            Mov Test = new Mov();
+            Instruction.addParsedArgs(Test, args);
             Console.WriteLine($" Test calls {Test.Tag} Instruction with parameters {arg1} and {arg2} ");
             // test Move on completely blank CPU 
             CPUState defaultState = new CPUState();

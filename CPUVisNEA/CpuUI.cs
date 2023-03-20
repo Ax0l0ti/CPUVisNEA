@@ -59,6 +59,7 @@ namespace CPUVisNEA
         private bool Editstate = true;
         private CPU cpu;
         private bool BytesVHuman = false;
+        private bool paused = false;
 
         public UI(CPU cpu)
         {
@@ -91,23 +92,28 @@ namespace CPUVisNEA
 
         private void run()
         {
-            //set up and refresh all variables for new Run Command
-            cpu.SetUpFresh();
-            RefreshLogs();
-            cpu.FillRam();
-            //fist index is always 0
+            
+            
+                //set up and refresh all variables for new Run Command
+                cpu.SetUpFresh();
+                RefreshLogs();
+                cpu.FillRam();
+                //fist index is always 0
 
-            VisualMemoryCreate();
-            SPRCreate();
-            do
-            {
-                // todo wait for step
-                wait(RunSpeed.Value);
-                VisualMemoryUpdate(cpu.CurrentState.PC.content);
-                cpu.FDECycle( /* todo step parameter to slow it down */); // Complete 1 cycle
-                updateFDELogs(); //todo mabye make whenever updated
-                SPRupdate();
-            } while (!cpu.CheckHalted());
+                VisualMemoryCreate();
+                SPRCreate();
+                do
+                {
+                    // todo wait for step
+                    wait(RunSpeed.Value);
+                    VisualMemoryUpdate(cpu.CurrentState.PC.content);
+                    cpu.FDECycle( /* todo step parameter to slow it down */); // Complete 1 cycle
+                    updateFDELogs(); //todo mabye make whenever updated
+                    SPRupdate();
+                    //de moivre theorem (!A & !B) == !(A|B)
+                    //continues to run whilst edit state hasn't been called or form returned to edit state 
+                } while (!cpu.CheckHalted() && !Editstate);
+            
         }
 
 
@@ -388,9 +394,8 @@ namespace CPUVisNEA
 
         private void updateFDELogs()
         {
-            foreach (var change in cpu.CurrentState.changeLog) txt_shortFDE.Text += change + Environment.NewLine;
-            foreach (var change in cpu.CurrentState.DetailedChangeLog)
-                txt_longFDE.Text = txt_longFDE.Text + change + Environment.NewLine;
+            foreach (var change in cpu.CurrentState.changeLog) txt_shortFDE.AppendText(change + Environment.NewLine );
+            foreach (var change in cpu.CurrentState.DetailedChangeLog) txt_longFDE.AppendText(change + Environment.NewLine );
 
             if (cpu.CurrentState.Outputs != null) txt_out.Text += " " + cpu.CurrentState.Outputs;
         }
@@ -422,6 +427,11 @@ namespace CPUVisNEA
         //declared inside UI class to allow interaction and register when a click event on the form is taken
         private void wait(int ms)
         {
+            do
+            {
+                Application.DoEvents();
+            } while (paused);
+            
             var timer = new System.Windows.Forms.Timer();
             if (ms == 0 || ms < 0) return;
 
@@ -447,16 +457,21 @@ namespace CPUVisNEA
 
         private void MemoryTable_Paint(object sender, PaintEventArgs e)
         {
+            
         }
 
-        private void txt_shortFDE_TextChanged(object sender, EventArgs e)
+        private void btn_play_Click(object sender, EventArgs e)
         {
-            txt_shortFDE.ScrollToCaret();
+            paused = false;
+            btn_play.Enabled = false;
+            btn_pause.Enabled = true;
         }
 
-        private void txt_longFDE_TextChanged(object sender, EventArgs e)
+        private void btn_pause_Click(object sender, EventArgs e)
         {
-            txt_longFDE.ScrollToCaret();
+            paused = true;
+            btn_play.Enabled = true;
+            btn_pause.Enabled = false;
         }
     }
 }

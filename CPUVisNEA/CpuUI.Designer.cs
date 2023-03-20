@@ -52,7 +52,6 @@ namespace CPUVisNEA
             this.pnl_uCodeManip = new System.Windows.Forms.Panel();
             this.txt_uProg = new System.Windows.Forms.TextBox();
             this.gb_Execute = new System.Windows.Forms.GroupBox();
-            this.teeheee = new System.Windows.Forms.Button();
             this.btn_pause = new System.Windows.Forms.Button();
             this.RunSpeed = new System.Windows.Forms.TrackBar();
             this.btn_play = new System.Windows.Forms.Button();
@@ -106,7 +105,6 @@ namespace CPUVisNEA
             this.txt_longFDE.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
             this.txt_longFDE.Size = new System.Drawing.Size(756, 381);
             this.txt_longFDE.TabIndex = 3;
-            this.txt_longFDE.TextChanged += new System.EventHandler(this.txt_longFDE_TextChanged);
             // 
             // txt_shortFDE
             // 
@@ -122,7 +120,6 @@ namespace CPUVisNEA
             this.txt_shortFDE.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
             this.txt_shortFDE.Size = new System.Drawing.Size(756, 381);
             this.txt_shortFDE.TabIndex = 2;
-            this.txt_shortFDE.TextChanged += new System.EventHandler(this.txt_shortFDE_TextChanged);
             // 
             // gb_InpOut
             // 
@@ -347,10 +344,8 @@ namespace CPUVisNEA
             // 
             // gb_Execute
             // 
-            this.gb_Execute.AutoSize = true;
             this.gb_Execute.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
             this.gb_Execute.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(62)))), ((int)(((byte)(84)))), ((int)(((byte)(151)))));
-            this.gb_Execute.Controls.Add(this.teeheee);
             this.gb_Execute.Controls.Add(this.btn_pause);
             this.gb_Execute.Controls.Add(this.RunSpeed);
             this.gb_Execute.Controls.Add(this.btn_play);
@@ -367,18 +362,6 @@ namespace CPUVisNEA
             this.gb_Execute.TabStop = false;
             this.gb_Execute.Text = "Execution Buttons";
             // 
-            // teeheee
-            // 
-            this.teeheee.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(90)))), ((int)(((byte)(90)))), ((int)(((byte)(90)))));
-            this.teeheee.ForeColor = System.Drawing.Color.White;
-            this.teeheee.Location = new System.Drawing.Point(531, 32);
-            this.teeheee.Margin = new System.Windows.Forms.Padding(6);
-            this.teeheee.Name = "teeheee";
-            this.teeheee.Size = new System.Drawing.Size(87, 40);
-            this.teeheee.TabIndex = 13;
-            this.teeheee.Text = "teehee\r\n";
-            this.teeheee.UseVisualStyleBackColor = false;
-            // 
             // btn_pause
             // 
             this.btn_pause.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(90)))), ((int)(((byte)(90)))), ((int)(((byte)(90)))));
@@ -386,18 +369,21 @@ namespace CPUVisNEA
             this.btn_pause.Location = new System.Drawing.Point(453, 133);
             this.btn_pause.Margin = new System.Windows.Forms.Padding(6);
             this.btn_pause.Name = "btn_pause";
-            this.btn_pause.Size = new System.Drawing.Size(91, 59);
+            this.btn_pause.Size = new System.Drawing.Size(81, 59);
             this.btn_pause.TabIndex = 12;
             this.btn_pause.Text = "Pause";
             this.btn_pause.UseVisualStyleBackColor = false;
             this.btn_pause.Visible = false;
+            this.btn_pause.Click += new System.EventHandler(this.btn_pause_Click);
             // 
             // RunSpeed
             // 
             this.RunSpeed.Location = new System.Drawing.Point(199, 32);
             this.RunSpeed.Name = "RunSpeed";
+            this.RunSpeed.RightToLeft = System.Windows.Forms.RightToLeft.Yes;
             this.RunSpeed.Size = new System.Drawing.Size(419, 90);
             this.RunSpeed.TabIndex = 11;
+            this.RunSpeed.Tag = "";
             // 
             // btn_play
             // 
@@ -411,6 +397,7 @@ namespace CPUVisNEA
             this.btn_play.Text = "Play";
             this.btn_play.UseVisualStyleBackColor = false;
             this.btn_play.Visible = false;
+            this.btn_play.Click += new System.EventHandler(this.btn_play_Click);
             // 
             // btn_ReturnToEdit
             // 
@@ -596,8 +583,6 @@ namespace CPUVisNEA
         private System.Windows.Forms.TableLayoutPanel tableLayoutPanel2;
 
         private System.Windows.Forms.Button btn_MachineHuman;
-
-        private System.Windows.Forms.Button teeheee;
 
         private System.Windows.Forms.Button btn_pause;
 

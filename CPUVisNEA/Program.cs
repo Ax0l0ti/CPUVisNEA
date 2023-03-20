@@ -64,7 +64,11 @@ namespace CPUVisNEA
                 {"Labeltest", "B Test\r\nMOV R0, #10\r\nOUT R0\r\nTest: MOV R0, #69\r\nOUT R0\r\nHALT"} ,
                 
                 // creates for loop that iterates through outputs 1 to 100 
-                { "for100", "MOV R0, #1\r\nstartloop: OUT R0\r\nADD R0, R0, #1\r\nCMP R0, #101\r\nBNE  startloop\r\nendloop: HALT\r\n " } ,
+                { "For100", "MOV R1, #1\r\nMOV R0, #1\r\nstartloop: OUT R0\r\nADD R0, R0, R1\r\nCMP R0, #101\r\nBNE  startloop\r\nendloop: HALT\r\n " } ,
+                //multiplies R0 and R1
+                { "Multiplication","\r\nMOV R0, #9 \r\nMOV R1, #12 \r\nMOV R2, #0 \r\nMOV R8, #1 \r\nOUT R0 \r\nOUT R1 \r\n" +
+                                   "startloop: AND R3, R0, R8 \r\nCMP R3, #1 \r\nBNE jump \r\nADD R2, R2, R1 \r\njump: LSR R0, R0, #1 \r\nLSL R1, R1, #1 \r\nCMP R0, #0 \r\nBEQ endloop " +
+                                   "\r\nB startloop \r\nendloop: OUT R2 \r\nHALT"},
                 
                 // EveryTest - Test Vast Majority of all potential aspects
                 // designed to test if ALL Instructions compiled and functioned.
