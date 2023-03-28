@@ -264,15 +264,17 @@ namespace CPUVisNEA
             // btn_MachineHuman
             // 
             this.btn_MachineHuman.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(90)))), ((int)(((byte)(90)))), ((int)(((byte)(90)))));
+            this.btn_MachineHuman.Enabled = false;
             this.btn_MachineHuman.ForeColor = System.Drawing.Color.White;
             this.btn_MachineHuman.Location = new System.Drawing.Point(708, 46);
             this.btn_MachineHuman.Margin = new System.Windows.Forms.Padding(6);
             this.btn_MachineHuman.Name = "btn_MachineHuman";
             this.btn_MachineHuman.Size = new System.Drawing.Size(178, 77);
             this.btn_MachineHuman.TabIndex = 9;
-            this.btn_MachineHuman.Text = "Machine Code\r\nHuman Code \r\n";
+            this.btn_MachineHuman.Text = "Convert to Machine Code \r\n";
             this.btn_MachineHuman.UseVisualStyleBackColor = false;
             this.btn_MachineHuman.Visible = false;
+            this.btn_MachineHuman.Click += new System.EventHandler(this.btn_MachineHuman_Click);
             // 
             // lbl_MemoryTest
             // 
@@ -310,7 +312,7 @@ namespace CPUVisNEA
             this.MemoryTable.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 10F));
             this.MemoryTable.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 10F));
             this.MemoryTable.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 10F));
-            this.MemoryTable.Size = new System.Drawing.Size(863, 784);
+            this.MemoryTable.Size = new System.Drawing.Size(863, 823);
             this.MemoryTable.TabIndex = 4;
             this.MemoryTable.Paint += new System.Windows.Forms.PaintEventHandler(this.MemoryTable_Paint);
             // 

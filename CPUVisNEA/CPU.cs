@@ -28,7 +28,7 @@ namespace CPUVisNEA
         private Dictionary<string, int> LabelToRamIndex = new Dictionary<string, int>() { };
 
         // readonly variable for me to modify in case more or less registers are needed for testing, final code, adjustments etc.
-        private static readonly int BasicRegisterNumber = 10;
+        private static readonly int NumberOf_BasicRegisters = 10;
         // Normal User interactable Registers in a Computer
         private Register[] BasicRegisters;
 
@@ -43,8 +43,7 @@ namespace CPUVisNEA
         public RAM ram = new RAM();
         // used to compile User string to Cleaned Instruction[]. This confirms the program is valid before trying to compile the code in technically correct CPU assembly translation 
         public Compiler Compiler = new Compiler();
-        private List<string> FetchDecodeToAdd;
-        public string FDadd;
+        public string Fetch_Decode_add;
 
         public enum Instructions : byte
         {
@@ -178,12 +177,12 @@ namespace CPUVisNEA
 
         public void FDECycle()
         {
-            FDadd = "";
+            Fetch_Decode_add = "";
             // Searches from index in RAM for next Instruction
             // calls Display Fetch Log
             //todo combine into EXECUTE funxtion as currently deals w CPUState registers handling
             var FetchedInstruction = Fetch(CurrentState.PC.content);
-            FDadd += ($"\n----------------\n   Fetch\n----------------\n CPU fetches byte {FetchedInstruction} from MDR {CurrentState.PC.content}.\n");
+            Fetch_Decode_add += ($"\n----------------\n   Fetch\n----------------\n CPU fetches byte {FetchedInstruction} from MDR {CurrentState.PC.content}.\n");
             // Checks How many Parameters Required
             // calls ParameterFetch() to get Parameters
             // Incriments Program Counter 
@@ -192,8 +191,8 @@ namespace CPUVisNEA
 
             var InstructionToExecute = Decode(FetchedInstruction);
 
-            FDadd += ($"\n----------------\n   Execute\n----------------\nExecuting {InstructionToExecute.Tag} with parameters: {string.Join(", ", InstructionToExecute.args.Select(arg => $"{arg.name}"))}") ;
-            Trace.WriteLine(FDadd);
+            Fetch_Decode_add += ($"\n----------------\n   Execute\n----------------\nExecuting {InstructionToExecute.Tag} with parameters: {string.Join(", ", InstructionToExecute.args.Select(arg => $"{arg.name}"))}") ;
+            Trace.WriteLine(Fetch_Decode_add);
             try
             {
                 CurrentState = Execute(InstructionToExecute);
@@ -281,10 +280,10 @@ namespace CPUVisNEA
                 //incrementing the Program counter by number of bytes used to store parameters to access the next instruction assuming no branch condition
             }
 
-            FDadd += ($"\n----------------\n   Decode\n----------------\n CPU decodes MDR {BinaryInstruction} as a {TargetInstruction.Tag} Instruction, {parameters} parameters required.");
+            Fetch_Decode_add += ($"\n----------------\n   Decode\n----------------\n CPU decodes MDR {BinaryInstruction} as a {TargetInstruction.Tag} Instruction, {parameters} parameters required.");
             if (parameters > 0)
             {
-                FDadd += ($" CPU Fetches parameters from Memory Indexes {CurrentState.PC.content + 1} to {CurrentState.PC.content + parameters + 1}");
+                Fetch_Decode_add += ($" CPU Fetches parameters from Memory Indexes {CurrentState.PC.content + 1} to {CurrentState.PC.content + parameters + 1}");
             }
             CurrentState.PC.content += parameters + 1;
             return TargetInstruction;

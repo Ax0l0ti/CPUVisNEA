@@ -58,8 +58,10 @@ namespace CPUVisNEA
         private List<string> availableFiles = new List<string>();
         private bool Editstate = true;
         private CPU cpu;
-        private bool BytesVHuman = false;
+        private bool HumanReadableMemory = false;
         private bool paused = false;
+        private int currentExecution = 0 ;
+
 
         public UI(CPU cpu)
         {
@@ -92,8 +94,8 @@ namespace CPUVisNEA
 
         private void run()
         {
-            
-            
+
+            btn_MachineHuman.Enabled = true;
                 //set up and refresh all variables for new Run Command
                 cpu.SetUpFresh();
                 RefreshLogs();
@@ -105,10 +107,15 @@ namespace CPUVisNEA
                 do
                 {
                     // todo wait for step
+                    checked
+                    {
+                        
+                    }
                     wait(RunSpeed.Value);
-                    VisualMemoryUpdate(cpu.CurrentState.PC.content);
-                    cpu.FDECycle( /* todo step parameter to slow it down */); // Complete 1 cycle
-                    updateFDELogs(); //todo mabye make whenever updated
+                    currentExecution = cpu.CurrentState.PC.content;
+                    VisualMemoryUpdate();
+                    cpu.FDECycle(); // Complete 1 cycle
+                    updateFDELogs();
                     SPRupdate();
                     //de moivre theorem (!A & !B) == !(A|B)
                     //continues to run whilst edit state hasn't been called or form returned to edit state 
@@ -220,8 +227,10 @@ namespace CPUVisNEA
         }
 
 
-        private void VisualMemoryUpdate(int current)
+        private void VisualMemoryUpdate()
         {
+            System.Drawing.Font BinaryFont = new Font("Microsoft Sans Serif", 6F, FontStyle.Bold);
+            System.Drawing.Font HumanFont = new Font("Microsoft Sans Serif", 10.5F, FontStyle.Bold);
             var max = ReqNumOfMemoryIndexes();
             for (var row = 0; row < max / 10 + 1; row++)
             for (var col = 0; col < 10; col++)
@@ -231,15 +240,31 @@ namespace CPUVisNEA
                 if (cpu.ram.Memory.Count <= index)
                     text = "0";
                 else
-                    text = $"{cpu.ram.Memory[index]}";
+                {
+                    if (HumanReadableMemory)
+                    {
+                        text = $"{cpu.ram.Memory[index]}";
+
+                        ((Cell)MemoryTable.Controls[index]).content.Font = HumanFont;
+                    }
+                    else
+                    {
+                        ((Cell)MemoryTable.Controls[index]).content.Font = BinaryFont;
+                        text = bytePrint(index);
+                    }
+                    
+
+
+                }
+                    
 
 
                 // Create a new Label control with the text and add it to the TableLayoutPanel
-                if (index == current)
+                if (index == currentExecution)
                     MemoryTable.Controls[index].BackColor = Color.DeepSkyBlue;
                 else
                     MemoryTable.Controls[index].BackColor = Color.DarkSlateGray;
-
+                
                 ((Cell)MemoryTable.Controls[index]).content.Text = text;
             }
         }
@@ -247,6 +272,11 @@ namespace CPUVisNEA
         // this form contains 2 Labels
         // -> private Cell title as it doesnt need to be written to
         // -> public content title needs to be colour edited and content potentially changed with each FDE cycle 
+        public string bytePrint(int index)
+        {
+            return $"{Int32.Parse(Convert.ToString(cpu.ram.Memory[index], 2)):0000 0000}";
+        }
+        
         public class Cell : Panel
         {
             private Label name;
@@ -261,7 +291,7 @@ namespace CPUVisNEA
                 this.name.TextAlign = ContentAlignment.MiddleCenter;
                 this.name.Dock = DockStyle.Top;
                 // name in boldened font
-                this.name.Font = new Font(this.name.Font, FontStyle.Bold);
+                this.name.Font = new Font("Microsoft Sans Serif", 11F, FontStyle.Bold);
 
 
                 // Initialize the content label
@@ -343,6 +373,7 @@ namespace CPUVisNEA
             btn_play.Visible = !edit;
             btn_pause.Visible = !edit;
             RunSpeed.Visible = !edit;
+            btn_MachineHuman.Visible = !edit;
         }
 
 
@@ -384,6 +415,7 @@ namespace CPUVisNEA
         private void btn_ReturnToEdit_Click(object sender, EventArgs e)
         {
             setEditState(true);
+            btn_MachineHuman.Enabled = false;
         }
 
         private void btn_Run_Click(object sender, EventArgs e)
@@ -450,11 +482,6 @@ namespace CPUVisNEA
             while (timer.Enabled) Application.DoEvents();
         }
 
-        private void DD_Speed_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            throw new NotImplementedException();
-        }
-
         private void MemoryTable_Paint(object sender, PaintEventArgs e)
         {
             
@@ -472,6 +499,22 @@ namespace CPUVisNEA
             paused = true;
             btn_play.Enabled = true;
             btn_pause.Enabled = false;
+        }
+
+        private void btn_MachineHuman_Click(object sender, EventArgs e)
+        {
+            //currently Human readable
+            if (HumanReadableMemory)
+            {
+                btn_MachineHuman.Text = "Change to Numbers";
+            }
+            else
+            {
+                btn_MachineHuman.Text = "Change to Bytes";
+            }
+            //switch bool regardless of bytes or number
+            HumanReadableMemory = !HumanReadableMemory;
+            VisualMemoryUpdate();
         }
     }
 }

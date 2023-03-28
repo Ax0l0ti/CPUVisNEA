@@ -41,7 +41,7 @@ namespace CPUVisNEA
             else
             {
                 // if not in list of default files, allow overwrite 
-                if(  !( new List<string>(){ "succ", "admin" } ).Contains(txt_FileName.Text)  )
+                if(  !( new List<string>(){ "EveryTest", "For100", "Labeltest","Multiplication" } ).Contains(txt_FileName.Text)  )
                 {
                     if (DialogResult.Yes == MessageBox.Show($"overwrite contents of file : {txt_FileName.Text} ?",
                             "This action is permenant", MessageBoxButtons.YesNo))
