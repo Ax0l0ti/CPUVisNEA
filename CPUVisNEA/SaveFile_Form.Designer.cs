@@ -56,7 +56,7 @@ namespace CPUVisNEA
             this.Note.Name = "Note";
             this.Note.Size = new System.Drawing.Size(696, 116);
             this.Note.TabIndex = 11;
-            this.Note.Text = "Note : \r\n• If a Program already has that name , it will overwrite.\r\n   • Overwrit" + "ing cannot be undone";
+            this.Note.Text = "Note : \r\n• If a Program already has that name, it will overwrite.\r\n   • Overwriti" + "ng cannot be undone";
             // 
             // txt_FileName
             // 

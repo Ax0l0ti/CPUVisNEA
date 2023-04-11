@@ -366,7 +366,7 @@ namespace CPUVisNEA
             txt_uProg.Enabled = edit;
             btn_Compile.Visible = edit;
             btn_LoadFile.Visible = edit;
-            
+            btn_Help.Visible = edit;
             // run mode
             btn_ReturnToEdit.Visible = !edit;
             btn_Run.Visible = !edit;
@@ -506,7 +506,7 @@ namespace CPUVisNEA
             //currently Human readable
             if (HumanReadableMemory)
             {
-                btn_MachineHuman.Text = "Change to Numbers";
+                btn_MachineHuman.Text = "Change to Integers";
             }
             else
             {
@@ -515,6 +515,127 @@ namespace CPUVisNEA
             //switch bool regardless of bytes or number
             HumanReadableMemory = !HumanReadableMemory;
             VisualMemoryUpdate();
+        }
+        
+        // all below are simply Hover over descriptions 
+        //Info.Show("", );
+
+        
+
+        private void MemoryTable_MouseHover(object sender, EventArgs e)
+        {
+            Info.Show("This is a Visual display of your program stored as binary (similar to an executable file)" +
+                      "\nIt can also be translated into the binary's integer equivelants to make it easier to read" , MemoryTable);
+        }
+
+        private void SPRTable_MouseHover(object sender, EventArgs e)
+        {
+           Info.Show("This is a Row for Special Purpose Registers \nA list Registers and Purposes are as followed : \n        \nProgram Counter (PC) - holds memory index of the next instruction to be executed\nMemory Address Register (MAR) - holds the memory address of instruction required for execution\nMemory Data Register (MDR) - holds the data that is being read from or written to memory at MAR\nAccumulator (ACC) - holds intermediate results of arithmetic and logic operations (during execution)\nCurrent Instruction Register (CIR) - holds the instruction that is currently being executed by the CPU \n\t", SPRTable);
+        }
+
+        private void btn_MachineHuman_MouseHover(object sender, EventArgs e)
+        {
+           Info.Show("Button used to switch Visual Display \nbetween Machine code (binary) and the Integer equivalent",btn_MachineHuman );
+        }
+
+        private void txt_out_MouseHover(object sender, EventArgs e)
+        {
+           Info.Show("Console that responds to the Assembly OUT command \nOutputs values of the register passed to the instruction during execution", txt_out);
+        }
+
+        private void txt_shortFDE_MouseHover(object sender, EventArgs e)
+        {
+           Info.Show("Console used to track Fetch Decode Execute cycle \n This log is a simplified and more compact version compared to its counterpart",txt_shortFDE );
+        }
+
+        private void txt_longFDE_MouseHover(object sender, EventArgs e)
+        {
+           Info.Show("Console used to track Fetch Decode Execute cycle \n This log is expanded and more detailed than its counterpart", txt_longFDE);
+        }
+
+        private void RunSpeed_MouseHover(object sender, EventArgs e)
+        {
+           Info.Show("Slider that affects run time of execution \nRanges from Real Time Execution to large delays to allow the FDE cycle to be followed step by step", RunSpeed );
+        }
+        
+        private void lbl_hover_MouseHover(object sender, EventArgs e)
+        {
+            Info.Show("Wow... very smart. Please actually use the project instead of messing about", lbl_hover);
+        }
+
+        private void btn_Compile_MouseHover(object sender, EventArgs e)
+        {
+           Info.Show("Button used to compile the Assembly program (above)  \nThis will switch the window into run mode if successfully compiled", btn_Compile);
+        }
+
+        private void txt_uProg_MouseHover(object sender, EventArgs e)
+        {
+           Info.Show("This is the user's interactable area for programming an Assembly Langauage " +
+                     "\nInstruction Set is as follows : " +
+                     "\nSTR Rd, <memory ref> - Store the value that is in register d into the memory location specified by <memory ref>." + 
+"\nADD Rd, Rn, <operand2> - Add the value specified in <operand2> to the value in register n and store the result in register d." + 
+"\nSUB Rd, Rn, <operand2> - Subtract the value specified by <operand2> from the value in register n and store the result in register d." + 
+"\nMOV Rd, <operand2> - Copy the value specified by <operand2> into register d." + 
+"\nCMP Rn, <operand2> - Compare the value stored in register n with the value specified by <operand2>." + 
+"\nB <label> - Always branch to the instruction at position <label> in the program." + 
+"\nBEQ <label> - Branch to the instruction at position <label> if the last comparison meets an equal to criteria." +  
+"\nBNE <label> - Branch to the instruction at position <label> if the last comparison meets a not equal to criteria." + 
+"\nBLT <label> - Branch to the instruction at position <label> if the last comparison meets a less than criteria." + 
+"\nBGT <label> - Branch to the instruction at position <label> if the last comparison meets a greater than criteria." + 
+"\nAND Rd, Rn, <operand2> - Perform a bitwise logical AND operation between the value in register n and the value specified by <operand2> and store the result in register d." + 
+"\nORR Rd, Rn, <operand2> - Perform a bitwise logical OR operation between the value in register n and the value specified by <operand2> and store the result in register d." + 
+"\nEOR Rd, Rn, <operand2> - Perform a bitwise logical XOR (exclusive or) operation between the value in register n and the value specified by <operand2> and store the result in register d." + 
+"\nMVN Rd, <operand2> - Perform a bitwise logical NOT operation on the value specified by <operand2> and store the result in register d." + 
+
+
+"\nLSL Rd, Rn, <operand2> - Logically shift left the value stored in register n by the number of bits specified by <operand2> and store the result in register d." + 
+"\nLSR Rd, Rn, <operand2> - Logically shift right the value stored in register n by the number of bits specified by <operand2> and store the result in register d." + 
+"\nHALT - Stops the execution of the program." + 
+"\nOUT Rn - Returns the value of Rn to the output log ( top right )"
+, txt_uProg);
+        }
+
+        private void BasicRegTable_MouseHoverBasicRegTable_MouseHover(object sender, EventArgs e)
+        {
+            Info.Show("This is a Row for Basic Registers that hold integer values that the CPU can interact with", BasicRegTable);
+        }
+
+        private void btn_Help_Click(object sender, EventArgs e)
+        {
+            MessageBox.Show("STR Rd, <memory ref> - " +
+                            "\nStore the value that is in register d into the memory location specified by <memory ref>." +
+                            "\nADD Rd, Rn, <operand2> - " +
+                            "\nAdd the value specified in <operand2> to the value in register n and store the result in register d." +
+                            "\nSUB Rd, Rn, <operand2> - " +
+                            "\nSubtract the value specified by <operand2> from the value in register n and store the result in register d." +
+                            "\nMOV Rd, <operand2> - " +
+                            "\nCopy the value specified by <operand2> into register d." +
+                            "\nCMP Rn, <operand2> - " +
+                            "\nCompare the value stored in register n with the value specified by <operand2>." +
+                            "\nB <label> - " +
+                            "\nAlways branch to the instruction at position <label> in the program." +
+                            "\nBEQ <label> - " +
+                            "\nBranch to the instruction at position <label> if the last comparison meets an equal to criteria." +
+                            "\nBNE <label> - " +
+                            "\nBranch to the instruction at position <label> if the last comparison meets a not equal to criteria." +
+                            "\nBLT <label> - " +
+                            "\nBranch to the instruction at position <label> if the last comparison meets a less than criteria." +
+                            "\nBGT <label> - " +
+                            "\nBranch to the instruction at position <label> if the last comparison meets a greater than criteria." +
+                            "\nAND Rd, Rn, <operand2> - " +
+                            "\nPerform a bitwise logical AND operation between the value in register n and the value specified by <operand2> and store the result in register d." +
+                            "\nORR Rd, Rn, <operand2> - " +
+                            "\nPerform a bitwise logical OR operation between the value in register n and the value specified by <operand2> and store the result in register d." +
+                            "\nEOR Rd, Rn, <operand2> - " +
+                            "\nPerform a bitwise logical XOR (exclusive or) operation between the value in register n and the value specified by <operand2> and store the result in register d." +
+                            "\nMVN Rd, <operand2> - " +
+                            "\nPerform a bitwise logical NOT operation on the value specified by <operand2> and store the result in register d." +
+                            "\nLSL Rd, Rn, <operand2> - " +
+                            "Logically shift left the value stored in register n by the number of bits specified by <operand2> and store the result in register d." +
+                            "\nLSR Rd, Rn, <operand2> - " +
+                            "\nLogically shift right the value stored in register n by the number of bits specified by <operand2> and store the result in register d." +
+                            "\nHALT - Stops the execution of the program." +
+                            "\nOUT Rn - Returns the value of Rn to the output log ( top right )", "Instruction Set is as follows :");
         }
     }
 }

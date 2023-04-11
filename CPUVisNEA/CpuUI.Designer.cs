@@ -32,6 +32,7 @@ namespace CPUVisNEA
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(UI));
             this.backgroundWorker1 = new System.ComponentModel.BackgroundWorker();
             this.gb_outputs = new System.Windows.Forms.GroupBox();
@@ -46,12 +47,14 @@ namespace CPUVisNEA
             this.BasicRegTable = new System.Windows.Forms.TableLayoutPanel();
             this.SPRTable = new System.Windows.Forms.TableLayoutPanel();
             this.gb_Display = new System.Windows.Forms.GroupBox();
+            this.lbl_hover = new System.Windows.Forms.Label();
             this.btn_MachineHuman = new System.Windows.Forms.Button();
             this.lbl_MemoryTest = new System.Windows.Forms.Label();
             this.MemoryTable = new System.Windows.Forms.TableLayoutPanel();
             this.pnl_uCodeManip = new System.Windows.Forms.Panel();
             this.txt_uProg = new System.Windows.Forms.TextBox();
             this.gb_Execute = new System.Windows.Forms.GroupBox();
+            this.btn_Help = new System.Windows.Forms.Button();
             this.btn_pause = new System.Windows.Forms.Button();
             this.RunSpeed = new System.Windows.Forms.TrackBar();
             this.btn_play = new System.Windows.Forms.Button();
@@ -64,6 +67,7 @@ namespace CPUVisNEA
             this.btn_SaveFile = new System.Windows.Forms.Button();
             this.gb_userInput = new System.Windows.Forms.GroupBox();
             this.tableLayoutPanel2 = new System.Windows.Forms.TableLayoutPanel();
+            this.Info = new System.Windows.Forms.ToolTip(this.components);
             this.gb_outputs.SuspendLayout();
             this.gb_InpOut.SuspendLayout();
             this.gb_registers.SuspendLayout();
@@ -105,6 +109,7 @@ namespace CPUVisNEA
             this.txt_longFDE.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
             this.txt_longFDE.Size = new System.Drawing.Size(756, 381);
             this.txt_longFDE.TabIndex = 3;
+            this.txt_longFDE.MouseHover += new System.EventHandler(this.txt_longFDE_MouseHover);
             // 
             // txt_shortFDE
             // 
@@ -120,6 +125,7 @@ namespace CPUVisNEA
             this.txt_shortFDE.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
             this.txt_shortFDE.Size = new System.Drawing.Size(756, 381);
             this.txt_shortFDE.TabIndex = 2;
+            this.txt_shortFDE.MouseHover += new System.EventHandler(this.txt_shortFDE_MouseHover);
             // 
             // gb_InpOut
             // 
@@ -150,6 +156,7 @@ namespace CPUVisNEA
             this.txt_out.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
             this.txt_out.Size = new System.Drawing.Size(612, 200);
             this.txt_out.TabIndex = 3;
+            this.txt_out.MouseHover += new System.EventHandler(this.txt_out_MouseHover);
             // 
             // groupBox4
             // 
@@ -177,11 +184,11 @@ namespace CPUVisNEA
             this.gb_registers.Controls.Add(this.BasicRegTable);
             this.gb_registers.Controls.Add(this.SPRTable);
             this.gb_registers.ForeColor = System.Drawing.Color.White;
-            this.gb_registers.Location = new System.Drawing.Point(12, 1008);
+            this.gb_registers.Location = new System.Drawing.Point(10, 1000);
             this.gb_registers.Margin = new System.Windows.Forms.Padding(6);
             this.gb_registers.Name = "gb_registers";
             this.gb_registers.Padding = new System.Windows.Forms.Padding(6);
-            this.gb_registers.Size = new System.Drawing.Size(876, 267);
+            this.gb_registers.Size = new System.Drawing.Size(880, 270);
             this.gb_registers.TabIndex = 2;
             this.gb_registers.TabStop = false;
             this.gb_registers.Text = "Registers";
@@ -201,7 +208,7 @@ namespace CPUVisNEA
             this.BasicRegTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 10F));
             this.BasicRegTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 10F));
             this.BasicRegTable.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.875F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.BasicRegTable.Location = new System.Drawing.Point(11, 149);
+            this.BasicRegTable.Location = new System.Drawing.Point(9, 171);
             this.BasicRegTable.Name = "BasicRegTable";
             this.BasicRegTable.RowCount = 1;
             this.BasicRegTable.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 10F));
@@ -214,6 +221,7 @@ namespace CPUVisNEA
             this.BasicRegTable.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 10F));
             this.BasicRegTable.Size = new System.Drawing.Size(863, 90);
             this.BasicRegTable.TabIndex = 6;
+            this.BasicRegTable.MouseHover += new System.EventHandler(this.BasicRegTable_MouseHoverBasicRegTable_MouseHover);
             // 
             // SPRTable
             // 
@@ -243,16 +251,18 @@ namespace CPUVisNEA
             this.SPRTable.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 10F));
             this.SPRTable.Size = new System.Drawing.Size(863, 100);
             this.SPRTable.TabIndex = 5;
+            this.SPRTable.MouseHover += new System.EventHandler(this.SPRTable_MouseHover);
             // 
             // gb_Display
             // 
             this.gb_Display.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(70)))), ((int)(((byte)(70)))), ((int)(((byte)(70)))));
+            this.gb_Display.Controls.Add(this.lbl_hover);
             this.gb_Display.Controls.Add(this.btn_MachineHuman);
             this.gb_Display.Controls.Add(this.lbl_MemoryTest);
             this.gb_Display.Controls.Add(this.MemoryTable);
             this.gb_Display.Controls.Add(this.gb_registers);
             this.gb_Display.ForeColor = System.Drawing.Color.White;
-            this.gb_Display.Location = new System.Drawing.Point(702, 0);
+            this.gb_Display.Location = new System.Drawing.Point(700, 0);
             this.gb_Display.Margin = new System.Windows.Forms.Padding(6);
             this.gb_Display.Name = "gb_Display";
             this.gb_Display.Padding = new System.Windows.Forms.Padding(6);
@@ -260,6 +270,18 @@ namespace CPUVisNEA
             this.gb_Display.TabIndex = 1;
             this.gb_Display.TabStop = false;
             this.gb_Display.Text = "CPU stuff";
+            // 
+            // lbl_hover
+            // 
+            this.lbl_hover.AutoSize = true;
+            this.lbl_hover.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(40)))), ((int)(((byte)(40)))), ((int)(((byte)(40)))));
+            this.lbl_hover.Font = new System.Drawing.Font("Microsoft YaHei UI", 10.125F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lbl_hover.Location = new System.Drawing.Point(162, 5);
+            this.lbl_hover.Name = "lbl_hover";
+            this.lbl_hover.Size = new System.Drawing.Size(549, 35);
+            this.lbl_hover.TabIndex = 11;
+            this.lbl_hover.Text = "Hover over Elements to get a descritpion!";
+            this.lbl_hover.MouseHover += new System.EventHandler(this.lbl_hover_MouseHover);
             // 
             // btn_MachineHuman
             // 
@@ -275,6 +297,7 @@ namespace CPUVisNEA
             this.btn_MachineHuman.UseVisualStyleBackColor = false;
             this.btn_MachineHuman.Visible = false;
             this.btn_MachineHuman.Click += new System.EventHandler(this.btn_MachineHuman_Click);
+            this.btn_MachineHuman.MouseHover += new System.EventHandler(this.btn_MachineHuman_MouseHover);
             // 
             // lbl_MemoryTest
             // 
@@ -315,6 +338,7 @@ namespace CPUVisNEA
             this.MemoryTable.Size = new System.Drawing.Size(863, 823);
             this.MemoryTable.TabIndex = 4;
             this.MemoryTable.Paint += new System.Windows.Forms.PaintEventHandler(this.MemoryTable_Paint);
+            this.MemoryTable.MouseHover += new System.EventHandler(this.MemoryTable_MouseHover);
             // 
             // pnl_uCodeManip
             // 
@@ -343,11 +367,13 @@ namespace CPUVisNEA
             this.txt_uProg.TabIndex = 3;
             this.txt_uProg.Text = resources.GetString("txt_uProg.Text");
             this.txt_uProg.TextChanged += new System.EventHandler(this.txt_uProg_TextChanged);
+            this.txt_uProg.MouseHover += new System.EventHandler(this.txt_uProg_MouseHover);
             // 
             // gb_Execute
             // 
             this.gb_Execute.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
             this.gb_Execute.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(62)))), ((int)(((byte)(84)))), ((int)(((byte)(151)))));
+            this.gb_Execute.Controls.Add(this.btn_Help);
             this.gb_Execute.Controls.Add(this.btn_pause);
             this.gb_Execute.Controls.Add(this.RunSpeed);
             this.gb_Execute.Controls.Add(this.btn_play);
@@ -359,19 +385,34 @@ namespace CPUVisNEA
             this.gb_Execute.Margin = new System.Windows.Forms.Padding(6);
             this.gb_Execute.Name = "gb_Execute";
             this.gb_Execute.Padding = new System.Windows.Forms.Padding(6);
-            this.gb_Execute.Size = new System.Drawing.Size(630, 239);
+            this.gb_Execute.Size = new System.Drawing.Size(630, 262);
             this.gb_Execute.TabIndex = 3;
             this.gb_Execute.TabStop = false;
             this.gb_Execute.Text = "Execution Buttons";
+            // 
+            // btn_Help
+            // 
+            this.btn_Help.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(90)))), ((int)(((byte)(90)))), ((int)(((byte)(90)))));
+            this.btn_Help.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.875F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.btn_Help.ForeColor = System.Drawing.Color.White;
+            this.btn_Help.Location = new System.Drawing.Point(231, 36);
+            this.btn_Help.Margin = new System.Windows.Forms.Padding(6);
+            this.btn_Help.Name = "btn_Help";
+            this.btn_Help.Size = new System.Drawing.Size(154, 104);
+            this.btn_Help.TabIndex = 13;
+            this.btn_Help.Text = "Instruction Set Help";
+            this.btn_Help.UseVisualStyleBackColor = false;
+            this.btn_Help.Visible = false;
+            this.btn_Help.Click += new System.EventHandler(this.btn_Help_Click);
             // 
             // btn_pause
             // 
             this.btn_pause.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(90)))), ((int)(((byte)(90)))), ((int)(((byte)(90)))));
             this.btn_pause.ForeColor = System.Drawing.Color.White;
-            this.btn_pause.Location = new System.Drawing.Point(453, 133);
+            this.btn_pause.Location = new System.Drawing.Point(397, 163);
             this.btn_pause.Margin = new System.Windows.Forms.Padding(6);
             this.btn_pause.Name = "btn_pause";
-            this.btn_pause.Size = new System.Drawing.Size(81, 59);
+            this.btn_pause.Size = new System.Drawing.Size(95, 59);
             this.btn_pause.TabIndex = 12;
             this.btn_pause.Text = "Pause";
             this.btn_pause.UseVisualStyleBackColor = false;
@@ -380,21 +421,22 @@ namespace CPUVisNEA
             // 
             // RunSpeed
             // 
-            this.RunSpeed.Location = new System.Drawing.Point(199, 32);
+            this.RunSpeed.Location = new System.Drawing.Point(9, 145);
             this.RunSpeed.Name = "RunSpeed";
             this.RunSpeed.RightToLeft = System.Windows.Forms.RightToLeft.Yes;
-            this.RunSpeed.Size = new System.Drawing.Size(419, 90);
+            this.RunSpeed.Size = new System.Drawing.Size(379, 90);
             this.RunSpeed.TabIndex = 11;
             this.RunSpeed.Tag = "";
+            this.RunSpeed.MouseHover += new System.EventHandler(this.RunSpeed_MouseHover);
             // 
             // btn_play
             // 
             this.btn_play.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(90)))), ((int)(((byte)(90)))), ((int)(((byte)(90)))));
             this.btn_play.ForeColor = System.Drawing.Color.White;
-            this.btn_play.Location = new System.Drawing.Point(546, 133);
+            this.btn_play.Location = new System.Drawing.Point(523, 163);
             this.btn_play.Margin = new System.Windows.Forms.Padding(6);
             this.btn_play.Name = "btn_play";
-            this.btn_play.Size = new System.Drawing.Size(72, 59);
+            this.btn_play.Size = new System.Drawing.Size(95, 59);
             this.btn_play.TabIndex = 10;
             this.btn_play.Text = "Play";
             this.btn_play.UseVisualStyleBackColor = false;
@@ -405,10 +447,10 @@ namespace CPUVisNEA
             // 
             this.btn_ReturnToEdit.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(90)))), ((int)(((byte)(90)))), ((int)(((byte)(90)))));
             this.btn_ReturnToEdit.ForeColor = System.Drawing.Color.White;
-            this.btn_ReturnToEdit.Location = new System.Drawing.Point(12, 121);
+            this.btn_ReturnToEdit.Location = new System.Drawing.Point(397, 32);
             this.btn_ReturnToEdit.Margin = new System.Windows.Forms.Padding(6);
             this.btn_ReturnToEdit.Name = "btn_ReturnToEdit";
-            this.btn_ReturnToEdit.Size = new System.Drawing.Size(178, 82);
+            this.btn_ReturnToEdit.Size = new System.Drawing.Size(221, 82);
             this.btn_ReturnToEdit.TabIndex = 9;
             this.btn_ReturnToEdit.Text = "Return to Edit (Cancel Run ) ";
             this.btn_ReturnToEdit.UseVisualStyleBackColor = false;
@@ -418,13 +460,14 @@ namespace CPUVisNEA
             // btn_Run
             // 
             this.btn_Run.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(90)))), ((int)(((byte)(90)))), ((int)(((byte)(90)))));
+            this.btn_Run.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.875F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.btn_Run.ForeColor = System.Drawing.Color.White;
-            this.btn_Run.Location = new System.Drawing.Point(12, 32);
+            this.btn_Run.Location = new System.Drawing.Point(24, 36);
             this.btn_Run.Margin = new System.Windows.Forms.Padding(6);
             this.btn_Run.Name = "btn_Run";
-            this.btn_Run.Size = new System.Drawing.Size(178, 77);
+            this.btn_Run.Size = new System.Drawing.Size(154, 104);
             this.btn_Run.TabIndex = 8;
-            this.btn_Run.Text = "Run Program\r\n\r\n";
+            this.btn_Run.Text = "Run Program";
             this.btn_Run.UseVisualStyleBackColor = false;
             this.btn_Run.Visible = false;
             this.btn_Run.Click += new System.EventHandler(this.btn_Run_Click);
@@ -432,15 +475,17 @@ namespace CPUVisNEA
             // btn_Compile
             // 
             this.btn_Compile.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(90)))), ((int)(((byte)(90)))), ((int)(((byte)(90)))));
+            this.btn_Compile.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.875F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.btn_Compile.ForeColor = System.Drawing.Color.White;
-            this.btn_Compile.Location = new System.Drawing.Point(12, 32);
+            this.btn_Compile.Location = new System.Drawing.Point(14, 36);
             this.btn_Compile.Margin = new System.Windows.Forms.Padding(6);
             this.btn_Compile.Name = "btn_Compile";
-            this.btn_Compile.Size = new System.Drawing.Size(210, 104);
+            this.btn_Compile.Size = new System.Drawing.Size(173, 104);
             this.btn_Compile.TabIndex = 4;
-            this.btn_Compile.Text = "Compile Assembely Code\r\n";
+            this.btn_Compile.Text = "Compile Program\r\n";
             this.btn_Compile.UseVisualStyleBackColor = false;
             this.btn_Compile.Click += new System.EventHandler(this.btn_Compile_Click);
+            this.btn_Compile.MouseHover += new System.EventHandler(this.btn_Compile_MouseHover);
             // 
             // gb_UAssControls
             // 
@@ -544,6 +589,18 @@ namespace CPUVisNEA
             this.tableLayoutPanel2.Size = new System.Drawing.Size(200, 100);
             this.tableLayoutPanel2.TabIndex = 0;
             // 
+            // Info
+            // 
+            this.Info.AutoPopDelay = 10000;
+            this.Info.BackColor = System.Drawing.SystemColors.ControlLight;
+            this.Info.ForeColor = System.Drawing.SystemColors.ControlText;
+            this.Info.InitialDelay = 500;
+            this.Info.ReshowDelay = 100;
+            this.Info.ShowAlways = true;
+            this.Info.Tag = "";
+            this.Info.ToolTipIcon = System.Windows.Forms.ToolTipIcon.Info;
+            this.Info.ToolTipTitle = "Description";
+            // 
             // UI
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(12F, 25F);
@@ -578,6 +635,12 @@ namespace CPUVisNEA
             this.gb_userInput.PerformLayout();
             this.ResumeLayout(false);
         }
+
+        private System.Windows.Forms.Button btn_Help;
+
+        private System.Windows.Forms.Label lbl_hover;
+
+        private System.Windows.Forms.Button fucku;
 
         private System.Windows.Forms.TableLayoutPanel BasicRegTable;
 
@@ -617,6 +680,7 @@ namespace CPUVisNEA
         private System.Windows.Forms.TableLayoutPanel MemoryTable;
         private System.Windows.Forms.Label lbl_MemoryTest;
         private System.Windows.Forms.TrackBar RunSpeed;
+        private ToolTip Info;
     }
     
     
