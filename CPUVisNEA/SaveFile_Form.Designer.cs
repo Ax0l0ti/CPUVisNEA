@@ -65,7 +65,6 @@ namespace CPUVisNEA
             this.txt_FileName.Name = "txt_FileName";
             this.txt_FileName.Size = new System.Drawing.Size(391, 48);
             this.txt_FileName.TabIndex = 12;
-            this.txt_FileName.TextChanged += new System.EventHandler(this.txt_FileName_TextChanged);
             // 
             // SaveFile_Form
             // 

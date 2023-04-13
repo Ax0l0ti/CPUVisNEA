@@ -47,6 +47,5 @@ namespace CPUVisNEA
                     $"Load {DD_files.Text} program?", MessageBoxButtons.YesNo))
                 Close();
         }
-        //https://learn.microsoft.com/en-us/dotnet/api/system.io.file.appendtext?view=net-7.0
     }
 }

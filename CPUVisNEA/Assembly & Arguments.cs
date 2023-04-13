@@ -92,7 +92,8 @@ namespace CPUVisNEA
         //all arguements have a 
         protected internal virtual int RetInt()
         {
-            throw new Exception("Argument not cast");
+            //if not a child class and using non overriden method, then throw an error
+            throw new Exception("Argument not cast, still basic Argument class");
         }
     }
 
@@ -289,7 +290,7 @@ namespace CPUVisNEA
                 args.Add(arg);
             //else output error saying the argument type cant be used as the nth parameter ( +1 to counter 0 first index) 
             else
-                throw new Exception($"Argument {arg.name} : arg {args.Count + 1} can't be {arg.GetType()} for {Tag} Instruction ");
+                throw new Exception($"Invalid Argument \"{arg.name}\" for {Tag} Instruction \n(Argument was cast as an {arg.GetType()} )");
         }
 
         /*
@@ -318,7 +319,7 @@ namespace CPUVisNEA
                     return new LineLabel(s);
 
                 default:
-                    throw new Exception($"{argumentStringForm} does not match any of the specified regexes for arguments");
+                    throw new Exception($" \"{argumentStringForm}\" does not match any of the specified regexes for arguments");
             }
         }
 
@@ -346,6 +347,7 @@ namespace CPUVisNEA
                         //therefore valid input type at index for instruction class tag
                         return true;
             return false;
+            throw new Exception($"Invalid Argument \"{arg.name}\" for {Tag} Instruction \n(Argument was cast as an {arg.GetType()} )");
         }
 
         //called by CPU Decode function to indicate how many bytes must be fetched to retrieve parameters

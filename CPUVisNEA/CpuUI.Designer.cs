@@ -349,7 +349,6 @@ namespace CPUVisNEA
             this.pnl_uCodeManip.Name = "pnl_uCodeManip";
             this.pnl_uCodeManip.Size = new System.Drawing.Size(0, 0);
             this.pnl_uCodeManip.TabIndex = 2;
-            this.pnl_uCodeManip.Paint += new System.Windows.Forms.PaintEventHandler(this.pnl_uCodeManip_Paint);
             // 
             // txt_uProg
             // 
@@ -558,7 +557,6 @@ namespace CPUVisNEA
             this.gb_userInput.TabIndex = 0;
             this.gb_userInput.TabStop = false;
             this.gb_userInput.Text = "User Input";
-            this.gb_userInput.Enter += new System.EventHandler(this.gb_userInput_Enter);
             // 
             // tableLayoutPanel2
             // 

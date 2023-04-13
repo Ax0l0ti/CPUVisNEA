@@ -103,7 +103,7 @@ namespace CPUVisNEA
             //todo 
         }
 
-        [Test]
+        [Test] // this was a throw away form to test all file handling before breaking it and creating individual forms 
         public void FileHandlingStartUp()
         {
             var FileHandling = new FileHandlingForm();

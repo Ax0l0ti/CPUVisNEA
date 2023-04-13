@@ -64,11 +64,11 @@
     <Compile Include="DeleteFile_Form.Designer.cs">
       <DependentUpon>DeleteFile_Form.cs</DependentUpon>
     </Compile>
-    <Compile Include="FileHandlingForm.cs">
+    <Compile Include="FileHandlingTestingForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="FileHandlingForm.Designer.cs">
-      <DependentUpon>FileHandlingForm.cs</DependentUpon>
+    <Compile Include="FileHandlingTestingForm.Designer.cs">
+      <DependentUpon>FileHandlingTestingForm.cs</DependentUpon>
     </Compile>
     <Compile Include="LoadFile_Form.cs">
       <SubType>Form</SubType>
@@ -91,8 +91,8 @@
     <EmbeddedResource Include="DeleteFile_Form.resx">
       <DependentUpon>DeleteFile_Form.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="FileHandlingForm.resx">
-      <DependentUpon>FileHandlingForm.cs</DependentUpon>
+    <EmbeddedResource Include="FileHandlingTestingForm.resx">
+      <DependentUpon>FileHandlingTestingForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="LoadFile_Form.resx">
       <DependentUpon>LoadFile_Form.cs</DependentUpon>

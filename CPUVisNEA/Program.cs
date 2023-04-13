@@ -7,6 +7,7 @@ using System;
 using System.Diagnostics;
 using System.IO;
 using System.Windows.Forms;
+
 // for Trace & Debug
 
 // abstract data types 
@@ -99,7 +100,7 @@ namespace CPUVisNEA
             {
                 var PushPath = Environment.GetFolderPath(Environment.SpecialFolder.Personal) + "\\CPU_Edu_UI\\" +
                                premadeFiles[i, 0];
-                //stop user maliciously modifiying the default files via folder 
+                //stop user maliciously modifying the default files via folder 
                 File.Delete(PushPath);
                 using (var sw = File.CreateText(PushPath))
                 {
