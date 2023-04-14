@@ -128,7 +128,7 @@ namespace CPUVisNEA
                 case "LineLabel":
                     return GetNewLabelDetails(ByteFormOfContent);
                 default:
-                    throw new Exception($"Invalid Argument Type {ArgType.Name} ");
+                    throw new Exception($"Invalid Argument Type {ArgType.Name}\n\n ");
             }
         }
 
@@ -187,21 +187,22 @@ namespace CPUVisNEA
             //todo combine into EXECUTE funxtion as currently deals w CPUState registers handling
             var FetchedInstruction = Fetch(CurrentState.PC.content);
             Fetch_Decode_add +=
-                $"\n----------------\n   Fetch\n----------------\n CPU fetches byte {FetchedInstruction} from MDR {CurrentState.PC.content}.\n";
+                $"\n----------------\n   Fetch\n----------------\n CPU fetches byte from memory at address index of MAR value {CurrentState.PC.content}\nThe value returned ({FetchedInstruction}) is stored in MDR.";
             // Checks How many Parameters Required
             // calls ParameterFetch() to get Parameters
             // Incriments Program Counter 
-            // calls Display Decode Log
-
-
+            // Adds the Decode section of FDe cycle with FDE
             var InstructionToExecute = Decode(FetchedInstruction);
 
             Fetch_Decode_add +=
                 $"\n----------------\n   Execute\n----------------\nExecuting {InstructionToExecute.Tag} with parameters: {string.Join(", ", InstructionToExecute.args.Select(arg => $"{arg.name}"))}";
-            Trace.WriteLine(Fetch_Decode_add);
+            
             try
             {
                 CurrentState = Execute(InstructionToExecute);
+                Fetch_Decode_add += $"\n{CurrentState.DetailedChangeLog[0]}";
+                //FDE_Add message written in full details for individual FDE Cycle to add to complex FDE log
+                Trace.WriteLine(Fetch_Decode_add);
             }
             catch (Exception ex)
             {
@@ -283,11 +284,10 @@ namespace CPUVisNEA
             }
 
             Fetch_Decode_add +=
-                $"\n----------------\n   Decode\n----------------\n CPU decodes MDR {BinaryInstruction} as a {TargetInstruction.Tag} Instruction, {parameters} parameters required.";
+                $"\n----------------\n   Decode\n----------------\n CPU decodes MDR {BinaryInstruction} as a {TargetInstruction.Tag} Instruction, assigned to CIR. {parameters} parameters required. \n CPU Fetches parameters from Memory Indexes {CurrentState.PC.content + 1} to {CurrentState.PC.content + parameters + 1}";
+            //if not a halt instruction
             if (parameters > 0)
-                Fetch_Decode_add +=
-                    $" CPU Fetches parameters from Memory Indexes {CurrentState.PC.content + 1} to {CurrentState.PC.content + parameters + 1}";
-            CurrentState.PC.content += parameters + 1;
+                CurrentState.PC.content += parameters + 1;
             return TargetInstruction;
         }
 
@@ -296,14 +296,6 @@ namespace CPUVisNEA
             int parameters;
             parameters = TargetInstruction.NumberOfParameters();
             return parameters;
-        }
-
-
-        private void PCIncriment(int parameters)
-        {
-            /* increment the Program Counter by 1 for instruction and all parameters for next execution
-             However a branch command will overwrite this Increment to the branched location*/
-            CurrentState.PC.content = +parameters + 1;
         }
 
 
@@ -318,7 +310,6 @@ namespace CPUVisNEA
             try
             {
                 if (NewState.MAR.content < ram.Memory.Count)
-                    //todo error here 
                     NewState.MDR.content = $"{ram.Memory[NewState.MAR.content]}";
             }
             catch (Exception ex)
@@ -382,7 +373,9 @@ namespace CPUVisNEA
             catch (Exception ex)
             {
                 Trace.WriteLine($"Compile failed: {ex}");
-                MessageBox.Show($"Failed to Compile Program, error message : \n{ex}","Assembly Invalid");
+                //all exceptions that are accounted for finish with \n\n
+                string errorMsgWithoutCallStack = ex.Message.Substring(0, ex.Message.IndexOf("\n\n"));
+                MessageBox.Show($"Failed to Compile Program, error message : \n{errorMsgWithoutCallStack}","Assembly Invalid");
             }
 
             return valid;
@@ -398,7 +391,7 @@ namespace CPUVisNEA
     public class RAM
     {
         public List<byte> Memory = new List<byte>();
-        private Instruction[] AssembelyProgram = { };
+        private Instruction[] AssembelyProgram;
         public Dictionary<Instruction, int> InstructionLocations = new Dictionary<Instruction, int>();
         private bool binaryMode;
 
@@ -412,38 +405,7 @@ namespace CPUVisNEA
         {
             if (index > -1)
                 return Memory[index];
-            throw new Exception($"Index {index} invalid memory index");
-        }
-
-        private List<string> FormRamDisplay_Convert()
-        {
-            var newContent = new List<string>();
-            if (binaryMode)
-            {
-                newContent = Bin2Ass();
-                binaryMode = false;
-            }
-            else
-            {
-                newContent = Ass2Bin();
-            }
-
-            binaryMode = true;
-
-            return newContent;
-        }
-
-        private List<string> Ass2Bin()
-        {
-            //for all lines run algorithm to change assembely track to binary equivelant
-            return null;
-        }
-
-        private List<string> Bin2Ass()
-        {
-            //opposite search of bin to ass for all lines
-            //both stored as strings 
-            return null;
+            throw new Exception($"Index {index} invalid memory index \n\n");
         }
     }
 
@@ -474,7 +436,7 @@ namespace CPUVisNEA
                     // branch instructions need to know where their label points to
                     var target = (LineLabel)maybeBranch.args[0];
                     if (!LabelledInstructions.ContainsKey(target.name))
-                        throw new Exception($"Label: {target.name} not defined");
+                        throw new Exception($"Label: {target.name} not defined\n\n");
                 }
             }
         }
@@ -500,6 +462,7 @@ namespace CPUVisNEA
         {
             
             var InstrArray = new List<Instruction>();
+            // foreach line in user script try translate to instruction. If fialed throw the contextualised exception up to compile
             foreach (var line in program)
                 {
                     try
@@ -511,7 +474,7 @@ namespace CPUVisNEA
                     }
                     catch (Exception ex)
                     {
-                        throw new Exception($"Failed to compile line {InstrArray.Count+1} : \n{line}Error:\n{ex} ");
+                        throw new Exception($" \n Failed to compile line {InstrArray.Count+1} : {line}\n{ex} ");
                     }
                 }
             return InstrArray;
@@ -545,16 +508,14 @@ namespace CPUVisNEA
             //if returns false, throw exception of invalid instruction instead of creating new instruction
             if (!Enum.TryParse(instruction, out instrType))
             {
-                throw new Exception($"Invalid Instruction name : \n- {instruction} ");
+                throw new Exception($"Invalid Instruction name : \n{instruction}\n\n ");
             }
             var parsed = CPU.newInstruction(instrType);
             if (label != null) parsed.Label = label;
 
-            // now add the arguments to the instruction:
+            // now try add the arguments to the instruction. 
+            // this is done by passing the list of string arguments and instruction 
             Instruction.addParsedArgs(parsed, args);
-
-
-
 
                 return parsed;
         }
@@ -667,7 +628,7 @@ namespace CPUVisNEA
 
         public CPUState Copy()
         {
-            Trace.WriteLine(Outputs);
+            
             var cpuState = new CPUState();
             cpuState.PC.content = PC.content;
             cpuState.MAR.content = MAR.content;

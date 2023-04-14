@@ -87,7 +87,6 @@ namespace CPUVisNEA
 
         private void run()
         {
-            
             btn_MachineHuman.Enabled = true;
             //set up and refresh all variables for new Run Command
             cpu.SetUpFresh();
@@ -108,9 +107,54 @@ namespace CPUVisNEA
                 //de moivre theorem (!A & !B) == !(A|B)
                 //continues to run whilst edit state hasn't been called or form returned to edit state 
             } while (!cpu.CheckHalted() && !Editstate);
-            
-            
         }
+        
+        
+        
+        // Cell is a child class that inherits from the default class used in forms of panels
+        // this form contains 2 Labels
+        // -> private Cell title as it doesnt need to be written to
+        // -> public content title needs to be colour edited and content potentially changed with each FDE cycle 
+        
+
+        public class Cell : Panel
+        {
+            private readonly Label name;
+            public Label content;
+
+            public Cell(string name)
+            {
+                // Initialize the name label
+                this.name = new Label();
+                this.name.Text = name;
+                this.name.AutoSize = false;
+                this.name.TextAlign = ContentAlignment.MiddleCenter;
+                this.name.Dock = DockStyle.Top;
+                // name in boldened font
+                this.name.Font = new Font("Microsoft Sans Serif", 11F, FontStyle.Bold);
+
+
+                // Initialize the content label
+                content = new Label();
+                content.Text = "";
+                content.AutoSize = false;
+                content.TextAlign = ContentAlignment.MiddleCenter;
+                content.Dock = DockStyle.Bottom;
+
+                // Add the name and content labels to the cell
+
+                // Set the cell's controls and initial background color
+                BackColor = Color.LightSlateGray;
+                Controls.Add(this.name);
+                Controls.Add(content);
+            }
+
+            public Color BackColor
+            {
+                set => content.BackColor = value;
+            }
+        }
+
 
 
         private void VisualMemoryCreate()
@@ -176,6 +220,10 @@ namespace CPUVisNEA
                 Registeri.content.Text = cpu.CurrentState.Basic[i].content.ToString();
                 BasicRegTable.Controls.Add(Registeri, i, 0);
             }
+        }
+        public string bytePrint(int index)
+        {
+            return $"{int.Parse(Convert.ToString(cpu.ram.Memory[index], 2)):0000 0000}";
         }
 
         private void SPRupdate()
@@ -247,53 +295,7 @@ namespace CPUVisNEA
             }
         }
 
-        // Cell is a child class that inherits from the default class used in forms of panels
-        // this form contains 2 Labels
-        // -> private Cell title as it doesnt need to be written to
-        // -> public content title needs to be colour edited and content potentially changed with each FDE cycle 
-        public string bytePrint(int index)
-        {
-            return $"{int.Parse(Convert.ToString(cpu.ram.Memory[index], 2)):0000 0000}";
-        }
-
-        public class Cell : Panel
-        {
-            private readonly Label name;
-            public Label content;
-
-            public Cell(string name)
-            {
-                // Initialize the name label
-                this.name = new Label();
-                this.name.Text = name;
-                this.name.AutoSize = false;
-                this.name.TextAlign = ContentAlignment.MiddleCenter;
-                this.name.Dock = DockStyle.Top;
-                // name in boldened font
-                this.name.Font = new Font("Microsoft Sans Serif", 11F, FontStyle.Bold);
-
-
-                // Initialize the content label
-                content = new Label();
-                content.Text = "";
-                content.AutoSize = false;
-                content.TextAlign = ContentAlignment.MiddleCenter;
-                content.Dock = DockStyle.Bottom;
-
-                // Add the name and content labels to the cell
-
-                // Set the cell's controls and initial background color
-                BackColor = Color.LightSlateGray;
-                Controls.Add(this.name);
-                Controls.Add(content);
-            }
-
-            public Color BackColor
-            {
-                set => content.BackColor = value;
-            }
-        }
-
+        
         private void RefreshLogs()
         {
             txt_longFDE.Text = "";
@@ -309,16 +311,17 @@ namespace CPUVisNEA
             try
             {
                 cpu.Compiler = new Compiler();
-                var valid = cpu.Compile(txt_uProg.Text);
+                //if caught error compiling go to catch and dont switch edit state
+                cpu.Compile(txt_uProg.Text);
                 Trace.WriteLine($"compiled: \n {txt_uProg.Text}");
                 setEditState(false);
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Failed to Compile Program, error message : {ex} on line ","Assembly Invalid");
+                //used as message to user to output message that contains :
+                // string of line, line number, error e.g Instruction or argument invalid
+                MessageBox.Show($"Failed to Compile Program, error message : {ex} on line ", "Assembly Invalid");
             }
-            // if valid, call CPU.ChangeState()
-            // if invalid, output assembly problems
         }
 
         private void setEditState(bool edit)
@@ -330,6 +333,7 @@ namespace CPUVisNEA
             btn_Compile.Visible = edit;
             btn_LoadFile.Visible = edit;
             btn_Help.Visible = edit;
+            
             // run mode
             btn_ReturnToEdit.Visible = !edit;
             btn_Run.Visible = !edit;
@@ -384,11 +388,12 @@ namespace CPUVisNEA
 
         private void updateFDELogs()
         {
+            // for all small changes append to shortFDE
             foreach (var change in cpu.CurrentState.changeLog) txt_shortFDE.AppendText(change + Environment.NewLine);
-            foreach (var change in cpu.CurrentState.DetailedChangeLog)
-                txt_longFDE.AppendText(change + Environment.NewLine);
+            // as all detailed changes compiled into single string beforehand, it can simply be added
+            txt_longFDE.AppendText(cpu.Fetch_Decode_add.Replace("\n", Environment.NewLine));
 
-            if (cpu.CurrentState.Outputs != null) txt_out.Text += " " + cpu.CurrentState.Outputs;
+            if (cpu.CurrentState.Outputs != null) txt_out.AppendText(cpu.CurrentState.Outputs + " " );
         }
 
         private void btn_SaveFile_Click(object sender, EventArgs e)
@@ -454,7 +459,7 @@ namespace CPUVisNEA
             btn_play.Enabled = true;
             btn_pause.Enabled = false;
         }
-
+        //alters variable that determines value of
         private void btn_MachineHuman_Click(object sender, EventArgs e)
         {
             //currently Human readable
@@ -467,10 +472,7 @@ namespace CPUVisNEA
             VisualMemoryUpdate();
         }
 
-        // all below are simply Hover over descriptions 
-        //Info.Show("", );
-
-
+        // most below are simply Hover over descriptions 
         private void MemoryTable_MouseHover(object sender, EventArgs e)
         {
             Info.Show("This is a Visual display of your program stored as binary (similar to an executable file)" +
@@ -531,31 +533,6 @@ namespace CPUVisNEA
                 btn_Compile);
         }
 
-        private void txt_uProg_MouseHover(object sender, EventArgs e)
-        {
-            Info.Show("This is the user's interactable area for programming an Assembly Langauage " +
-                      "\nInstruction Set is as follows : " +
-                      "\nSTR Rd, <memory ref> - Store the value that is in register d into the memory location specified by <memory ref>." +
-                      "\nADD Rd, Rn, <operand2> - Add the value specified in <operand2> to the value in register n and store the result in register d." +
-                      "\nSUB Rd, Rn, <operand2> - Subtract the value specified by <operand2> from the value in register n and store the result in register d." +
-                      "\nMOV Rd, <operand2> - Copy the value specified by <operand2> into register d." +
-                      "\nCMP Rn, <operand2> - Compare the value stored in register n with the value specified by <operand2>." +
-                      "\nB <label> - Always branch to the instruction at position <label> in the program." +
-                      "\nBEQ <label> - Branch to the instruction at position <label> if the last comparison meets an equal to criteria." +
-                      "\nBNE <label> - Branch to the instruction at position <label> if the last comparison meets a not equal to criteria." +
-                      "\nBLT <label> - Branch to the instruction at position <label> if the last comparison meets a less than criteria." +
-                      "\nBGT <label> - Branch to the instruction at position <label> if the last comparison meets a greater than criteria." +
-                      "\nAND Rd, Rn, <operand2> - Perform a bitwise logical AND operation between the value in register n and the value specified by <operand2> and store the result in register d." +
-                      "\nORR Rd, Rn, <operand2> - Perform a bitwise logical OR operation between the value in register n and the value specified by <operand2> and store the result in register d." +
-                      "\nEOR Rd, Rn, <operand2> - Perform a bitwise logical XOR (exclusive or) operation between the value in register n and the value specified by <operand2> and store the result in register d." +
-                      "\nMVN Rd, <operand2> - Perform a bitwise logical NOT operation on the value specified by <operand2> and store the result in register d." +
-                      "\nLSL Rd, Rn, <operand2> - Logically shift left the value stored in register n by the number of bits specified by <operand2> and store the result in register d." +
-                      "\nLSR Rd, Rn, <operand2> - Logically shift right the value stored in register n by the number of bits specified by <operand2> and store the result in register d." +
-                      "\nHALT - Stops the execution of the program." +
-                      "\nOUT Rn - Returns the value of Rn to the output log ( top right )"
-                , txt_uProg);
-        }
-
         private void BasicRegTable_MouseHoverBasicRegTable_MouseHover(object sender, EventArgs e)
         {
             Info.Show("This is a Row for Basic Registers that hold integer values that the CPU can interact with",
@@ -599,6 +576,7 @@ namespace CPUVisNEA
                             "\nHALT - Stops the execution of the program." +
                             "\nOUT Rn - Returns the value of Rn to the output log ( top right )",
                 "Instruction Set is as follows :");
+            Application.DoEvents();
         }
     }
 }
