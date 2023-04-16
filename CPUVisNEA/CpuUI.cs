@@ -87,6 +87,7 @@ namespace CPUVisNEA
 
         private void run()
         {
+            
             btn_MachineHuman.Enabled = true;
             refreshEverything();
             do
@@ -105,6 +106,7 @@ namespace CPUVisNEA
         public void refreshEverything()
         {
             //set up and refresh all variables for new Run Command
+            currentExecutionIndex = 0;
             cpu.SetUpFresh();
             RefreshLogs();
             cpu.FillRam();
@@ -112,6 +114,7 @@ namespace CPUVisNEA
 
             VisualMemoryCreate();
             SPRCreate();
+            
         }
         
         

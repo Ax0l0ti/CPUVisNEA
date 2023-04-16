@@ -47,6 +47,7 @@ namespace CPUVisNEA
         public enum Instructions : byte
         {
             //enum number integer can be converted to represent binary value
+            HALT,
             OUT,
             LDR,
             ADD,
@@ -63,8 +64,8 @@ namespace CPUVisNEA
             EOR,
             MVN,
             LSL,
-            LSR,
-            HALT
+            LSR
+            
         }
 
         //switch case that takes a enum from Instructions and translates it to a new instance of a correspondent Instruction class 
