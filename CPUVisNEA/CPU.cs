@@ -369,16 +369,19 @@ namespace CPUVisNEA
 
                 Trace.WriteLine($"Start Compiling: [ '\n'{text}'\n']");
                 Compiler.fullCompile(program);
+                //
+                return true;
             }
             catch (Exception ex)
             {
                 Trace.WriteLine($"Compile failed: {ex}");
                 //all exceptions that are accounted for finish with \n\n
                 string errorMsgWithoutCallStack = ex.Message.Substring(0, ex.Message.IndexOf("\n\n"));
-                MessageBox.Show($"Failed to Compile Program, error message : \n{errorMsgWithoutCallStack}","Assembly Invalid");
+                MessageBox.Show($"Encountered error whilst Compiling :{errorMsgWithoutCallStack}","Assembly Invalid");
+                return false;
+
             }
 
-            return valid;
         }
 
         public CPU()
@@ -474,7 +477,7 @@ namespace CPUVisNEA
                     }
                     catch (Exception ex)
                     {
-                        throw new Exception($" \n Failed to compile line {InstrArray.Count+1} : {line}\n{ex} ");
+                        throw new Exception($"\nFailed to Compile line {InstrArray.Count+1} : {line}\n{ex} ");
                     }
                 }
             return InstrArray;
@@ -508,7 +511,7 @@ namespace CPUVisNEA
             //if returns false, throw exception of invalid instruction instead of creating new instruction
             if (!Enum.TryParse(instruction, out instrType))
             {
-                throw new Exception($"Invalid Instruction name : \n{instruction}\n\n ");
+                throw new Exception($"Invalid Instruction name : {instruction}\n\n ");
             }
             var parsed = CPU.newInstruction(instrType);
             if (label != null) parsed.Label = label;

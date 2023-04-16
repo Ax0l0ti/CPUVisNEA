@@ -88,17 +88,10 @@ namespace CPUVisNEA
         private void run()
         {
             btn_MachineHuman.Enabled = true;
-            //set up and refresh all variables for new Run Command
-            cpu.SetUpFresh();
-            RefreshLogs();
-            cpu.FillRam();
-            //fist index is always 0
-
-            VisualMemoryCreate();
-            SPRCreate();
+            refreshEverything();
             do
             {
-                wait(RunSpeed.Value);
+                wait(RunSpeed.Value + 1);
                 currentExecutionIndex = cpu.CurrentState.PC.content;
                 VisualMemoryUpdate();
                 cpu.FDECycle(); // Complete 1 cycle
@@ -107,6 +100,18 @@ namespace CPUVisNEA
                 //de moivre theorem (!A & !B) == !(A|B)
                 //continues to run whilst edit state hasn't been called or form returned to edit state 
             } while (!cpu.CheckHalted() && !Editstate);
+        }
+
+        public void refreshEverything()
+        {
+            //set up and refresh all variables for new Run Command
+            cpu.SetUpFresh();
+            RefreshLogs();
+            cpu.FillRam();
+            //fist index is always 0
+
+            VisualMemoryCreate();
+            SPRCreate();
         }
         
         
@@ -183,12 +188,12 @@ namespace CPUVisNEA
 
                 MemoryTable.Controls.Add(cell, col, row);
             }
+            VisualMemoryUpdate();
         }
 
         private void SPRCreate()
         {
             var index = 0;
-            var SPRs = new List<string> { "PC", "MAR", "MDR", "ACC", "CIR", "MBR" };
             var pc = new Cell("PC");
             pc.content.Text = cpu.CurrentState.PC.content.ToString();
             SPRTable.Controls.Add(pc, index, 0);
@@ -220,6 +225,7 @@ namespace CPUVisNEA
                 Registeri.content.Text = cpu.CurrentState.Basic[i].content.ToString();
                 BasicRegTable.Controls.Add(Registeri, i, 0);
             }
+            SPRupdate();
         }
         public string bytePrint(int index)
         {
@@ -308,21 +314,19 @@ namespace CPUVisNEA
 
         private void btn_Compile_Click(object sender, EventArgs e)
         {
-            try
-            {
-                cpu.Compiler = new Compiler();
-                //if caught error compiling go to catch and dont switch edit state
-                cpu.Compile(txt_uProg.Text);
+            cpu.Compiler = new Compiler();
+                //cpu.Compile returns a boolean. IF it compiles then Edit state sert to false and vice versa
+                // if compile is successful, no output message is shown
+                // if an error occurs output message is displayed
+                setEditState(!cpu.Compile(txt_uProg.Text));
+                // if it did compile, refresh all form components ready for execution
+                if (!Editstate)
+                {
+                    refreshEverything();
+                }
                 Trace.WriteLine($"compiled: \n {txt_uProg.Text}");
-                setEditState(false);
-            }
-            catch (Exception ex)
-            {
-                //used as message to user to output message that contains :
-                // string of line, line number, error e.g Instruction or argument invalid
-                MessageBox.Show($"Failed to Compile Program, error message : {ex} on line ", "Assembly Invalid");
-            }
         }
+        
 
         private void setEditState(bool edit)
         {

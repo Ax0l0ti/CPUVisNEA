@@ -388,7 +388,7 @@ namespace CPUVisNEA
             this.txt_uProg.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
             this.txt_uProg.Size = new System.Drawing.Size(652, 766);
             this.txt_uProg.TabIndex = 3;
-            this.txt_uProg.Text = "Please Write Assembely Program here";
+            this.txt_uProg.Text = "Please Write Assembly Program here";
             this.txt_uProg.TextChanged += new System.EventHandler(this.txt_uProg_TextChanged);
             // 
             // gb_Execute
