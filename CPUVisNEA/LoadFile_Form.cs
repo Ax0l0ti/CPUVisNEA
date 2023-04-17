@@ -14,11 +14,10 @@ namespace CPUVisNEA
 
         public LoadFile_Form(List<string> existingFiles)
         {
-            this.existingFiles = existingFiles;
-            InitializeComponent();
-            //todo make this a select list box of possible closable files
             // found through searching through files, takes CpuUI.Files<List> as parameter
             // select all files 
+            this.existingFiles = existingFiles;
+            InitializeComponent();
         }
 
         private void LoadFile_Form_Load(object sender, EventArgs e)

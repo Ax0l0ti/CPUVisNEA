@@ -72,9 +72,9 @@ namespace CPUVisNEA
                     "startloop: AND R3, R0, R8 \r\nCMP R3, #1 \r\nBNE jump \r\nADD R2, R2, R1 \r\njump: LSR R0, R0, #1 \r\nLSL R1, R1, #1 \r\nCMP R0, #0 \r\nBEQ endloop " +
                     "\r\nB startloop \r\nendloop: OUT R2 \r\nHALT"
                 },
-                
+
                 {
-                    "Fibonnacci" , 
+                    "Fibonnacci",
                     "MOV R0, #0\r\nMOV R1, #1\r\nMOV R2, #0\r\n" +
                     "FibonacciLoop: CMP R2, #500\r\nBGT FibonacciDone\r\nADD R2, R1, R0\r\n" +
                     "OUT R2\r\nLDR R0, R1\r\nLDR R1, R2\r\nB FibonacciLoop\r\n\nFibonacciDone: HALT"
@@ -97,7 +97,6 @@ namespace CPUVisNEA
                     //Binary shifts
                     "LSL R0, R0, #2\r\nOUT R0\r\nLSR R0, R0, #1\r\nOUT R0\r\nHALT"
                 }
-
             };
             //used get length of 1st dimension in case New file manually appended later
             for (var i = 0; i < premadeFiles.GetLength(0); i++)

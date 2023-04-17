@@ -8,15 +8,6 @@ using System.Windows.Forms;
 
 namespace CPUVisNEA
 {
-    /* General todos 
-     * ----> Make Register Dictionary SP Basic ( used to find register for given string )
-     * ----> Check if direct or indirect addressing
-     * ----> LABELS
-     * ----> Fill InstructionLocations
-     * ----> use LabelToRAMIndex, LabelledInstructions, Instruction Locations
-     */
-
-
     //----------------------------------------Main Class CPU------------------------------------------------
     // CPU acts as the main class that operates as the main bulk of class interactions and back end code
 
@@ -42,7 +33,7 @@ namespace CPUVisNEA
 
         // used to compile User string to Cleaned Instruction[]. This confirms the program is valid before trying to compile the code in technically correct CPU assembly translation 
         public Compiler Compiler = new Compiler();
-        public string Fetch_Decode_add;
+        public string NextDetailedFDELog;
 
         public enum Instructions : byte
         {
@@ -65,7 +56,6 @@ namespace CPUVisNEA
             MVN,
             LSL,
             LSR
-            
         }
 
         //switch case that takes a enum from Instructions and translates it to a new instance of a correspondent Instruction class 
@@ -139,21 +129,23 @@ namespace CPUVisNEA
             var labelTag = LabelToRamIndex.FirstOrDefault(x => x.Value == TargetLocation).Key;
             if (labelTag == null) MessageBox.Show("Ram to Instruction Execute - Branch label not found");
             var LabelToAdd = new LineLabel(labelTag);
-            LabelToAdd.location = TargetLocation;
+            LabelToAdd.LabelDestination = TargetLocation;
             return LabelToAdd;
         }
 
-        //As the Form must Compile before executing Run, the Main Entrance of Run doesnt need to Compile the code but simply Fillram
-        // This Run function exists for test use and is copied with added modifications to grab values output them to the form
+
         /*---------------------------------------- Run ------------------------------------------------
+        This run is void and not used by the program. This was a console applicable run that works with NUnit testing interface and debug window
+        This is the function that is used to construct the more complex Run method used for Forms in the CpuUI class which builds off the form class
         |  BREAKDOWN
-        |----> SetUp() Resets all used variables called by Run() 
-        |----> FillRam() Takes Compiled Version of User Program
+        |----> SetUpFresh() Resets all used variables called by Run() 
+        |----> FillRam() Takes Compiled Version of User Program and stores in RAM class
         
-        |----> todo Cycle Halt
+        |----> whilst not halted repeat
+        |----> FDE cycle console outputs build up over Fetch Decode Execute Instructions
         |----> FDECycle()  ( Preforms 1 full cycle of Fetch Decode Execute CPU Cycle )
         |--------->  Fetch() 
-        |-------------->  access RAM and retrieve the memory index at Program Counter
+        |-------------->  access RAM class and retrieve the memory index at Program Counter
         |--------->  Decode()
         |-------------->  Decode byte value and create Instruction
         |-------------->  Check how many arguments Instruction takes
@@ -162,11 +154,10 @@ namespace CPUVisNEA
         |-------------->  ExecuteInstruction()
         |-------------->  Add new CPUState to History 
         |----> CheckHalted() 
-        |----> todo  DisplayConsoleLogs() 
         
         */
-        
-        //this was a temprary console based run for the Nunit test console 
+
+        //this was a console based run for the Nunit test console 
         public void Run()
         {
             //set up and refresh all variables for new Run Command
@@ -182,12 +173,13 @@ namespace CPUVisNEA
 
         public void FDECycle()
         {
-            Fetch_Decode_add = "";
+            // reset next FDE log variable 
+            NextDetailedFDELog = "";
             // Searches from index in RAM for next Instruction
             // calls Display Fetch Log
-            //todo combine into EXECUTE funxtion as currently deals w CPUState registers handling
             var FetchedInstruction = Fetch(CurrentState.PC.content);
-            Fetch_Decode_add +=
+            //todo add into fetch
+            NextDetailedFDELog +=
                 $"\n----------------\n   Fetch\n----------------\n CPU fetches byte from memory at address index of MAR value {CurrentState.PC.content}\nThe value returned ({FetchedInstruction}) is stored in MDR.";
             // Checks How many Parameters Required
             // calls ParameterFetch() to get Parameters
@@ -195,15 +187,15 @@ namespace CPUVisNEA
             // Adds the Decode section of FDe cycle with FDE
             var InstructionToExecute = Decode(FetchedInstruction);
 
-            Fetch_Decode_add +=
+            NextDetailedFDELog +=
                 $"\n----------------\n   Execute\n----------------\nExecuting {InstructionToExecute.Tag} with parameters: {string.Join(", ", InstructionToExecute.args.Select(arg => $"{arg.name}"))}";
-            
+
             try
             {
                 CurrentState = Execute(InstructionToExecute);
-                Fetch_Decode_add += $"\n{CurrentState.DetailedChangeLog[0]}";
+                NextDetailedFDELog += $"\n{CurrentState.DetailedChangeLog[0]}";
                 //FDE_Add message written in full details for individual FDE Cycle to add to complex FDE log
-                Trace.WriteLine(Fetch_Decode_add);
+                Trace.WriteLine(NextDetailedFDELog);
             }
             catch (Exception ex)
             {
@@ -228,7 +220,6 @@ namespace CPUVisNEA
             foreach (var instruction in Compiler.CompUProg_Instructions)
             {
                 // for every instruction in the compiled program, fill RAM index with instruction signiture 
-                //todo appemnds??? or byte List
                 ram.Memory.Add((byte)instruction.Tag);
                 ram.InstructionLocations[instruction] = index;
                 //increment and for each argument of instruction store operand and increment again
@@ -249,7 +240,7 @@ namespace CPUVisNEA
                     var jumpTarget = Compiler.LabelledInstructions[label.name];
                     var jumpLocation = ram.InstructionLocations[jumpTarget];
                     LabelToRamIndex.Add(label.name, jumpLocation);
-                    ((LineLabel)instruction.args[0]).location = jumpLocation;
+                    ((LineLabel)instruction.args[0]).LabelDestination = jumpLocation;
                     ram.Memory[ram.InstructionLocations[instruction] + 1] = instruction.args[0].ToByte();
                 }
         }
@@ -284,7 +275,7 @@ namespace CPUVisNEA
                 //incrementing the Program counter by number of bytes used to store parameters to access the next instruction assuming no branch condition
             }
 
-            Fetch_Decode_add +=
+            NextDetailedFDELog +=
                 $"\n----------------\n   Decode\n----------------\n CPU decodes MDR {BinaryInstruction} as a {TargetInstruction.Tag} Instruction, assigned to CIR. {parameters} parameters required. \n CPU Fetches parameters from Memory Indexes {CurrentState.PC.content + 1} to {CurrentState.PC.content + parameters + 1}";
             //if not a halt instruction
             if (parameters > 0)
@@ -325,27 +316,11 @@ namespace CPUVisNEA
             return NewState;
         }
 
-        /* TODO add 
-         GetAssemblyFiles()  // for the menu of load programs
-         SaveUserAssembly()  //calls Compiler.SaveProg calls create new instantiation of AssProg
-         
-         
-         Runspeed Dictionary //to translate choices to int speed or user step
-         Run() // uses big if( user step ) else run at speed ...
-         step() //does an iteration
-         RequestInputs() // display message box to take input
-            // message box code req while(!validInput) { carry on asking for input type }  
-         Outputs() // update lil output box and pass to FDE stuff
-         DisplayShortFDE() // create calls for steps in cycle e.g 
-         DisplayLongFDE()
-         ReturnToEdit() 
-         */
-
         // function used in CPU constructor to generate initial values with the index at the first byte of RAM 
         // set public to help with Nunit tests ans CPU User Interface access
         public void SetUpFresh()
         {
-            /* Reset/Set everything to fresh
+            /* Reset everything to fresh : 
              CurrentState
              History
              Ram
@@ -357,7 +332,6 @@ namespace CPUVisNEA
             LabelToRamIndex.Clear();
         }
 
-        //todo check if fills Memory
         public bool Compile(string text)
         {
             var valid = false;
@@ -377,14 +351,14 @@ namespace CPUVisNEA
             {
                 Trace.WriteLine($"Compile failed: {ex}");
                 //all exceptions that are accounted for finish with \n\n
-                string errorMsgWithoutCallStack = ex.Message.Substring(0, ex.Message.IndexOf("\n\n"));
-                MessageBox.Show($"Encountered error whilst Compiling :{errorMsgWithoutCallStack}","Assembly Invalid");
+                var errorMsgWithoutCallStack = ex.Message.Substring(0, ex.Message.IndexOf("\n\n"));
+                //show a Message box that displays the contextual error without details user doesnt need to see
+                MessageBox.Show($"Encountered error whilst Compiling :{errorMsgWithoutCallStack}", "Assembly Invalid");
                 return false;
-
             }
-
         }
 
+        //used by testing Console and main program
         public CPU()
         {
             SetUpFresh();
@@ -394,8 +368,13 @@ namespace CPUVisNEA
 
     public class RAM
     {
+        // Memory stores the byte representation of the User's assembely script
         public List<byte> Memory = new List<byte>();
+
+        // whilst not used by program or CpuUI, this can be used by the NUnit for testing the compiled program directly without using FDE method
         private Instruction[] AssembelyProgram;
+
+        // Dictionary is used with the Compiler class' LabelledInstructions to connect Labels to RAM indexes in the CPU class
         public Dictionary<Instruction, int> InstructionLocations = new Dictionary<Instruction, int>();
         private bool binaryMode;
 
@@ -415,10 +394,12 @@ namespace CPUVisNEA
 
     public class Compiler
     {
+        // 
         public List<string> StringProgram = new List<string>();
 
         public List<Instruction> CompUProg_Instructions = new List<Instruction>();
 
+        // Dictionary is used with the RAM class' InstructionLocations to map Labels to RAM indexes in the CPU class
         // maps a Dictionary of Label names to correct Instruction index in CompUProg_Instructions
         public Dictionary<string, Instruction> LabelledInstructions = new Dictionary<string, Instruction>();
 
@@ -464,28 +445,25 @@ namespace CPUVisNEA
         //checks if valid format, called after cleanse
         public List<Instruction> Valid(List<string> program)
         {
-            
             var InstrArray = new List<Instruction>();
             // foreach line in user script try translate to instruction. If fialed throw the contextualised exception up to compile
             foreach (var line in program)
+                try
                 {
-                    try
-                    {
                     //linearly iterate through Program and add correspondent Instruction to array of instruction with parameters
                     var nextInstr = lineToInstruction(line);
                     InstrArray.Add(nextInstr);
                     if (nextInstr.Label != null) LabelledInstructions.Add(nextInstr.Label, nextInstr);
-                    }
-                    catch (Exception ex)
-                    {
-                        throw new Exception($"\nFailed to Compile line {InstrArray.Count+1} : {line}\n{ex} ");
-                    }
                 }
-            return InstrArray;
+                catch (Exception ex)
+                {
+                    throw new Exception($"\nFailed to Compile line {InstrArray.Count + 1} : {line}\n{ex} ");
+                }
 
+            return InstrArray;
         }
 
-
+        // takes a single string line and outputs the equivalent Instruction to append to an Instruction[]
         public Instruction lineToInstruction(string line)
         {
             // split on whitespace and comma means split whitespace
@@ -511,9 +489,7 @@ namespace CPUVisNEA
             Enum.TryParse(instruction, out instrType);
             //if returns false, throw exception of invalid instruction instead of creating new instruction
             if (!Enum.TryParse(instruction, out instrType))
-            {
                 throw new Exception($"Invalid Instruction name : {instruction}\n\n ");
-            }
             var parsed = CPU.newInstruction(instrType);
             if (label != null) parsed.Label = label;
 
@@ -521,42 +497,32 @@ namespace CPUVisNEA
             // this is done by passing the list of string arguments and instruction 
             Instruction.addParsedArgs(parsed, args);
 
-                return parsed;
+            return parsed;
         }
     }
 
 //----------------------------------------Class of user interactable Registers  ------------------------------------------------
 
 /*basic class of a register. As a register can store either a string or integer I have
- created a parent class that can be inherited for both basic and special registers */
+ created a parent class that can be inherited for both basic and special registers 
+ Used both for General and Special Purpose Registers*/
+
     public abstract class Register
     {
         //display name of Register Instance
-        protected string name;
+        protected string Name;
 
         //determines if Assembly language is allowed or integers. useful to determine what data type the content is
         // doesnt have to be passed as a parameter as child class influences assAllowed value
-        protected bool assAllowed;
-        protected object content;
+        protected bool AssAllowed;
+        protected object Content;
 
         //protected constructor so inherited classes can use class
-        //by using content as an object, this allows different registers to assign strings or integers to content
+        //by using content as an object, this allows different registers to assign strings or integers to content as seen below
         protected Register(string name, object content)
         {
-            this.name = name;
-            this.content = content;
-        }
-
-        //function to extract value of Register's assAllowed value due to local scope
-        protected virtual object RetContent()
-        {
-            return content;
-        }
-
-        //function to extract value of Register's name value due to local scope
-        protected string getName()
-        {
-            return name;
+            Name = name;
+            Content = content;
         }
     }
 
@@ -567,7 +533,7 @@ namespace CPUVisNEA
 
         public IntReg(string name, int content) : base(name, content)
         {
-            assAllowed = false;
+            AssAllowed = false;
             this.content = content;
         }
     }
@@ -579,19 +545,14 @@ namespace CPUVisNEA
 
         public CodeReg(string name, string content) : base(name, content)
         {
-            assAllowed = true;
+            AssAllowed = true;
             this.content = content;
         }
     }
 
-    //needs to be improved below 
-
-    //special case registers created due to Special Purpose needing to store Opcode instructions from assembly language as a string to display 
-    //mabye delete below? Methods stored in individual classes instead
-
+    // holds a snapshot of a CPU's state. It is the parameter and return type for an Execution Statemen
     public class CPUState
     {
-        //todo create list of changes
         // the SpecialPurpose Register array contains all required data for immediate execution and testing of any instruction
         // needs to be public so any index in arrays can be quickly accessed for both Instruction classes and Test Console
         public List<string> changeLog = new List<string>();
@@ -632,7 +593,6 @@ namespace CPUVisNEA
 
         public CPUState Copy()
         {
-            
             var cpuState = new CPUState();
             cpuState.PC.content = PC.content;
             cpuState.MAR.content = MAR.content;

@@ -88,7 +88,6 @@ namespace CPUVisNEA
 
         private void run()
         {
-            
             btn_MachineHuman.Enabled = true;
             refreshEverything();
             do
@@ -100,7 +99,7 @@ namespace CPUVisNEA
                 GPRupdate();
                 updateFDELogs();
                 VisualMemoryUpdate();
-                
+
                 //de moivre theorem (!A & !B) == !(A|B)
                 //continues to run whilst edit state hasn't been called or form returned to edit state 
             } while (!cpu.CheckHalted() && !Editstate);
@@ -117,16 +116,14 @@ namespace CPUVisNEA
 
             VisualMemoryCreate();
             SPRCreate();
-            
         }
-        
-        
-        
+
+
         // Cell is a child class that inherits from the default class used in forms of panels
         // this form contains 2 Labels
         // -> private Cell title as it doesnt need to be written to
         // -> public content title needs to be colour edited and content potentially changed with each FDE cycle 
-        
+
 
         public class Cell : Panel
         {
@@ -167,7 +164,6 @@ namespace CPUVisNEA
         }
 
 
-
         private void VisualMemoryCreate()
         {
             var max = ReqNumOfMemoryIndexes();
@@ -194,6 +190,7 @@ namespace CPUVisNEA
 
                 MemoryTable.Controls.Add(cell, col, row);
             }
+
             VisualMemoryUpdate();
         }
 
@@ -231,17 +228,19 @@ namespace CPUVisNEA
                 Registeri.content.Text = cpu.CurrentState.Basic[i].content.ToString();
                 GPRegisterTable.Controls.Add(Registeri, i, 0);
             }
+
             RegistersUpdate();
         }
+
         public string bytePrint(int index)
         {
             return $"{int.Parse(Convert.ToString(cpu.ram.Memory[index], 2)):0000 0000}";
         }
-        
+
         private void RegistersUpdate()
         {
-           SPRupdate();
-           GPRupdate();
+            SPRupdate();
+            GPRupdate();
         }
 
         private void SPRupdate()
@@ -262,7 +261,6 @@ namespace CPUVisNEA
 
             ((Cell)SPRTable.Controls[index]).content.Text = cpu.CurrentState.CIR.content;
             index++;
-
         }
 
         private void GPRupdate()
@@ -270,7 +268,7 @@ namespace CPUVisNEA
             for (var i = 0; i < cpu.CurrentState.Basic.Length; i++)
                 ((Cell)GPRegisterTable.Controls[i]).content.Text = cpu.CurrentState.Basic[i].content.ToString();
         }
-        
+
 
         private int ReqNumOfMemoryIndexes()
         {
@@ -318,7 +316,7 @@ namespace CPUVisNEA
             }
         }
 
-        
+
         private void RefreshLogs()
         {
             txt_longFDE.Text = "";
@@ -332,18 +330,15 @@ namespace CPUVisNEA
         private void btn_Compile_Click(object sender, EventArgs e)
         {
             cpu.Compiler = new Compiler();
-                //cpu.Compile returns a boolean. IF it compiles then Edit state sert to false and vice versa
-                // if compile is successful, no output message is shown
-                // if an error occurs output message is displayed
-                setEditState(!cpu.Compile(txt_uProg.Text));
-                // if it did compile, refresh all form components ready for execution
-                if (!Editstate)
-                {
-                    refreshEverything();
-                }
-                Trace.WriteLine($"compiled: \n {txt_uProg.Text}");
+            //cpu.Compile returns a boolean. IF it compiles then Edit state sert to false and vice versa
+            // if compile is successful, no output message is shown
+            // if an error occurs output message is displayed
+            setEditState(!cpu.Compile(txt_uProg.Text));
+            // if it did compile, refresh all form components ready for execution
+            if (!Editstate) refreshEverything();
+            Trace.WriteLine($"compiled: \n {txt_uProg.Text}");
         }
-        
+
 
         private void setEditState(bool edit)
         {
@@ -354,7 +349,7 @@ namespace CPUVisNEA
             btn_Compile.Visible = edit;
             btn_LoadFile.Visible = edit;
             btn_Help.Visible = edit;
-            
+
             // run mode
             btn_ReturnToEdit.Visible = !edit;
             btn_Run.Visible = !edit;
@@ -413,9 +408,9 @@ namespace CPUVisNEA
             // for all small changes append to shortFDE
             foreach (var change in cpu.CurrentState.changeLog) txt_shortFDE.AppendText(change + Environment.NewLine);
             // as all detailed changes compiled into single string beforehand, it can simply be added
-            txt_longFDE.AppendText(cpu.Fetch_Decode_add.Replace("\n", Environment.NewLine));
+            txt_longFDE.AppendText(cpu.NextDetailedFDELog.Replace("\n", Environment.NewLine));
 
-            if (cpu.CurrentState.Outputs != null) txt_out.AppendText(cpu.CurrentState.Outputs + " " );
+            if (cpu.CurrentState.Outputs != null) txt_out.AppendText(cpu.CurrentState.Outputs + " ");
         }
 
         private void btn_SaveFile_Click(object sender, EventArgs e)
@@ -444,10 +439,7 @@ namespace CPUVisNEA
         private void wait(int ms)
         {
             // while paused, continue checking for continue clicked
-            while (paused && NoStep)
-            {
-                Application.DoEvents();
-            }
+            while (paused && NoStep) Application.DoEvents();
             // if NoStep is true, then run a normal wait time, else dont wait
             if (NoStep)
             {
@@ -465,10 +457,10 @@ namespace CPUVisNEA
                     timer.Stop();
                     // Console.WriteLine("stop wait timer");
                 };
-                
+
                 while (timer.Enabled) Application.DoEvents();
             }
-            
+
             //resets NoStep for next FDE
             NoStep = true;
         }
@@ -483,7 +475,6 @@ namespace CPUVisNEA
             btn_play.Enabled = false;
             btn_step.Enabled = false;
             btn_pause.Enabled = true;
-
         }
 
         private void btn_pause_Click(object sender, EventArgs e)
@@ -492,8 +483,8 @@ namespace CPUVisNEA
             btn_play.Enabled = true;
             btn_step.Enabled = true;
             btn_pause.Enabled = false;
-            
         }
+
         //alters variable that determines value of
         private void btn_MachineHuman_Click(object sender, EventArgs e)
         {

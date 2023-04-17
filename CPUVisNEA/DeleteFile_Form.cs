@@ -16,7 +16,6 @@ namespace CPUVisNEA
             InitializeComponent();
             this.existingFiles = existingFiles;
             DD_DeletableFiles.DataSource = existingFiles;
-            //todo make this a select list box of possible closable files
             // found through searching through files, takes CpuUI.Files<List> as parameter
             // select only user made files
         }

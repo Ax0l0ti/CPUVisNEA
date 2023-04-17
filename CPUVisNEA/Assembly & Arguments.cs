@@ -2,36 +2,14 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Linq.Expressions;
 using System.Text.RegularExpressions;
 
 //https://resources.jetbrains.com/storage/products/rider/docs/Rider_default_win_shortcuts.pdf?_gl=1*8v6mpv*_ga*Mzk0Njg2ODg3LjE2NjExMDU4MzA.*_ga_9J976DJZ68*MTY3NTAyNjgxNS4xNy4wLjE2NzUwMjY4MjAuMC4wLjA.&_ga=2.77451923.725299765.1675026816-394686887.1661105830
 
-/* basic todo list
- General 
- ---->  Take old and new method of param get acceptable and do writeup
- ---->  ExecuteInstruction
- ---->  Change operands to Memory Or Int 
- --------->  returns CPUState
- --------->  Takes CPUState
- 
- Specialised 
- ---->  ExecuteInstruction whatnot
- ---->  B parsedArgs errors( relates to general 1 ) 
- --------->  Compare Branch interactions
- --------->  Labels
- ---->  Halt business
- --------->  Check she doesnt Kill program w null list
-  
- 
- 
-*/
-
 namespace CPUVisNEA
 {
     //---------------------------------------- Argument classes ------------------------------------------------
-    /*todo fill in arguement and acceptible RegArg and Literal value arguements, Add additonal types of parameters
-    
+    /*
     //HALT 
     //B <Label>
     //B<condition> <Label>
@@ -48,53 +26,24 @@ namespace CPUVisNEA
     //LSR RegisterArg, RegisterArg, IntegerArg
     //ADD RegisterArg, RegisterArg, IntegerArg
     //SUB RegisterArg, RegisterArg, IntegerArg
-    
-    todo compare old valid param w new in Write up
-        protected void validArgType(Argument arg,  ) {
-            if( !(  arg.GetType().IsInstanceOfType( typeof(RegisterArg) )  )  && args.Count == 0 } 
-        }
-        
-        protected void addArg(Argument arg){
-            if( validArgType( arg ) ) {  args.append( arg ) ;   } }
-            
     */
-    //todo Create operand Arguement 
-    // when done refactor for (IntegerArgs)args[2] and (IntegerArgs)args[2]
-    /*
-    public class OperandArg : Argument
-    {
-        public bool RegOrInt;
-        public OperandArg(string StringArg)
-        {
-            if(StringArg[0] == '#'){
-                
-            }
-            else
-            {
-                index = (int) int.Parse(StringArg.Remove(0, 1)) ;
-            }
-            // from is R(index) or r(index) to allow for user Mistakes. Hence Memory Index is string minus first index of string 
-            index = (int) int.Parse(StringArg.Remove(0, 1)) ;
-        }
-    } */
-
     public abstract class Argument
     {
         protected internal string name;
         protected int value;
+        
 
-        //protected int byteLength ;
-        // todo decide IntegerArg byteLength = ( value % 255 ) + 1; 1 for others 
+        //all arguments have an integer Value to return. This allows contextualised Returns for each child class
+        protected internal virtual int RetInt()
+        {
+            // whilst it can be inherited, it should never be an basic argument
+            //if not a child class and using non overriden method, then throw an error
+            throw new Exception("Argument not cast, still basic Argument class");
+        }
+        // this doesnt need context and is used whilst filling the Ram class after a valid compile
         protected internal virtual byte ToByte()
         {
             return (byte)value;
-        }
-
-        //all arguements have a 
-        protected internal virtual int RetInt()
-        {
-            //if not a child class and using non overriden method, then throw an error
-            throw new Exception("Argument not cast, still basic Argument class");
         }
     }
 
@@ -119,6 +68,7 @@ namespace CPUVisNEA
             index = Convert.ToInt32(ByteForm);
             name = $"R{index}";
         }
+
         protected internal override byte ToByte()
         {
             return (byte)index;
@@ -159,30 +109,29 @@ namespace CPUVisNEA
         }
     }
 
-    public class LineLabel : Argument //todo maybe create linked class between Label argument and destination location
+    public class LineLabel : Argument 
     {
-        public int location; // destination
+        public int LabelDestination;
 
         public LineLabel(string name)
         {
             this.name = name;
-             
         }
 
         public int Location
         {
-            get => location;
-            set => location = value;
+            get => LabelDestination;
+            set => LabelDestination = value;
         }
 
         protected internal override byte ToByte()
         {
-            return (byte)location;
+            return (byte)LabelDestination;
         }
 
         protected internal override int RetInt()
         {
-            return location;
+            return LabelDestination;
         }
     }
 
@@ -203,12 +152,13 @@ namespace CPUVisNEA
         {
             Tag = tag;
         }
-        
+
         public string Label
         {
             get => label;
             set => label = value;
         }
+
         //contains set of CPU.Instructions that correspond to an appropriate layout of Parameters 
         protected internal static Dictionary<CPU.Instructions[], Type[]> dictionaryOfValidParams =
             new Dictionary<CPU.Instructions[], Type[]>
@@ -255,7 +205,8 @@ namespace CPUVisNEA
                 {
                     new[]
                     {
-                        CPU.Instructions.AND, CPU.Instructions.ORR, CPU.Instructions.EOR, CPU.Instructions.ADD, CPU.Instructions.SUB
+                        CPU.Instructions.AND, CPU.Instructions.ORR, CPU.Instructions.EOR, CPU.Instructions.ADD,
+                        CPU.Instructions.SUB
                     },
                     new[] { typeof(RegisterArg), typeof(RegisterArg), typeof(RegisterArg) }
                 },
@@ -272,8 +223,6 @@ namespace CPUVisNEA
             };
 
 
-
-
         //add Parsed Argument takes takes the instruction its a
         public static void addParsedArgs(Instruction instruc, List<string> StringArguments)
         {
@@ -282,7 +231,7 @@ namespace CPUVisNEA
             //line for debugging
             Trace.WriteLine($"successfully passed all {instruc.Tag} arguements");
         }
-        
+
         protected internal static Argument GenerateArg(string argumentStringForm)
         {
             //switch case assigns argumentStringForm to s before checking if the temporary variable s is a match with any argument regex expressions
@@ -301,7 +250,8 @@ namespace CPUVisNEA
                     return new LineLabel(s);
 
                 default:
-                    throw new Exception($"\"{argumentStringForm}\" does not match any of the specified regexes for arguments");
+                    throw new Exception(
+                        $"\"{argumentStringForm}\" does not match any of the specified regexes for arguments");
             }
         }
 
@@ -309,7 +259,7 @@ namespace CPUVisNEA
         {
             ArgErrorThrow(arg);
             //if its a valid argument, add it to the objects Arguments list
-                args.Add(arg);
+            args.Add(arg);
             //else output error saying the argument type cant be used as the nth parameter ( +1 to counter 0 first index) 
         }
 
@@ -320,7 +270,7 @@ namespace CPUVisNEA
         (whilst this method of solving the problem creates a public dictionary that takes up storage, 
         it vastly reduces number of repetitive methods and lines in the following child classes and programs 
         due to repetitive format of Instruction Parameters */
-        
+
 
         //finds the Type of argument required for an Instruction at ArgIndex
         public Type GetReqArgType(int ArgIndex)
@@ -333,13 +283,12 @@ namespace CPUVisNEA
                     return InstructGrouping.Value[ArgIndex];
             return null;
         }
-        
+
         protected void ArgErrorThrow(Argument arg)
         {
             if (!validArgType(arg))
-            {
-                throw new Exception($"Invalid Argument \"{arg.name}\" for {Tag} Instruction \n(R|r before registers and # before values)\n\n");
-            }
+                throw new Exception(
+                    $"Invalid Argument \"{arg.name}\" for {Tag} Instruction \n(R|r before registers and # before values)\n\n");
         }
 
         protected internal bool validArgType(Argument arg)
@@ -353,10 +302,8 @@ namespace CPUVisNEA
                         //therefore valid input type at index for instruction class tag
                         return true;
             return false;
-            
         }
 
-        
 
         //called by CPU Decode function to indicate how many bytes must be fetched to retrieve parameters
         protected internal int NumberOfParameters()
@@ -387,9 +334,6 @@ namespace CPUVisNEA
         Trace.WriteLine( BasicChangeLog );
         NewState.DetailedChangeLog.Add( $"XXX instruction - {args[1].name} ... register {args[0].name} ");
         */
-
-
-
     }
 
 
@@ -407,16 +351,15 @@ namespace CPUVisNEA
             //HALT Stop the execution of the program.
 
             NewState.PC.content = -1;
-            NewState.changeLog.Add( "Program Halted");
-            NewState.DetailedChangeLog.Add( "Program Halted");
+            NewState.changeLog.Add("Program Halted");
+            NewState.DetailedChangeLog.Add("Program Halted");
             return NewState;
         }
     }
-
+    //todo change commnets below
     //---------------------------------------     B     Instruction ------------------------------------------------
     //B <Label>
-
-    // todo special due to condition
+    
     //B class acts as all variants, conditional is seperated and stored as a local attribute of the Branch statement to switch case action in execute Instruction
     public abstract class Branch : Instruction
     {
@@ -447,9 +390,9 @@ namespace CPUVisNEA
         {
             //B <Label> Branch to the instruction at position <Label> Unconditionally
             //if Conditional Correctly Met, branch to label's indicated Memory Index 
-            
+
             //Accumulator assigned temporary value of operation value
-            NewState.ACC.content = ((LineLabel)args[0]).location;
+            NewState.ACC.content = ((LineLabel)args[0]).LabelDestination;
             NewState.PC.content = NewState.ACC.content;
             NewState.changeLog.Add($"Branched to {args[0].name} ");
             Trace.WriteLine($"Branched to {args[0].name} ");
@@ -466,7 +409,6 @@ namespace CPUVisNEA
             BranchFullName = "Equal To";
         }
 
-        //todo create Instruction method to deal w input ( also add description of how operator works, from NEA writeup )
         //BEQ <Label> Conditionally branch to the instruction at position <Label> in the program if the last comparison met the Equal To criteria
 
         protected internal override CPUState executeInstruction(List<Argument> args, CPUState NewState)
@@ -480,7 +422,7 @@ namespace CPUVisNEA
             string BasicChangeLog;
             if (NewState.ACC.content == 0)
             {
-                NewState.PC.content = ((LineLabel)args[0]).location;
+                NewState.PC.content = ((LineLabel)args[0]).LabelDestination;
                 BasicChangeLog = $"Branched to {args[0].name} ";
                 NewState.changeLog.Add(BasicChangeLog);
                 NewState.DetailedChangeLog.Add(
@@ -522,7 +464,7 @@ namespace CPUVisNEA
             string BasicChangeLog;
             if (NewState.ACC.content != 0)
             {
-                NewState.PC.content = ((LineLabel)args[0]).location;
+                NewState.PC.content = ((LineLabel)args[0]).LabelDestination;
                 BasicChangeLog = $"Branched to {args[0].name} ";
                 NewState.changeLog.Add(BasicChangeLog);
                 NewState.DetailedChangeLog.Add(
@@ -563,7 +505,7 @@ namespace CPUVisNEA
             string BasicChangeLog;
             if (NewState.ACC.content == 1)
             {
-                NewState.PC.content = ((LineLabel)args[0]).location;
+                NewState.PC.content = ((LineLabel)args[0]).LabelDestination;
                 BasicChangeLog = $"Branched to {args[0].name} ";
                 NewState.changeLog.Add(BasicChangeLog);
                 NewState.DetailedChangeLog.Add(
@@ -602,7 +544,7 @@ namespace CPUVisNEA
             string BasicChangeLog;
             if (NewState.ACC.content == 2)
             {
-                NewState.PC.content = ((LineLabel)args[0]).location;
+                NewState.PC.content = ((LineLabel)args[0]).LabelDestination;
                 BasicChangeLog = $"Branched to {args[0].name} ";
                 NewState.changeLog.Add(BasicChangeLog);
                 NewState.DetailedChangeLog.Add(
@@ -702,11 +644,11 @@ namespace CPUVisNEA
         protected internal override CPUState executeInstruction(List<Argument> args, CPUState NewState)
         {
             //OUT Rd, <memory ref> Load the value stored in the memory location specified by <memory ref> into register d. 
-            //todo display of FDEs
             NewState.Outputs = Convert.ToString(NewState.Basic[((RegisterArg)args[0]).RetInt()].content);
             Trace.WriteLine($"Output : {NewState.Outputs}");
             NewState.changeLog.Add($"Output : {NewState.Outputs}");
-            NewState.DetailedChangeLog.Add($"{Tag} used to output {NewState.Outputs} from register {((RegisterArg)args[0]).name} ");
+            NewState.DetailedChangeLog.Add(
+                $"{Tag} used to output {NewState.Outputs} from register {((RegisterArg)args[0]).name} ");
             return NewState;
         }
     }
@@ -738,7 +680,7 @@ namespace CPUVisNEA
             return NewState;
         }
     }
-    
+
     //---------------------------------------     MVN      Instruction ------------------------------------------------
     //MVN RegisterArg, IntegerArg
 
@@ -752,24 +694,23 @@ namespace CPUVisNEA
         protected internal override CPUState executeInstruction(List<Argument> args, CPUState NewState)
         {
             //MVN Rd, <operand2> Perform a bitwise logical NOT operation on the value specified by <operand2> and store the result in register d.
-            byte b1 = (byte)(NewState.Basic[args[1].RetInt()].content);
+            var b1 = (byte)NewState.Basic[args[1].RetInt()].content;
             //not b1
-            byte result = (byte) ~b1;
+            var result = (byte)~b1;
             NewState.ACC.content = result;
             NewState.Basic[args[0].RetInt()].content = result;
-            var BasicChangeLog = $"{args[0].name} assigned {Int32.Parse(Convert.ToString(result, 2)):0000 0000} from NOT {args[1].name}";
+            var BasicChangeLog =
+                $"{args[0].name} assigned {int.Parse(Convert.ToString(result, 2)):0000 0000} from NOT {args[1].name}";
             NewState.changeLog.Add(BasicChangeLog);
             Trace.WriteLine(BasicChangeLog);
             NewState.DetailedChangeLog.Add(
-                $"{Tag} instruction - preformed bitwise NOT on {args[1].name} value {b1} ({Int32.Parse(Convert.ToString(b1, 2)).ToString("0000")}). Result ({Int32.Parse(Convert.ToString(result, 2)):0000 0000} = {result}) stored in {args[0].name}");
-            return NewState; 
-
+                $"{Tag} instruction - preformed bitwise NOT on {args[1].name} value {b1} ({int.Parse(Convert.ToString(b1, 2)).ToString("0000")}). Result ({int.Parse(Convert.ToString(result, 2)):0000 0000} = {result}) stored in {args[0].name}");
             return NewState;
         }
 
-        //todo move all comments to all valid loc - create, passes string... ,return modifie
+        
     }
-    
+
     //---------------------------------------     AND      Instruction ------------------------------------------------
     //AND RegisterArg, RegisterArg, IntegerArg
     //will have multiple acceptable types in second addArg index
@@ -784,17 +725,19 @@ namespace CPUVisNEA
         protected internal override CPUState executeInstruction(List<Argument> args, CPUState NewState)
         {
             //AND Rd, Rn, <operand2> Perform a bitwise logical AND operation between the value in register n and the value specified by <operand2> and store the result in register d.
-            byte b1 = (byte)(NewState.Basic[args[1].RetInt()].content);
-            byte b2 = (byte)(NewState.Basic[args[2].RetInt()].content);
-            byte result = (byte) (b1 & b2);
+            var b1 = (byte)NewState.Basic[args[1].RetInt()].content;
+            var b2 = (byte)NewState.Basic[args[2].RetInt()].content;
+            var result = (byte)(b1 & b2);
             NewState.ACC.content = result;
             NewState.Basic[args[0].RetInt()].content = result;
-            var BasicChangeLog = $"{args[0].name} assigned {Int32.Parse(Convert.ToString(result, 2)):0000 0000} from AND {args[1].name},{args[2].name} ";
+            var BasicChangeLog =
+                $"{args[0].name} assigned {int.Parse(Convert.ToString(result, 2)):0000 0000} from AND {args[1].name},{args[2].name} ";
             NewState.changeLog.Add(BasicChangeLog);
             Trace.WriteLine(BasicChangeLog);
             NewState.DetailedChangeLog.Add(
-                $"{Tag} instruction - {args[1].name} value {b1} ({Int32.Parse(Convert.ToString(b1, 2)).ToString("0000")}) and {args[2].name} value {b2} ({Int32.Parse(Convert.ToString(b2, 2)).ToString("0000")}) AND result ({Int32.Parse(Convert.ToString(result, 2)):0000 0000} = {result}) stored in {args[0].name}");
-            return NewState;        }
+                $"{Tag} instruction - {args[1].name} value {b1} ({int.Parse(Convert.ToString(b1, 2)).ToString("0000")}) and {args[2].name} value {b2} ({int.Parse(Convert.ToString(b2, 2)).ToString("0000")}) AND result ({int.Parse(Convert.ToString(result, 2)):0000 0000} = {result}) stored in {args[0].name}");
+            return NewState;
+        }
     }
 
     //---------------------------------------     ORR      Instruction ------------------------------------------------
@@ -811,16 +754,17 @@ namespace CPUVisNEA
         protected internal override CPUState executeInstruction(List<Argument> args, CPUState NewState)
         {
             //ORR Rd, Rn, <operand2> Perform a bitwise logical OR operation between the value in register n and the value specified by <operand2> and store the result in register d.
-            byte b1 = (byte)(NewState.Basic[args[1].RetInt()].content);
-            byte b2 = (byte)(NewState.Basic[args[2].RetInt()].content);
-            byte result = (byte) (b1 | b2);
+            var b1 = (byte)NewState.Basic[args[1].RetInt()].content;
+            var b2 = (byte)NewState.Basic[args[2].RetInt()].content;
+            var result = (byte)(b1 | b2);
             NewState.ACC.content = result;
             NewState.Basic[args[0].RetInt()].content = result;
-            var BasicChangeLog = $"{args[0].name} assigned {Int32.Parse(Convert.ToString(result, 2)):0000 0000} from OR {args[1].name},{args[2].name} ";
+            var BasicChangeLog =
+                $"{args[0].name} assigned {int.Parse(Convert.ToString(result, 2)):0000 0000} from OR {args[1].name},{args[2].name} ";
             NewState.changeLog.Add(BasicChangeLog);
             Trace.WriteLine(BasicChangeLog);
             NewState.DetailedChangeLog.Add(
-                $"{Tag} instruction - {args[1].name} value {b1} ({Int32.Parse(Convert.ToString(b1, 2)).ToString("0000")}) and {args[2].name} value {b2} ({Int32.Parse(Convert.ToString(b2, 2)).ToString("0000")}) OR result ({Int32.Parse(Convert.ToString(result, 2)):0000 0000} = {result}) stored in {args[0].name}");
+                $"{Tag} instruction - {args[1].name} value {b1} ({int.Parse(Convert.ToString(b1, 2)).ToString("0000")}) and {args[2].name} value {b2} ({int.Parse(Convert.ToString(b2, 2)).ToString("0000")}) OR result ({int.Parse(Convert.ToString(result, 2)):0000 0000} = {result}) stored in {args[0].name}");
             return NewState;
         }
     }
@@ -839,16 +783,17 @@ namespace CPUVisNEA
         protected internal override CPUState executeInstruction(List<Argument> args, CPUState NewState)
         {
             //EOR Rd, Rn, <operand2> Perform a bitwise logical exclusive or (XOR) operation between the value in register n and the value specified by <operand2> and store the result in register d.
-            byte b1 = (byte)(NewState.Basic[args[1].RetInt()].content);
-            byte b2 = (byte)(NewState.Basic[args[2].RetInt()].content);
-            byte result = (byte) (b1 ^ b2);
+            var b1 = (byte)NewState.Basic[args[1].RetInt()].content;
+            var b2 = (byte)NewState.Basic[args[2].RetInt()].content;
+            var result = (byte)(b1 ^ b2);
             NewState.ACC.content = result;
             NewState.Basic[args[0].RetInt()].content = result;
-            var BasicChangeLog = $"{args[0].name} assigned {Int32.Parse(Convert.ToString(result, 2)):0000 0000} from EOR {args[1].name},{args[2].name} ";
+            var BasicChangeLog =
+                $"{args[0].name} assigned {int.Parse(Convert.ToString(result, 2)):0000 0000} from EOR {args[1].name},{args[2].name} ";
             NewState.changeLog.Add(BasicChangeLog);
             Trace.WriteLine(BasicChangeLog);
             NewState.DetailedChangeLog.Add(
-                $"{Tag} instruction - {args[1].name} value {b1} ({Int32.Parse(Convert.ToString(b1, 2)).ToString("0000")}) and {args[2].name} value {b2} ({Int32.Parse(Convert.ToString(b2, 2)).ToString("0000")}) Exclusive OR result ({Int32.Parse(Convert.ToString(result, 2)):0000 0000} = {result}) stored in {args[0].name}");
+                $"{Tag} instruction - {args[1].name} value {b1} ({int.Parse(Convert.ToString(b1, 2)).ToString("0000")}) and {args[2].name} value {b2} ({int.Parse(Convert.ToString(b2, 2)).ToString("0000")}) Exclusive OR result ({int.Parse(Convert.ToString(result, 2)):0000 0000} = {result}) stored in {args[0].name}");
             return NewState;
         }
     }
@@ -870,7 +815,7 @@ namespace CPUVisNEA
             //Basic Register at Rd assigned Rn value x 2 ^ <operand2>, aka binary shift left
             var orig = NewState.Basic[((RegisterArg)args[1]).RetInt()].content;
             var retInt = ((IntegerArg)args[2]).RetInt();
-            var endValue = ((byte)orig) << retInt;
+            var endValue = (byte)orig << retInt;
             NewState.ACC.content = endValue;
             NewState.Basic[args[0].RetInt()].content = NewState.ACC.content;
             var BasicChangeLog = $"{args[1].name} binary shifted left by {args[2].name}. Assigned to {args[0].name}";
@@ -955,10 +900,11 @@ namespace CPUVisNEA
             // Register d = value of Rn + operand
             var param1 = NewState.Basic[args[1].RetInt()].content;
             var param2 = NewState.Basic[args[2].RetInt()].content;
-            
+
             NewState.ACC.content = param1 - param2;
             NewState.Basic[args[0].RetInt()].content = NewState.ACC.content;
-            var BasicChangeLog = $"{args[0].name} = {args[1].name} ({args[1].RetInt()}) - {args[2].name} ({((RegisterArg)args[2]).RetInt()}) ";
+            var BasicChangeLog =
+                $"{args[0].name} = {args[1].name} ({args[1].RetInt()}) - {args[2].name} ({((RegisterArg)args[2]).RetInt()}) ";
             NewState.changeLog.Add(BasicChangeLog);
             Trace.WriteLine(BasicChangeLog);
             NewState.DetailedChangeLog.Add(
