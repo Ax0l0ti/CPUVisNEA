@@ -45,7 +45,7 @@ namespace CPUVisNEA
             this.groupBox3 = new System.Windows.Forms.GroupBox();
             this.backgroundWorker2 = new System.ComponentModel.BackgroundWorker();
             this.gb_registers = new System.Windows.Forms.GroupBox();
-            this.BasicRegTable = new System.Windows.Forms.TableLayoutPanel();
+            this.GPRegisterTable = new System.Windows.Forms.TableLayoutPanel();
             this.SPRTable = new System.Windows.Forms.TableLayoutPanel();
             this.gb_Display = new System.Windows.Forms.GroupBox();
             this.lbl_hover = new System.Windows.Forms.Label();
@@ -55,6 +55,7 @@ namespace CPUVisNEA
             this.pnl_uCodeManip = new System.Windows.Forms.Panel();
             this.txt_uProg = new System.Windows.Forms.TextBox();
             this.gb_Execute = new System.Windows.Forms.GroupBox();
+            this.btn_step = new System.Windows.Forms.Button();
             this.btn_Help = new System.Windows.Forms.Button();
             this.btn_pause = new System.Windows.Forms.Button();
             this.RunSpeed = new System.Windows.Forms.TrackBar();
@@ -205,7 +206,7 @@ namespace CPUVisNEA
             // gb_registers
             // 
             this.gb_registers.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(62)))), ((int)(((byte)(84)))), ((int)(((byte)(151)))));
-            this.gb_registers.Controls.Add(this.BasicRegTable);
+            this.gb_registers.Controls.Add(this.GPRegisterTable);
             this.gb_registers.Controls.Add(this.SPRTable);
             this.gb_registers.ForeColor = System.Drawing.Color.White;
             this.gb_registers.Location = new System.Drawing.Point(10, 1000);
@@ -217,35 +218,35 @@ namespace CPUVisNEA
             this.gb_registers.TabStop = false;
             this.gb_registers.Text = "Registers";
             // 
-            // BasicRegTable
+            // GPRegisterTable
             // 
-            this.BasicRegTable.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(65)))), ((int)(((byte)(65)))), ((int)(((byte)(65)))));
-            this.BasicRegTable.ColumnCount = 10;
-            this.BasicRegTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 10F));
-            this.BasicRegTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 10F));
-            this.BasicRegTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 10F));
-            this.BasicRegTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 10F));
-            this.BasicRegTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 10F));
-            this.BasicRegTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 10F));
-            this.BasicRegTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 10F));
-            this.BasicRegTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 10F));
-            this.BasicRegTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 10F));
-            this.BasicRegTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 10F));
-            this.BasicRegTable.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.875F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.BasicRegTable.Location = new System.Drawing.Point(9, 171);
-            this.BasicRegTable.Name = "BasicRegTable";
-            this.BasicRegTable.RowCount = 1;
-            this.BasicRegTable.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 10F));
-            this.BasicRegTable.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 10F));
-            this.BasicRegTable.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 10F));
-            this.BasicRegTable.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 10F));
-            this.BasicRegTable.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 10F));
-            this.BasicRegTable.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 10F));
-            this.BasicRegTable.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 10F));
-            this.BasicRegTable.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 10F));
-            this.BasicRegTable.Size = new System.Drawing.Size(863, 90);
-            this.BasicRegTable.TabIndex = 6;
-            this.BasicRegTable.MouseHover += new System.EventHandler(this.BasicRegTable_MouseHoverBasicRegTable_MouseHover);
+            this.GPRegisterTable.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(65)))), ((int)(((byte)(65)))), ((int)(((byte)(65)))));
+            this.GPRegisterTable.ColumnCount = 10;
+            this.GPRegisterTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 10F));
+            this.GPRegisterTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 10F));
+            this.GPRegisterTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 10F));
+            this.GPRegisterTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 10F));
+            this.GPRegisterTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 10F));
+            this.GPRegisterTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 10F));
+            this.GPRegisterTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 10F));
+            this.GPRegisterTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 10F));
+            this.GPRegisterTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 10F));
+            this.GPRegisterTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 10F));
+            this.GPRegisterTable.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.875F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.GPRegisterTable.Location = new System.Drawing.Point(9, 171);
+            this.GPRegisterTable.Name = "GPRegisterTable";
+            this.GPRegisterTable.RowCount = 1;
+            this.GPRegisterTable.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 10F));
+            this.GPRegisterTable.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 10F));
+            this.GPRegisterTable.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 10F));
+            this.GPRegisterTable.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 10F));
+            this.GPRegisterTable.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 10F));
+            this.GPRegisterTable.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 10F));
+            this.GPRegisterTable.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 10F));
+            this.GPRegisterTable.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 10F));
+            this.GPRegisterTable.Size = new System.Drawing.Size(863, 90);
+            this.GPRegisterTable.TabIndex = 6;
+            this.GPRegisterTable.MouseHover += new System.EventHandler(this.BasicRegTable_MouseHoverBasicRegTable_MouseHover);
             // 
             // SPRTable
             // 
@@ -395,6 +396,7 @@ namespace CPUVisNEA
             // 
             this.gb_Execute.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
             this.gb_Execute.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(62)))), ((int)(((byte)(84)))), ((int)(((byte)(151)))));
+            this.gb_Execute.Controls.Add(this.btn_step);
             this.gb_Execute.Controls.Add(this.btn_Help);
             this.gb_Execute.Controls.Add(this.btn_pause);
             this.gb_Execute.Controls.Add(this.RunSpeed);
@@ -411,6 +413,21 @@ namespace CPUVisNEA
             this.gb_Execute.TabIndex = 3;
             this.gb_Execute.TabStop = false;
             this.gb_Execute.Text = "Execution Buttons";
+            // 
+            // btn_step
+            // 
+            this.btn_step.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(90)))), ((int)(((byte)(90)))), ((int)(((byte)(90)))));
+            this.btn_step.ForeColor = System.Drawing.Color.White;
+            this.btn_step.Location = new System.Drawing.Point(310, 36);
+            this.btn_step.Margin = new System.Windows.Forms.Padding(6);
+            this.btn_step.Name = "btn_step";
+            this.btn_step.Size = new System.Drawing.Size(100, 50);
+            this.btn_step.TabIndex = 14;
+            this.btn_step.Text = "Step";
+            this.Info.SetToolTip(this.btn_step, "Runs 1 full FDE cycle ");
+            this.btn_step.UseVisualStyleBackColor = false;
+            this.btn_step.Visible = false;
+            this.btn_step.Click += new System.EventHandler(this.btn_step_Click);
             // 
             // btn_Help
             // 
@@ -431,10 +448,10 @@ namespace CPUVisNEA
             // 
             this.btn_pause.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(90)))), ((int)(((byte)(90)))), ((int)(((byte)(90)))));
             this.btn_pause.ForeColor = System.Drawing.Color.White;
-            this.btn_pause.Location = new System.Drawing.Point(200, 60);
+            this.btn_pause.Location = new System.Drawing.Point(199, 90);
             this.btn_pause.Margin = new System.Windows.Forms.Padding(6);
             this.btn_pause.Name = "btn_pause";
-            this.btn_pause.Size = new System.Drawing.Size(95, 59);
+            this.btn_pause.Size = new System.Drawing.Size(100, 50);
             this.btn_pause.TabIndex = 12;
             this.btn_pause.Text = "Pause";
             this.btn_pause.UseVisualStyleBackColor = false;
@@ -455,10 +472,10 @@ namespace CPUVisNEA
             // 
             this.btn_play.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(90)))), ((int)(((byte)(90)))), ((int)(((byte)(90)))));
             this.btn_play.ForeColor = System.Drawing.Color.White;
-            this.btn_play.Location = new System.Drawing.Point(300, 60);
+            this.btn_play.Location = new System.Drawing.Point(199, 36);
             this.btn_play.Margin = new System.Windows.Forms.Padding(6);
             this.btn_play.Name = "btn_play";
-            this.btn_play.Size = new System.Drawing.Size(95, 59);
+            this.btn_play.Size = new System.Drawing.Size(100, 50);
             this.btn_play.TabIndex = 10;
             this.btn_play.Text = "Play";
             this.btn_play.UseVisualStyleBackColor = false;
@@ -485,10 +502,10 @@ namespace CPUVisNEA
             this.btn_Run.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(90)))), ((int)(((byte)(90)))), ((int)(((byte)(90)))));
             this.btn_Run.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.875F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.btn_Run.ForeColor = System.Drawing.Color.White;
-            this.btn_Run.Location = new System.Drawing.Point(24, 36);
+            this.btn_Run.Location = new System.Drawing.Point(14, 36);
             this.btn_Run.Margin = new System.Windows.Forms.Padding(6);
             this.btn_Run.Name = "btn_Run";
-            this.btn_Run.Size = new System.Drawing.Size(154, 104);
+            this.btn_Run.Size = new System.Drawing.Size(173, 104);
             this.btn_Run.TabIndex = 8;
             this.btn_Run.Text = "Run Program";
             this.btn_Run.UseVisualStyleBackColor = false;
@@ -658,6 +675,8 @@ namespace CPUVisNEA
             this.ResumeLayout(false);
         }
 
+        private System.Windows.Forms.Button btn_step;
+
         private System.Windows.Forms.Label lbl_BasicLog;
 
         private System.Windows.Forms.Label lbl_DetailedLog;
@@ -668,7 +687,7 @@ namespace CPUVisNEA
 
         private System.Windows.Forms.Button fucku;
 
-        private System.Windows.Forms.TableLayoutPanel BasicRegTable;
+        private System.Windows.Forms.TableLayoutPanel GPRegisterTable;
 
         private System.Windows.Forms.TableLayoutPanel SPRTable;
         private System.Windows.Forms.TableLayoutPanel tableLayoutPanel2;

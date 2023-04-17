@@ -54,6 +54,7 @@ namespace CPUVisNEA
         private readonly CPU cpu;
         private bool HumanReadableMemory = true; // indicates whether byte list displayed as Integers or binary. 
         private bool paused; // determines whether next instruction should be executed, halts FDE cycle
+        private bool NoStep; // used for stepping whilst paused
         private int currentExecutionIndex; // used as CPU program counter for current memory index being executed
 
 
@@ -94,10 +95,12 @@ namespace CPUVisNEA
             {
                 wait(RunSpeed.Value + 1);
                 currentExecutionIndex = cpu.CurrentState.PC.content;
-                VisualMemoryUpdate();
+                RegistersUpdate();
                 cpu.FDECycle(); // Complete 1 cycle
+                GPRupdate();
                 updateFDELogs();
-                SPRupdate();
+                VisualMemoryUpdate();
+                
                 //de moivre theorem (!A & !B) == !(A|B)
                 //continues to run whilst edit state hasn't been called or form returned to edit state 
             } while (!cpu.CheckHalted() && !Editstate);
@@ -226,13 +229,19 @@ namespace CPUVisNEA
             {
                 var Registeri = new Cell($"R{i}");
                 Registeri.content.Text = cpu.CurrentState.Basic[i].content.ToString();
-                BasicRegTable.Controls.Add(Registeri, i, 0);
+                GPRegisterTable.Controls.Add(Registeri, i, 0);
             }
-            SPRupdate();
+            RegistersUpdate();
         }
         public string bytePrint(int index)
         {
             return $"{int.Parse(Convert.ToString(cpu.ram.Memory[index], 2)):0000 0000}";
+        }
+        
+        private void RegistersUpdate()
+        {
+           SPRupdate();
+           GPRupdate();
         }
 
         private void SPRupdate()
@@ -254,9 +263,14 @@ namespace CPUVisNEA
             ((Cell)SPRTable.Controls[index]).content.Text = cpu.CurrentState.CIR.content;
             index++;
 
-            for (var i = 0; i < cpu.CurrentState.Basic.Length; i++)
-                ((Cell)BasicRegTable.Controls[i]).content.Text = cpu.CurrentState.Basic[i].content.ToString();
         }
+
+        private void GPRupdate()
+        {
+            for (var i = 0; i < cpu.CurrentState.Basic.Length; i++)
+                ((Cell)GPRegisterTable.Controls[i]).content.Text = cpu.CurrentState.Basic[i].content.ToString();
+        }
+        
 
         private int ReqNumOfMemoryIndexes()
         {
@@ -312,7 +326,7 @@ namespace CPUVisNEA
             txt_out.Text = "";
             MemoryTable.Controls.Clear();
             SPRTable.Controls.Clear();
-            BasicRegTable.Controls.Clear();
+            GPRegisterTable.Controls.Clear();
         }
 
         private void btn_Compile_Click(object sender, EventArgs e)
@@ -348,6 +362,7 @@ namespace CPUVisNEA
             btn_pause.Visible = !edit;
             RunSpeed.Visible = !edit;
             btn_MachineHuman.Visible = !edit;
+            btn_step.Visible = !edit;
         }
 
 
@@ -429,24 +444,33 @@ namespace CPUVisNEA
         private void wait(int ms)
         {
             // while paused, continue checking for continue clicked
-            while (paused) Application.DoEvents();
-
-            var timer = new Timer();
-            if (ms == 0 || ms < 0) return;
-
-            // Console.WriteLine("start wait timer");
-            timer.Interval = ms;
-            timer.Enabled = true;
-            timer.Start();
-
-            timer.Tick += (s, e) =>
+            while (paused && NoStep)
             {
-                timer.Enabled = false;
-                timer.Stop();
-                // Console.WriteLine("stop wait timer");
-            };
+                Application.DoEvents();
+            }
+            // if NoStep is true, then run a normal wait time, else dont wait
+            if (NoStep)
+            {
+                var timer = new Timer();
+                if (ms == 0 || ms < 0) return;
 
-            while (timer.Enabled) Application.DoEvents();
+                // Console.WriteLine("start wait timer");
+                timer.Interval = ms;
+                timer.Enabled = true;
+                timer.Start();
+
+                timer.Tick += (s, e) =>
+                {
+                    timer.Enabled = false;
+                    timer.Stop();
+                    // Console.WriteLine("stop wait timer");
+                };
+                
+                while (timer.Enabled) Application.DoEvents();
+            }
+            
+            //resets NoStep for next FDE
+            NoStep = true;
         }
 
         private void MemoryTable_Paint(object sender, PaintEventArgs e)
@@ -457,14 +481,18 @@ namespace CPUVisNEA
         {
             paused = false;
             btn_play.Enabled = false;
+            btn_step.Enabled = false;
             btn_pause.Enabled = true;
+
         }
 
         private void btn_pause_Click(object sender, EventArgs e)
         {
             paused = true;
             btn_play.Enabled = true;
+            btn_step.Enabled = true;
             btn_pause.Enabled = false;
+            
         }
         //alters variable that determines value of
         private void btn_MachineHuman_Click(object sender, EventArgs e)
@@ -543,7 +571,7 @@ namespace CPUVisNEA
         private void BasicRegTable_MouseHoverBasicRegTable_MouseHover(object sender, EventArgs e)
         {
             Info.Show("This is a Row for Basic Registers that hold integer values that the CPU can interact with",
-                BasicRegTable);
+                GPRegisterTable);
         }
 
         private void btn_Help_Click(object sender, EventArgs e)
@@ -584,6 +612,11 @@ namespace CPUVisNEA
                             "\nOUT Rn - Returns the value of Rn to the output log ( top right )",
                 "Instruction Set is as follows :");
             Application.DoEvents();
+        }
+
+        private void btn_step_Click(object sender, EventArgs e)
+        {
+            NoStep = false;
         }
     }
 }
