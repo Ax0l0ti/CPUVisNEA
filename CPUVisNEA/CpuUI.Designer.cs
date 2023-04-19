@@ -33,6 +33,7 @@ namespace CPUVisNEA
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(UI));
             this.backgroundWorker1 = new System.ComponentModel.BackgroundWorker();
             this.gb_outputs = new System.Windows.Forms.GroupBox();
             this.lbl_DetailedLog = new System.Windows.Forms.Label();
@@ -217,6 +218,7 @@ namespace CPUVisNEA
             this.gb_registers.TabIndex = 2;
             this.gb_registers.TabStop = false;
             this.gb_registers.Text = "Registers";
+            this.Info.SetToolTip(this.gb_registers, resources.GetString("gb_registers.ToolTip"));
             // 
             // GPRegisterTable
             // 

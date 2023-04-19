@@ -13,28 +13,24 @@ namespace CPUVisNEA
 
     public class CPU
     {
-        private readonly Dictionary<string, int> LabelToRamIndex = new Dictionary<string, int>();
-
+        
+        // public for CPU UI to have access to Current State
+        // this allows it to output to the simple and detailed FDE Log
+        public CPUState CurrentState;
+        public string NextDetailedFDELog;
+        // Appended and contains data but never Implemented in CPU UI 
+        // I could have used this to create a step Back feature or used it to help debug code,
+        // but that was never an objectives so no point unnecessarily overcrowding my UI for unnecessary work
+        private List<CPUState> History = new List<CPUState>();
+        
         // readonly variable for me to modify in case more or less registers are needed for testing, final code, adjustments etc.
         private static readonly int NumberOf_BasicRegisters = 10;
-
-        // Normal User interactable Registers in a Computer
+        // General Purpose Registers used by User script
         private Register[] BasicRegisters;
-
-        private int PCNonBranchIncriment = 0;
-
-
-        // public for CPU User Interface to have access to Current State and History
-        // this allows it to output to the simple and detailed FDE Log
-        public List<CPUState> History = new List<CPUState>();
-        public CPUState CurrentState;
-
         public RAM ram = new RAM();
-
+        private readonly Dictionary<string, int> LabelToRamIndex = new Dictionary<string, int>();
         // used to compile User string to Cleaned Instruction[]. This confirms the program is valid before trying to compile the code in technically correct CPU assembly translation 
         public Compiler Compiler = new Compiler();
-        public string NextDetailedFDELog;
-
         public enum Instructions : byte
         {
             //enum number integer can be converted to represent binary value
@@ -102,14 +98,15 @@ namespace CPUVisNEA
                     return new Sub();
                 default:
                     //as it switches based on enum value, any value higher than the potential maxima ( SUB )
-                    throw new ArgumentOutOfRangeException(nameof(instr), instr, null);
+                    //already validated before this method is called so this should never be reached 
+                    throw new ArgumentOutOfRangeException(nameof(instr), instr, "failed to recognise Instruction enum");
             }
         }
 
         internal Argument TypeAndByteToArg(Type ArgType, byte ByteFormOfContent)
         {
             //C# doesnt allow the instantiation of a class using a Type variable
-            // hence I created a switchcase of the class name matched to the name of the type which is the same
+            // hence I created a switchcase that matches the class name to the name of the type which is the same
             switch (ArgType.Name)
             {
                 case "RegisterArg":
@@ -157,18 +154,14 @@ namespace CPUVisNEA
         
         */
 
-        //this was a console based run for the Nunit test console 
+        //this was a console based run for the Nunit test console and Alpha testing
         public void Run()
         {
-            //set up and refresh all variables for new Run Command
-            SetUpFresh();
-            FillRam();
-
-            // stop execution if Halt is called
-            do
-            {
-                FDECycle(); // Complete 1 cycle
-            } while (!CheckHalted());
+            SetUpFresh();//set up and refresh all variables for new Run Command
+            FillRam();//fill the now empty Ram memory
+            
+            do { FDECycle(); }// Complete 1 cycle
+            while (!CheckHalted());// continue Cycling until a Halt is called
         }
 
         public void FDECycle()
@@ -176,20 +169,10 @@ namespace CPUVisNEA
             // reset next FDE log variable 
             NextDetailedFDELog = "";
             // Searches from index in RAM for next Instruction
-            // calls Display Fetch Log
             var FetchedInstruction = Fetch(CurrentState.PC.content);
-            //todo add into fetch
-            NextDetailedFDELog +=
-                $"\n----------------\n   Fetch\n----------------\n CPU fetches byte from memory at address index of MAR value {CurrentState.PC.content}\nThe value returned ({FetchedInstruction}) is stored in MDR.";
-            // Checks How many Parameters Required
-            // calls ParameterFetch() to get Parameters
-            // Incriments Program Counter 
-            // Adds the Decode section of FDe cycle with FDE
+            // Calls ParameterFetch() to get Parameters then Retrieves Parameters and Incriments Program Counter 
             var InstructionToExecute = Decode(FetchedInstruction);
-
-            NextDetailedFDELog +=
-                $"\n----------------\n   Execute\n----------------\nExecuting {InstructionToExecute.Tag} with parameters: {string.Join(", ", InstructionToExecute.args.Select(arg => $"{arg.name}"))}";
-
+            
             try
             {
                 CurrentState = Execute(InstructionToExecute);
@@ -248,7 +231,10 @@ namespace CPUVisNEA
         //CPU calls Instruction to access the byte representing the Instruction at the index of the Program Counter
         private byte Fetch(int index)
         {
-            return ram.GetByteAt(index);
+            byte FetchedValue = ram.GetByteAt(index);
+            NextDetailedFDELog += "\n----------------\n   Fetch\n----------------\n " +
+                                  $"CPU fetches byte from memory at address index of MAR value {CurrentState.PC.content}\nThe value returned ({FetchedValue}) ";
+            return FetchedValue;
         }
 
         // Decode returns the Instruction to be ran with the correspondent arguments decoded
@@ -293,26 +279,30 @@ namespace CPUVisNEA
 
         private CPUState Execute(Instruction instr)
         {
-            //call the overriden instruction's execute command with its given arguements
-            //( Could be partically more efficient with passed args but this allows easy testing
-            //with my Unit testing interface for if executeInstruction works)
+            //standard Execution Message before that is appended to with context by individual Instruction class' execution method
+            NextDetailedFDELog += "\n----------------\n   Execute\n----------------\nExecuting " +
+                                  $"{instr.Tag} with parameters: {string.Join(", ", instr.args.Select(arg => $"{arg.name}"))}";
 
+            
+            //create a replica copy 
             var NewState = CurrentState.Copy();
             NewState.MAR = NewState.PC;
-            try
+            try //assign MDR with contents stored in MAR address
             {
                 if (NewState.MAR.content < ram.Memory.Count)
                     NewState.MDR.content = $"{ram.Memory[NewState.MAR.content]}";
             }
             catch (Exception ex)
-            {
+            { // catches erroneous and index out of range errors
                 throw new Exception(
                     $" index {NewState.MAR.content} of Ram Memory count {ram.Memory.Count} caused error : {ex}");
             }
-
-
+            
+            // assign CIR with Instruction name
             NewState.CIR.content = $"{instr.Tag}";
+            // execute the overridden execute method that takes its parameters and a snapshot of the CPUState
             NewState = instr.executeInstruction(instr.args, NewState);
+            
             return NewState;
         }
 

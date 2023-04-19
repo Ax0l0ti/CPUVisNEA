@@ -357,6 +357,7 @@ namespace CPUVisNEA
             btn_pause.Visible = !edit;
             RunSpeed.Visible = !edit;
             btn_MachineHuman.Visible = !edit;
+            btn_MachineHuman.Enabled = !edit;
             btn_step.Visible = !edit;
         }
 
@@ -439,7 +440,10 @@ namespace CPUVisNEA
         private void wait(int ms)
         {
             // while paused, continue checking for continue clicked
-            while (paused && NoStep) Application.DoEvents();
+            do
+            {
+                Application.DoEvents();
+            } while (paused && NoStep);
             // if NoStep is true, then run a normal wait time, else dont wait
             if (NoStep)
             {
@@ -501,7 +505,7 @@ namespace CPUVisNEA
         // most below are simply Hover over descriptions 
         private void MemoryTable_MouseHover(object sender, EventArgs e)
         {
-            Info.Show("This is a Visual display of your program stored as binary (similar to an executable file)" +
+            Info.Show("This is a Visual display of your program stored in a binary representation" +
                       "\nIt can also be translated into the binary's integer equivelants to make it easier to read",
                 MemoryTable);
         }
