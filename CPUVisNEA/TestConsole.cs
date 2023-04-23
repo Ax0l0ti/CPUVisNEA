@@ -24,6 +24,8 @@ namespace CPUVisNEA
             cpu.Compiler.StringProgram = new List<string> { "compile", "text", "for", "this test", "" };
             cpu.Compile("addProgram\n\n test\nawooga");
             foreach (var line in cpu.Compiler.StringProgram) Console.WriteLine(line);
+            cpu.Compile("MOV");
+            foreach (var line in cpu.Compiler.StringProgram) Console.WriteLine(line);
         }
 
         [Test] //test if instruction argument parsing wont break on unexpected argument type
@@ -119,8 +121,6 @@ namespace CPUVisNEA
         ---->  Branch
         --------->  Conditional
         --------->  Labels locations 
-        -------------->  correctly take Label location followed by instruction  
-        later used assembly program to test every instruction and branch loop   
         
         general Outputs 
         ---->  FDE Cycle

@@ -4,8 +4,6 @@ using System.Diagnostics;
 using System.Linq;
 using System.Windows.Forms;
 
-//https://resources.jetbrains.com/storage/products/rider/docs/Rider_default_win_shortcuts.pdf?_gl=1*8v6mpv*_ga*Mzk0Njg2ODg3LjE2NjExMDU4MzA.*_ga_9J976DJZ68*MTY3NTAyNjgxNS4xNy4wLjE2NzUwMjY4MjAuMC4wLjA.&_ga=2.77451923.725299765.1675026816-394686887.1661105830
-
 namespace CPUVisNEA
 {
     //----------------------------------------Main Class CPU------------------------------------------------
@@ -106,7 +104,7 @@ namespace CPUVisNEA
         internal Argument TypeAndByteToArg(Type ArgType, byte ByteFormOfContent)
         {
             //C# doesnt allow the instantiation of a class using a Type variable
-            // hence I created a switchcase that matches the class name to the name of the type which is the same
+            // hence I created a switch case that matches the class name to the name of the type which is the same
             switch (ArgType.Name)
             {
                 case "RegisterArg":
@@ -170,7 +168,7 @@ namespace CPUVisNEA
             NextDetailedFDELog = "";
             // Searches from index in RAM for next Instruction
             var FetchedInstruction = Fetch(CurrentState.PC.content);
-            // Calls ParameterFetch() to get Parameters then Retrieves Parameters and Incriments Program Counter 
+            // Calls ParameterFetch() to get Parameters then Retrieves Parameters and Increments Program Counter 
             var InstructionToExecute = Decode(FetchedInstruction);
             
             try
@@ -202,7 +200,7 @@ namespace CPUVisNEA
             var index = 0;
             foreach (var instruction in Compiler.CompUProg_Instructions)
             {
-                // for every instruction in the compiled program, fill RAM index with instruction signiture 
+                // for every instruction in the compiled program, fill RAM index with instruction signature 
                 ram.Memory.Add((byte)instruction.Tag);
                 ram.InstructionLocations[instruction] = index;
                 //increment and for each argument of instruction store operand and increment again
@@ -214,15 +212,15 @@ namespace CPUVisNEA
                 }
             }
 
-            // fill in all branch targets to Ram after full compile analyses and records any ppotentail branch locations
+            // fill in all branch targets to Ram after full compile analyses and records any potential branch locations
             foreach (var instruction in Compiler.CompUProg_Instructions)
                 if (instruction.GetType().IsSubclassOf(typeof(Branch)))
                 {
                     var firstArg = instruction.args[0];
                     var label = (LineLabel)firstArg;
-                    var jumpTarget = Compiler.LabelledInstructions[label.name];
+                    var jumpTarget = Compiler.LabelledInstructions[label.Name];
                     var jumpLocation = ram.InstructionLocations[jumpTarget];
-                    LabelToRamIndex.Add(label.name, jumpLocation);
+                    LabelToRamIndex.Add(label.Name, jumpLocation);
                     ((LineLabel)instruction.args[0]).LabelDestination = jumpLocation;
                     ram.Memory[ram.InstructionLocations[instruction] + 1] = instruction.args[0].ToByte();
                 }
@@ -251,9 +249,9 @@ namespace CPUVisNEA
             {
                 //use the Instruction class to retrieve the required type of arg at parameter index i
                 var ArgType = TargetInstruction.GetReqArgType(i);
-                //Instanciate a new instance of the specific Argument 
+                //instantiate a new instance of the specific Argument 
                 /* TypeAndByteToArg creates a new Argument the Argtype to indicate the subclass of Argument and accesses
-                 the ram to retrieve the byte at the index of instruction incrimented by the parameter number dsd representing the Arg's content
+                 the ram to retrieve the byte at the index of instruction incremented by the parameter number dsd representing the Arg's content
                 */
                 var FilledArg = TypeAndByteToArg(ArgType, ram.GetByteAt(CurrentState.PC.content + i + 1));
                 TargetInstruction.addArg(FilledArg);
@@ -281,7 +279,7 @@ namespace CPUVisNEA
         {
             //standard Execution Message before that is appended to with context by individual Instruction class' execution method
             NextDetailedFDELog += "\n----------------\n   Execute\n----------------\nExecuting " +
-                                  $"{instr.Tag} with parameters: {string.Join(", ", instr.args.Select(arg => $"{arg.name}"))}";
+                                  $"{instr.Tag} with parameters: {string.Join(", ", instr.args.Select(arg => $"{arg.Name}"))}";
 
             
             //create a replica copy 
@@ -358,7 +356,7 @@ namespace CPUVisNEA
 
     public class RAM
     {
-        // Memory stores the byte representation of the User's assembely script
+        // Memory stores the byte representation of the User's assembly script
         public List<byte> Memory = new List<byte>();
 
         // whilst not used by program or CpuUI, this can be used by the NUnit for testing the compiled program directly without using FDE method
@@ -367,10 +365,6 @@ namespace CPUVisNEA
         // Dictionary is used with the Compiler class' LabelledInstructions to connect Labels to RAM indexes in the CPU class
         public Dictionary<Instruction, int> InstructionLocations = new Dictionary<Instruction, int>();
         private bool binaryMode;
-
-        //Local Convert function in RAM class to completely translate the users program displayed in RAm between its binary representation
-        //and its assembly language representation. This is completed by checking the local class variable binaryMode to
-        //select the direction on conversion - binary to Assembly ( Bin2Ass() ) or Assembly to binary ( Ass2Bin() ) 
 
         //this is useful so students can see what is being held in RAM as values they can read and understand
 
@@ -410,8 +404,8 @@ namespace CPUVisNEA
                 {
                     // branch instructions need to know where their label points to
                     var target = (LineLabel)maybeBranch.args[0];
-                    if (!LabelledInstructions.ContainsKey(target.name))
-                        throw new Exception($"Label: {target.name} not defined\n\n");
+                    if (!LabelledInstructions.ContainsKey(target.Name))
+                        throw new Exception($"Label: {target.Name} not defined\n\n");
                 }
             }
         }
@@ -436,7 +430,7 @@ namespace CPUVisNEA
         public List<Instruction> Valid(List<string> program)
         {
             var InstrArray = new List<Instruction>();
-            // foreach line in user script try translate to instruction. If fialed throw the contextualised exception up to compile
+            // foreach line in user script try translate to instruction. If failed throw the contextualised exception up to compile
             foreach (var line in program)
                 try
                 {
@@ -540,7 +534,7 @@ namespace CPUVisNEA
         }
     }
 
-    // holds a snapshot of a CPU's state. It is the parameter and return type for an Execution Statemen
+    // holds a snapshot of a CPU's state. It is the parameter and return type for an Execution Statement
     public class CPUState
     {
         // the SpecialPurpose Register array contains all required data for immediate execution and testing of any instruction

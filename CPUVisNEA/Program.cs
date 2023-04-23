@@ -74,7 +74,7 @@ namespace CPUVisNEA
                 },
 
                 {
-                    "Fibonnacci",
+                    "Fibonacci",
                     "MOV R0, #0\r\nMOV R1, #1\r\nMOV R2, #0\r\n" +
                     "FibonacciLoop: CMP R2, #500\r\nBGT FibonacciDone\r\nADD R2, R1, R0\r\n" +
                     "OUT R2\r\nLDR R0, R1\r\nLDR R1, R2\r\nB FibonacciLoop\r\n\nFibonacciDone: HALT"
@@ -89,7 +89,7 @@ namespace CPUVisNEA
                     "MOV R9, #244\r\nMOV R8, #1\r\nMOV R0, #10\r\nLDR R1, R0\r\nMOV R2, #5\r\nOUT R1\r\n" +
                     //test of add, sub and incidentally out 
                     "ADD R1, R1, R8\r\nOUT R1\r\nSUB R1, R1, R8\r\nOUT R1\r\n" +
-                    //  tests branches, if EQ works, B and NE works. Test greater, hence lesser works 
+                    //  tests branches, if EQ works, B and NE works. Also tests greater, hence lesser works 
                     "CMP R9, #244\r\nBEQ pass\r\nOUT R9\r\npass: CMP R2, #10\r\nBGT greater\r\nOUT R1\r\ngreater: OUT R2\r\n" +
                     // logic gate tests AND OR XOR
                     // using blank register 7 to test 

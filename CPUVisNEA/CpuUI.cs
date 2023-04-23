@@ -88,32 +88,36 @@ namespace CPUVisNEA
 
         private void run()
         {
+            //initial preparation for run 
             btn_MachineHuman.Enabled = true;
             refreshEverything();
+            //pause briefly before starting run
+            wait(RunSpeed.Value + 1);
+            
+            
             do
             {
                 wait(RunSpeed.Value + 1);
                 currentExecutionIndex = cpu.CurrentState.PC.content;
-                RegistersUpdate();
                 cpu.FDECycle(); // Complete 1 cycle
-                GPRupdate();
+                RegistersUpdate();
                 updateFDELogs();
                 VisualMemoryUpdate();
-
+                
                 //de moivre theorem (!A & !B) == !(A|B)
-                //continues to run whilst edit state hasn't been called or form returned to edit state 
+                //continues to run whilst no detection of request for edit state or a called halt instruction  
             } while (!cpu.CheckHalted() && !Editstate);
         }
 
         public void refreshEverything()
         {
-            //set up and refresh all variables for new Run Command
+            
+            //fist index is always 0
             currentExecutionIndex = 0;
             cpu.SetUpFresh();
             RefreshLogs();
             cpu.FillRam();
-            //fist index is always 0
-
+            //set up and refresh all variables for new Run Command
             VisualMemoryCreate();
             SPRCreate();
         }
