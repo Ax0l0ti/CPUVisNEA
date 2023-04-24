@@ -231,7 +231,7 @@ namespace CPUVisNEA
         {
             byte FetchedValue = ram.GetByteAt(index);
             NextDetailedFDELog += "\n----------------\n   Fetch\n----------------\n " +
-                                  $"CPU fetches byte from memory at address index of MAR value {CurrentState.PC.content}\nThe value returned ({FetchedValue}) ";
+                                  $"CPU fetches byte from memory at address index of MAR value {CurrentState.PC.content}\nThe value of the returned byte is {FetchedValue} ";
             return FetchedValue;
         }
 

@@ -30,7 +30,7 @@ namespace CPUVisNEA
             var DeletePath = path + DD_DeletableFiles.Text;
             // if user confirms delete, delete the file and close deleteFile form
             if (DialogResult.Yes == MessageBox.Show($"Delete file : {DD_DeletableFiles.Text} ?",
-                    "This action is permenant", MessageBoxButtons.YesNo))
+                    "This action is permanent", MessageBoxButtons.YesNo))
             {
                 Trace.WriteLine($"Deleted File : {DD_DeletableFiles.Text} ");
                 File.Delete(DeletePath);
