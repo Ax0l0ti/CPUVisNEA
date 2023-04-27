@@ -237,22 +237,24 @@ namespace CPUVisNEA
             //if there are no matches, it returns an error message
             switch (argumentStringForm)
             {
-                // Register Argument - lower or uppercase R followed by a single digit number due to indexes 0 to 9
-                case var s when Regex.IsMatch(s, "^(R|r)\\d$"):
-                    return new RegisterArg(s);
                 // Integer Argument - # followed by 1 or more digits
-                case var s when Regex.IsMatch(s, "^#(\\d)*$"):
-                    return new IntegerArg(s);
+                case var _ when Regex.IsMatch(argumentStringForm, "^#(\\d)*$"):
+                    return new IntegerArg(argumentStringForm);
+                // Register Argument - lower or uppercase R followed by a single digit number due to indexes 0 to 9
+                case var _ when Regex.IsMatch(argumentStringForm, "^(R|r)\\d$"):
+                    return new RegisterArg(argumentStringForm);
                 // Label argument - any number of word characters
-                case var s when Regex.IsMatch(s, "^(\\w)*$"):
-                    return new LineLabel(s);
+                case var _ when Regex.IsMatch(argumentStringForm, "^(\\w)*$"):
+                    return new LineLabel(argumentStringForm);
 
                 default:
                     throw new Exception(
                         $"\"{argumentStringForm}\" does not match any of the specified regexes for arguments");
             }
         }
-
+        /*Checks if the argument passed is a valid argument to be passed to the instruction
+        -- protected and stored in Instruction class so all child classes can inherit usage.
+        -- internal used so the Console interface can access the method */
         protected internal void addArg(Argument arg)
         {
             ArgErrorThrow(arg);
@@ -260,18 +262,18 @@ namespace CPUVisNEA
             args.Add(arg);
             //else output error saying the argument type cant be used as the nth parameter ( +1 to counter 0 first index) 
         }
+        protected void ArgErrorThrow(Argument arg)
+        {
+            if (!validArgType(arg))
+                throw new Exception(
+                    $"Invalid Argument \"{arg.Name}\" for {Tag} Instruction \n(R|r before registers and # before values)\n\n");
+        }
 
-        /*
-        Checks if the argument passed is a valid argument to be passed to the instruction
-        -- protected and stored in Instruction class so all child classes can inherit usage.
-        -- internal used so the Console interface can access the method 
-        (whilst this method of solving the problem creates a public dictionary that takes up storage, 
+//finds the Type of argument required for an Instruction at ArgIndex
+       /*(whilst this method of solving the problem creates a public dictionary that takes up storage, 
         it vastly reduces number of repetitive methods and lines in the following child classes and programs 
         due to repetitive format of Instruction Parameters */
-
-
-        //finds the Type of argument required for an Instruction at ArgIndex
-        public Type GetReqArgType(int ArgIndex)
+       public Type GetReqArgType(int ArgIndex)
         {
             //linear search through dictionary to find a correspondent tag in key
             foreach (var InstructGrouping in dictionaryOfValidParams)
@@ -282,12 +284,7 @@ namespace CPUVisNEA
             return null;
         }
 
-        protected void ArgErrorThrow(Argument arg)
-        {
-            if (!validArgType(arg))
-                throw new Exception(
-                    $"Invalid Argument \"{arg.Name}\" for {Tag} Instruction \n(R|r before registers and # before values)\n\n");
-        }
+        
 
         protected internal bool validArgType(Argument arg)
         {
