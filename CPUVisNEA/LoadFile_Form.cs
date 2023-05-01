@@ -42,7 +42,7 @@ namespace CPUVisNEA
                 MessageBox.Show(" File Name error ");
             }
 
-            if (DialogResult.Yes == MessageBox.Show("This will erase you current Assembly Program",
+            if (DialogResult.Yes == MessageBox.Show("This will erase your current Assembly Program",
                     $"Load {DD_files.Text} program?", MessageBoxButtons.YesNo))
             {
                 Trace.WriteLine($"Program returned from file {DD_files.Text} is : \n{ReturnedProgram}");

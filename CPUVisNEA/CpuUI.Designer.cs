@@ -307,7 +307,7 @@ namespace CPUVisNEA
             this.lbl_hover.Name = "lbl_hover";
             this.lbl_hover.Size = new System.Drawing.Size(549, 35);
             this.lbl_hover.TabIndex = 11;
-            this.lbl_hover.Text = "Hover over Elements to get a descritpion!";
+            this.lbl_hover.Text = "Hover over Elements to get a description!";
             this.lbl_hover.MouseHover += new System.EventHandler(this.lbl_hover_MouseHover);
             // 
             // btn_MachineHuman
@@ -545,7 +545,7 @@ namespace CPUVisNEA
             this.gb_UAssControls.Size = new System.Drawing.Size(652, 139);
             this.gb_UAssControls.TabIndex = 4;
             this.gb_UAssControls.TabStop = false;
-            this.gb_UAssControls.Text = "File & Assembely Controls";
+            this.gb_UAssControls.Text = "File & Assembly Controls";
             // 
             // btn_LoadFile
             // 
