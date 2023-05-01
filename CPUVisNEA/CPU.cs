@@ -166,22 +166,17 @@ namespace CPUVisNEA
         {
             // reset next FDE log variable 
             NextDetailedFDELog = "";
+            
             // Searches from index in RAM for next Instruction
             var FetchedInstruction = Fetch(CurrentState.PC.content);
             // Calls ParameterFetch() to get Parameters then Retrieves Parameters and Increments Program Counter 
             var InstructionToExecute = Decode(FetchedInstruction);
-            
             try
             {
                 CurrentState = Execute(InstructionToExecute);
-                NextDetailedFDELog += $"\n{CurrentState.DetailedChangeLog[0]}";
-                //FDE_Add message written in full details for individual FDE Cycle to add to complex FDE log
                 Trace.WriteLine(NextDetailedFDELog);
             }
-            catch (Exception ex)
-            {
-                throw new Exception($" Failed to execute {InstructionToExecute} \n error : {ex}");
-            }
+            catch (Exception ex) { throw new Exception($" Failed to execute {InstructionToExecute} \n error : {ex}"); }
 
 
             //add to the CPU History
@@ -218,11 +213,19 @@ namespace CPUVisNEA
                 {
                     var firstArg = instruction.args[0];
                     var label = (LineLabel)firstArg;
-                    var jumpTarget = Compiler.LabelledInstructions[label.Name];
-                    var jumpLocation = ram.InstructionLocations[jumpTarget];
-                    LabelToRamIndex.Add(label.Name, jumpLocation);
-                    ((LineLabel)instruction.args[0]).LabelDestination = jumpLocation;
-                    ram.Memory[ram.InstructionLocations[instruction] + 1] = instruction.args[0].ToByte();
+                    try
+                    {
+                        var jumpTarget = Compiler.LabelledInstructions[label.Name];
+                        var jumpLocation = ram.InstructionLocations[jumpTarget];
+                        LabelToRamIndex.Add(label.Name, jumpLocation);
+                        ((LineLabel)instruction.args[0]).LabelDestination = jumpLocation;
+                        ram.Memory[ram.InstructionLocations[instruction] + 1] = instruction.args[0].ToByte();
+                    }
+                    catch( Exception ex)
+                    {
+                        MessageBox.Show($"Label \"{label.Name}\" couldn't be found in your program");
+                        throw new Exception($"Label \"{label.Name}\" couldn't be found in your program");
+                    }
                 }
         }
 
@@ -260,7 +263,7 @@ namespace CPUVisNEA
             }
 
             NextDetailedFDELog +=
-                $"\n----------------\n   Decode\n----------------\n CPU decodes MDR {BinaryInstruction} as a {TargetInstruction.Tag} Instruction, assigned to CIR. {parameters} parameters required. \n CPU Fetches parameters from Memory Indexes {CurrentState.PC.content + 1} to {CurrentState.PC.content + parameters + 1}";
+                $"\n----------------\n   Decode\n----------------\n CPU decodes MDR {BinaryInstruction} as a {TargetInstruction.Tag} Instruction, assigned to CIR. {parameters} parameters required. \n CPU Fetches parameters from Memory Indexes {CurrentState.PC.content + 1} to {CurrentState.PC.content + parameters }";
             //if not a halt instruction
             if (parameters > 0)
                 CurrentState.PC.content += parameters + 1;
@@ -301,6 +304,8 @@ namespace CPUVisNEA
             // execute the overridden execute method that takes its parameters and a snapshot of the CPUState
             NewState = instr.executeInstruction(instr.args, NewState);
             
+            // append changes after Instruction Execution
+            NextDetailedFDELog += $"\n{NewState.DetailedChangeLog[0]}";
             return NewState;
         }
 
@@ -332,7 +337,6 @@ namespace CPUVisNEA
 
                 Trace.WriteLine($"Start Compiling: [ '\n'{text}'\n']");
                 Compiler.fullCompile(program);
-                //
                 return true;
             }
             catch (Exception ex)
@@ -408,6 +412,7 @@ namespace CPUVisNEA
                         throw new Exception($"Label: {target.Name} not defined\n\n");
                 }
             }
+            
         }
 
         //Cleanse() used for removing all lines comprised of blank characters (blank line) 
