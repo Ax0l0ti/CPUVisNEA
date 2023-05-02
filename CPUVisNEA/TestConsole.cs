@@ -106,29 +106,13 @@ namespace CPUVisNEA
             var FileHandling = new FileHandlingForm();
             Application.Run(FileHandling);
         }
-
-
-        /* list of tests
-        all file handling tests done using FileHandlingTestingForm
-        ---->  reading
-        ---->  writing 
-        ---->  creating
-        
-        Instructions 
-        used debug window and validation of compile
-        ---->  Test if split works properly on a string 
-        used LabelTest in form and traced all outputs
-        ---->  Branch
-        --------->  Conditional
-        --------->  Labels locations 
-        
-        general Outputs 
-        ---->  FDE Cycle
-        --------->  Long
-        --------->  Short
-        ---->  Special Purpose Register update 
-        ---->  General Purpose Register update 
-
-         */
+        [Test] // 3.1 byte list to execution 
+        public void bytelistExecution()
+        {
+            cpu.SetUpFresh();
+            cpu.ram.Memory = new List<byte> {5, 9, 31, 0} ;
+            cpu.FDECycle();
+            
+        }
     }
 }
