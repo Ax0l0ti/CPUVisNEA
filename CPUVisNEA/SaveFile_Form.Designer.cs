@@ -77,7 +77,6 @@ namespace CPUVisNEA
             this.Controls.Add(this.btn_Push);
             this.Name = "SaveFile_Form";
             this.Text = "SaveFile_Form";
-            this.Load += new System.EventHandler(this.SaveFile_Form_Load);
             this.ResumeLayout(false);
             this.PerformLayout();
         }

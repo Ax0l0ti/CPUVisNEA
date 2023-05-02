@@ -331,7 +331,7 @@ namespace CPUVisNEA
 
             try
             {
-                /*split the string representing the content of the textbox into string[]
+                /*split the string representing the content of the text box into string[]
                  By looking for the new line character*/
                 var program = new List<string>(text.Split('\n'));
 

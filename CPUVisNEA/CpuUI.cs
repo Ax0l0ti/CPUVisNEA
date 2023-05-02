@@ -142,7 +142,7 @@ namespace CPUVisNEA
                 this.name.AutoSize = false;
                 this.name.TextAlign = ContentAlignment.MiddleCenter;
                 this.name.Dock = DockStyle.Top;
-                // name in boldened font
+                // name in emboldened font
                 this.name.Font = new Font("Microsoft Sans Serif", 11F, FontStyle.Bold);
 
 
@@ -334,7 +334,7 @@ namespace CPUVisNEA
         private void btn_Compile_Click(object sender, EventArgs e)
         {
             cpu.Compiler = new Compiler();
-            //cpu.Compile returns a boolean. IF it compiles then Edit state sert to false and vice versa
+            //cpu.Compile returns a boolean. IF it compiles then Edit state state to false and vice versa
             // if compile is successful, no output message is shown
             // if an error occurs output message is displayed
             setEditState(!cpu.Compile(txt_uProg.Text));
@@ -376,7 +376,7 @@ namespace CPUVisNEA
             {
                 /*as there is no built in function for converting
                  a text box from a string to array of lines, I cant use a foreach loop or for loop */
-                //try to assign to-be compiled string the string value in the form's textbox
+                //try to assign to-be compiled string the string value in the form's text box
                 try
                 {
                     if (txt_uProg.Lines != null) cpu.Compiler.StringProgram[i] = txt_uProg.Lines[i];
@@ -510,7 +510,7 @@ namespace CPUVisNEA
         private void MemoryTable_MouseHover(object sender, EventArgs e)
         {
             Info.Show("This is a Visual display of your program stored in a binary representation" +
-                      "\nIt can also be translated into the binary's integer equivelants to make it easier to read",
+                      "\nIt can also be translated into the binary's integer equivalents to make it easier to read",
                 MemoryTable);
         }
 

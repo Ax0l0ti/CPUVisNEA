@@ -26,7 +26,7 @@ namespace CPUVisNEA
             //Message to display in Debug window to show successful initial compile of program
             Trace.WriteLine("Welcome to CPU - Debug window");
 
-            // function to check for the file directory used for user premade files ( exists on school servers across computers) 
+            // function to check for the file directory used for user pre-made files ( exists on school servers across computers) 
             PreMadeFolderCheck();
             PreMadeFilesCheck();
 
@@ -58,7 +58,7 @@ namespace CPUVisNEA
 
         private static void PreMadeFilesCheck()
         {
-            string[,] premadeFiles =
+            string[,] preMadeFiles =
             {
                 // creates for loop that iterates through outputs 1 to 100 
                 {
@@ -99,15 +99,15 @@ namespace CPUVisNEA
                 }
             };
             //used get length of 1st dimension in case New file manually appended later
-            for (var i = 0; i < premadeFiles.GetLength(0); i++)
+            for (var i = 0; i < preMadeFiles.GetLength(0); i++)
             {
                 var PushPath = Environment.GetFolderPath(Environment.SpecialFolder.Personal) + "\\CPU_Edu_UI\\" +
-                               premadeFiles[i, 0];
+                               preMadeFiles[i, 0];
                 //stop user maliciously modifying the default files via folder 
                 File.Delete(PushPath);
                 using (var sw = File.CreateText(PushPath))
                 {
-                    sw.WriteLine(premadeFiles[i, 1]);
+                    sw.WriteLine(preMadeFiles[i, 1]);
                     sw.Close();
                 }
             }

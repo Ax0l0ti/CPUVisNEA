@@ -897,5 +897,3 @@ namespace CPUVisNEA
         }
     }
 }
-
-//useful line Int32.Parse(Convert.ToString(AND, 2)).ToString("0000")}

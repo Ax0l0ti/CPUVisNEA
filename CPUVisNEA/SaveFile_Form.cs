@@ -15,11 +15,6 @@ namespace CPUVisNEA
             InitializeComponent();
             ProgramToSave = Program;
         }
-
-        private void SaveFile_Form_Load(object sender, EventArgs e)
-        {
-        }
-
         // Push to File Button
         // - Creates a new File 
         // - OverWrites a File

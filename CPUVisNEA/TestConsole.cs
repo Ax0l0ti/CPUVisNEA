@@ -13,7 +13,7 @@ namespace CPUVisNEA
         private readonly CPU cpu = new CPU();
 
         [Test]
-        public void TestofTests()
+        public void TestOfTests()
         {
             Console.WriteLine("Thou doth work with great fanciness ");
         }
@@ -50,15 +50,15 @@ namespace CPUVisNEA
 
         [Test] // I am uncertain if  TypeAndByteToArg works or contains logic errors
         //proves Argument can be successfully generated with given arg type and byte data 
-        public void UncertaintytestForByte2ArgCast()
+        public void UncertaintyTestForByte2ArgCast()
         {
             var test = cpu.TypeAndByteToArg(typeof(RegisterArg), 2);
             Console.WriteLine(test.GetType().Name);
         } //Completed
 
-        [Test] //Provides a Test Interface to individually test Execute of a single instruction successfully change a CPU state correctlly 
-        //proves string to arguement works 
-        //proves parse Arguements works
+        [Test] //Provides a Test Interface to individually test Execute of a single instruction successfully change a CPU state correctly 
+        //proves string to argument works 
+        //proves parse Arguments works
         //proves execute instruction works
         //proves Valid parameter dictionary methods work
         public void TestExecuteSingleInstruction()
@@ -68,10 +68,7 @@ namespace CPUVisNEA
             var arg2 = "#10";
             // cheap way of returning Register Index 
             var targetIndex = int.Parse(arg1.Remove(0, 1));
-
             var args = new List<string> { arg1, arg2 };
-            //CHANGE THIS LINE TO EDIT INSTRUCTION TESTED
-
             var Test = new Mov();
             Instruction.addParsedArgs(Test, args);
             Console.WriteLine($" Test calls {Test.Tag} Instruction with parameters {arg1} and {arg2} ");
@@ -106,6 +103,7 @@ namespace CPUVisNEA
             var FileHandling = new FileHandlingForm();
             Application.Run(FileHandling);
         }
+        
         [Test] // 3.1 byte list to execution 
         public void bytelistExecution()
         {
