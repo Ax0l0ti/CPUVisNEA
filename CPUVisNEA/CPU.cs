@@ -368,14 +368,13 @@ namespace CPUVisNEA
 
         // Dictionary is used with the Compiler class' LabelledInstructions to connect Labels to RAM indexes in the CPU class
         public Dictionary<Instruction, int> InstructionLocations = new Dictionary<Instruction, int>();
-        private bool binaryMode;
-
-        //this is useful so students can see what is being held in RAM as values they can read and understand
 
         internal byte GetByteAt(int index)
         {
+            //if not halted
             if (index > -1)
                 return Memory[index];
+            // if invalid index throw index error
             throw new Exception($"Index {index} invalid memory index \n\n");
         }
     }
